@@ -8,25 +8,46 @@ import (
 	"os"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/gorilla/pat"
 )
 
+type config struct {
+	BindAddr    string
+	BabbageURL  string
+	RendererURL string
+}
+
 func main() {
-	bindAddr := os.Getenv("BIND_ADDR")
-	if len(bindAddr) == 0 {
-		bindAddr = ":8080"
+	cfg := config{
+		BindAddr:    ":8080",
+		BabbageURL:  "http://web.onsdigital.co.uk",
+		RendererURL: "http://localhost:8081",
 	}
 
-	p := pat.New()
+	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
+		cfg.BindAddr = v
+	}
+	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
+		cfg.BabbageURL = v
+	}
+	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
+		cfg.RendererURL = v
+	}
 
-	babbageURL, err := url.Parse("http://web.onsdigital.co.uk")
+	router := pat.New()
+
+	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	p.Handle("/{uri:.*}", newReverseProxy(httputil.NewSingleHostReverseProxy(babbageURL)))
+	router.HandleFunc("/", homepage.Handler(cfg.RendererURL))
+	router.Handle("/{uri:.*}", newReverseProxy(httputil.NewSingleHostReverseProxy(babbageURL)))
 
-	if err := http.ListenAndServe(bindAddr, p); err != nil {
+	log.Printf("Starting server on %s\n", cfg.BindAddr)
+
+	if err := http.ListenAndServe(cfg.BindAddr, router); err != nil {
 		log.Fatal(err)
 	}
 }
