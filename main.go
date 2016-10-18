@@ -38,6 +38,8 @@ func main() {
 		cfg.RendererURL = v
 	}
 
+	log.Namespace = "dp-frontend-router"
+
 	router := pat.New()
 	alice := alice.New(
 		timeout.Handler(10*time.Second),
