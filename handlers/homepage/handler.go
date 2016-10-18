@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/go-ns/log"
 )
 
@@ -25,6 +26,7 @@ func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) 
 		}
 
 		// FIXME there's other headers we want
+		rendererReq.Header.Set("Accept-Language", string(lang.Get(req)))
 		rendererReq.Header.Set("X-Request-Id", req.Header.Get("X-Request-Id"))
 
 		res, err := http.DefaultClient.Do(rendererReq)
