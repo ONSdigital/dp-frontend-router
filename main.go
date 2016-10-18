@@ -5,9 +5,11 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
+	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -37,7 +39,11 @@ func main() {
 	}
 
 	router := pat.New()
-	alice := alice.New(log.Handler, requestID.Handler(16)).Then(router)
+	alice := alice.New(
+		timeout.Handler(10*time.Second),
+		log.Handler,
+		requestID.Handler(16),
+	).Then(router)
 
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
@@ -56,7 +62,14 @@ func main() {
 
 	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
 
-	if err := http.ListenAndServe(cfg.BindAddr, alice); err != nil {
+	server := &http.Server{
+		Addr:         cfg.BindAddr,
+		Handler:      alice,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
