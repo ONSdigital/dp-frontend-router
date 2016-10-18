@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -54,13 +55,7 @@ func main() {
 	}
 
 	router.HandleFunc("/", homepage.Handler(cfg.RendererURL))
-	proxy := httputil.NewSingleHostReverseProxy(babbageURL)
-	director := proxy.Director
-	proxy.Director = func(req *http.Request) {
-		director(req)
-		req.Host = babbageURL.Host
-	}
-	router.Handle("/{uri:.*}", proxy)
+	router.Handle("/{uri:.*}", createReverseProxy(babbageURL))
 
 	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
 
@@ -75,4 +70,25 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
+}
+
+func createReverseProxy(babbageURL *url.URL) http.Handler {
+	proxy := httputil.NewSingleHostReverseProxy(babbageURL)
+	director := proxy.Director
+	proxy.Transport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   5 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+	proxy.Director = func(req *http.Request) {
+		director(req)
+		req.Host = babbageURL.Host
+	}
+	return proxy
 }
