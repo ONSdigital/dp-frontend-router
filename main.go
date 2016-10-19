@@ -8,12 +8,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
+	"github.com/ONSdigital/go-ns/handlers/requestID"
+	"github.com/ONSdigital/go-ns/handlers/timeout"
+	"github.com/ONSdigital/go-ns/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	"github.com/onsdigital/dp-frontend-router/handlers/homepage"
-	"github.com/onsdigital/go-ns/handlers/requestID"
-	"github.com/onsdigital/go-ns/handlers/timeout"
-	"github.com/onsdigital/go-ns/log"
 )
 
 type config struct {
