@@ -706,7 +706,7 @@ var stubbedData = `{
     ]
   },
   "data": {
-    "publications": [
+    "releases": [
       {
         "title": "Construction output in Great Britain: Aug 2016",
         "uri": "/businessindustryandtrade/constructionindustry/bulletins/constructionoutputingreatbritain/aug2016",
