@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/ONSdigital/dp-frontend-router/lang"
+	"github.com/ONSdigital/dp-frontend-router/resolver"
 	"github.com/ONSdigital/go-ns/log"
 	"io/ioutil"
 	"net/http"
@@ -11,7 +12,15 @@ import (
 
 func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-		b := []byte(stubbedData)
+		log.Debug("RendererURL "+rendererURL, nil)
+		b, err := resolver.ResolveContent("/")
+		if err != nil {
+			log.ErrorR(req, err, nil)
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
 		rdr := bytes.NewReader(b)
 
 		rendererReq, err := http.NewRequest("POST", rendererURL+"/homepage", rdr)
