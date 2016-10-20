@@ -1,7 +1,6 @@
 package resolver
 
 import (
-	"fmt"
 	"github.com/ONSdigital/go-ns/log"
 	"io/ioutil"
 	"net/http"
@@ -13,7 +12,7 @@ type config struct {
 	port string ":8082"
 	uri  string "/data"
 }
-
+tit
 var cfg = config{host: "http://localhost", port: ":8082", uri: "/data"}
 
 func init() {
