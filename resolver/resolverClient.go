@@ -13,7 +13,7 @@ type config struct {
 	uri  string "/data"
 }
 
-var cfg = config{host: "http://localhost", port: ":8082", uri: "/data"}
+var cfg = config{host: "http://localhost", port: ":8088", uri: "/resolve"}
 
 func init() {
 	host := os.Getenv("RESOLVER_HOST")
@@ -49,14 +49,14 @@ func ResolveContent(uri string) ([]byte, error) {
 	jsonBytes, err = ioutil.ReadAll(response.Body)
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		log.Debug("Response status code is not 200. "+string(jsonBytes), nil)
-		log.ErrorR(request, err, nil)
+	if err != nil {
+		log.ErrorC("Error reading body", err, nil)
 		return jsonBytes, err
 	}
 
-	if err != nil {
-		log.ErrorC("Error reading body", err, nil)
+	if response.StatusCode != 200 {
+		log.Debug("Response status code is not 200. "+string(jsonBytes), nil)
+		log.ErrorR(request, err, nil)
 		return jsonBytes, err
 	}
 	return jsonBytes, nil
