@@ -12,7 +12,7 @@ type config struct {
 	port string ":8082"
 	uri  string "/data"
 }
-tit
+
 var cfg = config{host: "http://localhost", port: ":8082", uri: "/data"}
 
 func init() {
