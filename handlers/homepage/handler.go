@@ -13,7 +13,7 @@ import (
 func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
 		log.Debug("RendererURL "+rendererURL, nil)
-		b, err := resolver.ResolveContent("/")
+		b, err := resolver.Get("/")
 		if err != nil {
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
