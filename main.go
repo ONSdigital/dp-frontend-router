@@ -24,9 +24,9 @@ type config struct {
 
 func main() {
 	cfg := config{
-		BindAddr:    ":8080",
+		BindAddr:    ":20000",
 		BabbageURL:  "https://www.ons.gov.uk",
-		RendererURL: "http://localhost:8081",
+		RendererURL: "http://localhost:20010",
 	}
 
 	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
