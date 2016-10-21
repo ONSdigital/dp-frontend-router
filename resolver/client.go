@@ -1,17 +1,18 @@
 package resolver
 
 import (
-	"github.com/ONSdigital/go-ns/log"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/ONSdigital/go-ns/log"
 )
 
 type config struct {
-	renderUrl string "http://localhost:8088"
+	renderUrl string
 }
 
-var cfg = config{renderUrl: "http://localhost:8088"}
+var cfg = config{renderUrl: "http://localhost:20020"}
 
 func init() {
 	if renderUrl := os.Getenv("RESOLVER_URL"); len(renderUrl) > 0 {
@@ -52,7 +53,7 @@ func Get(uri string) ([]byte, error) {
 }
 
 func getRequest(uri string) (*http.Request, error) {
-	request, err := http.NewRequest("GET", cfg.renderUrl + uri, nil)
+	request, err := http.NewRequest("GET", cfg.renderUrl+uri, nil)
 	if err != nil {
 		log.Debug("Error creating new request", nil)
 		log.ErrorR(request, err, nil)
