@@ -1,6 +1,7 @@
 package resolver
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -45,7 +46,7 @@ func Get(uri string) ([]byte, error) {
 	}
 
 	if response.StatusCode != 200 {
-		log.Debug("Response status code is not 200. "+string(jsonBytes), nil)
+		err = errors.New("Response status code is not 200")
 		log.ErrorR(request, err, nil)
 		return jsonBytes, err
 	}
