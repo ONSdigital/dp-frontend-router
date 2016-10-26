@@ -46,7 +46,7 @@ func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) 
 		defer res.Body.Close()
 
 		if res.StatusCode != 200 {
-			err = fmt.Errorf("unexpected status code: %d", res.StatusCode)
+			err = fmt.Errorf("Handler.handler: unexpected status code: %d", res.StatusCode)
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
