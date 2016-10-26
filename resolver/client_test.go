@@ -1,28 +1,31 @@
 package resolver
 
 import (
-	"testing"
-	"net/http"
 	"bytes"
-	"io/ioutil"
-	. "github.com/smartystreets/goconvey/convey"
 	"errors"
+	"fmt"
+	. "github.com/smartystreets/goconvey/convey"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"testing"
 )
 
 var requestedUrl string
 
 type fakeHttpCli struct {
-	statusCode int
+	statusCode      int
 	isErrorResponse bool
-	error error
-	responseStr string
-	bodyError bool
+	error           error
+	responseStr     string
+	bodyError       bool
 }
 
 func (faker *fakeHttpCli) Do(req *http.Request) (*http.Response, error) {
 	requestedUrl = req.URL.Path
 	rdr := bytes.NewReader([]byte(faker.responseStr))
 	if faker.isErrorResponse {
+		fmt.Println("1")
 		return nil, faker.error
 	}
 	if faker.bodyError {
@@ -52,11 +55,22 @@ func TestResolverGet(t *testing.T) {
 	})
 
 	Convey("Client returns error if reading the response.body fails.", t, func() {
-		expectedErr := errors.New("Somthing went wrong")
+		expectedErr := errors.New("Error reading body")
+		readResponseBody = func(r io.Reader) ([]byte, error) {
+			return make([]byte, 0), errors.New("Error reading body")
+		}
 		Client = &fakeHttpCli{statusCode: 500, bodyError: true, error: expectedErr}
 		b, err := Get("/")
-		So(err, ShouldEqual, expectedErr)
+		So(err.Error(), ShouldEqual, expectedErr.Error())
 		So(string(b), ShouldEqual, "")
 	})
-}
 
+	Convey("Client returns empty bytes slice and error is response status is not 200", t, func() {
+		expectedErr := errors.New("Response status code is not 200")
+		readResponseBody = ioutil.ReadAll
+		Client = &fakeHttpCli{statusCode: 500, isErrorResponse: false, error: expectedErr}
+		b, err := Get("/")
+		So(b, ShouldBeEmpty)
+		So(err.Error(), ShouldEqual, expectedErr.Error())
+	})
+}

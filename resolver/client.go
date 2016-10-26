@@ -2,7 +2,9 @@ package resolver
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ONSdigital/go-ns/log"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -18,7 +20,10 @@ var Client ResolverClient = &http.Client{
 	Timeout: 5 * time.Second,
 }
 
+var readResponseBody func(r io.Reader) ([]byte, error)
+
 func init() {
+	readResponseBody = ioutil.ReadAll
 	if renderUrl := os.Getenv("RESOLVER_URL"); len(renderUrl) > 0 {
 		cfg.renderUrl = renderUrl
 	}
@@ -42,13 +47,12 @@ func Get(uri string) ([]byte, error) {
 		return jsonBytes, err
 	}
 
-	jsonBytes, err = ioutil.ReadAll(response.Body)
-	defer response.Body.Close()
-
+	jsonBytes, err = readResponseBody(response.Body)
 	if err != nil {
 		log.ErrorC("Error reading body", err, nil)
 		return jsonBytes, err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
 		err = errors.New("Response status code is not 200")
@@ -65,5 +69,6 @@ func getRequest(uri string) (*http.Request, error) {
 		log.ErrorR(request, err, nil)
 		return nil, err
 	}
+	fmt.Printf("Request %v\n", request)
 	return request, nil
 }
