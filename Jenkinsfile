@@ -40,7 +40,7 @@ node {
             sh "aws s3 cp frontend-router-${revision}.tar.gz s3://${env.S3_REVISIONS_BUCKET}/"
         }
 
-        if (branch != 'develop') return
+        if (env.JOB_NAME.replaceFirst('.+/', '') != 'develop') return
 
         stage('Deploy') {
             for (group in [env.CODEDEPLOY_FRONTEND_DEPLOYMENT_GROUP, env.CODEDEPLOY_PUBLISHING_DEPLOYMENT_GROUP]) {
