@@ -32,7 +32,7 @@ var stubbedData = `{
             }
           ],
           "title": "Business"
-        },dw
+        },
         {
           "uri": "/businessindustryandtrade/changestobusiness",
           "description": {},
