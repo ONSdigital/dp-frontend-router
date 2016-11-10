@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -54,8 +55,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	router.HandleFunc("/", homepage.Handler(cfg.RendererURL))
-	router.Handle("/{uri:.*}", createReverseProxy(babbageURL))
+	reverseProxy := createReverseProxy(babbageURL)
+
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy))
+	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
 
@@ -70,6 +73,40 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
+}
+
+//abHandler ... percentA is the percentage of request that handler 'a' is used
+func abHandler(a, b http.Handler, percentA int) http.Handler {
+	if percentA < 0 || percentA > 100 {
+		panic("Percent 'a' but be between 0 and 100")
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// Detect cookie
+		cookie, _ := req.Cookie("homepage-version")
+
+		if cookie == nil {
+			var cookieValue string
+			if rand.Intn(100) < percentA {
+				cookieValue = "A"
+			} else {
+				cookieValue = "B"
+			}
+
+			expiration := time.Now().Add(365 * 24 * time.Hour)
+			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
+			http.SetCookie(w, cookie)
+		}
+
+		// Use cookie value to direct to a or b handler
+		if cookie.Value == "A" {
+			a.ServeHTTP(w, req)
+		}
+		if cookie.Value == "B" {
+			b.ServeHTTP(w, req)
+		}
+	})
 }
 
 func createReverseProxy(babbageURL *url.URL) http.Handler {
