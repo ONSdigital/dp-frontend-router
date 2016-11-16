@@ -20,6 +20,7 @@ source $CONFIG && docker run -d    \
   --env=BABBAGE_URL=$BABBAGE_URL   \
   --env=BIND_ADDR=$BIND_ADDR       \
   --env=RENDERER_URL=$RENDERER_URL \
+  --env=RESOLVER_URL=$RESOLVER_URL \
   --name=frontend-router           \
   --net=$DOCKER_NETWORK            \
   --restart=always                 \
