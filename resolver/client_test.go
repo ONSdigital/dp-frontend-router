@@ -56,7 +56,7 @@ func TestResolverGet(t *testing.T) {
 
 	Convey("Client returns error if reading the response.body fails.", t, func() {
 		expectedErr := errors.New("Error reading body")
-		readResponseBody = func(r io.Reader) ([]byte, error) {
+		responseBodyReader = func(r io.Reader) ([]byte, error) {
 			return make([]byte, 0), errors.New("Error reading body")
 		}
 		Client = &fakeHttpCli{statusCode: 500, bodyError: true, error: expectedErr}
@@ -67,7 +67,7 @@ func TestResolverGet(t *testing.T) {
 
 	Convey("Client returns empty bytes slice and error is response status is not 200", t, func() {
 		expectedErr := errors.New("Response status code is not 200")
-		readResponseBody = ioutil.ReadAll
+		responseBodyReader = ioutil.ReadAll
 		Client = &fakeHttpCli{statusCode: 500, isErrorResponse: false, error: expectedErr}
 		b, err := Get("/")
 		So(b, ShouldBeEmpty)
