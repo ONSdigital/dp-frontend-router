@@ -57,7 +57,11 @@ func main() {
 	router.HandleFunc("/", homepage.Handler(cfg.RendererURL))
 	router.Handle("/{uri:.*}", createReverseProxy(babbageURL))
 
-	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
+	log.Debug("Starting server", log.Data{
+		"bind_addr":    cfg.BindAddr,
+		"babbage_url":  cfg.BabbageURL,
+		"renderer_url": cfg.RendererURL,
+	})
 
 	server := &http.Server{
 		Addr:         cfg.BindAddr,
