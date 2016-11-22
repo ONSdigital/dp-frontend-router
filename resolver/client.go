@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -51,7 +52,7 @@ func Get(uri string) ([]byte, error) {
 			return nil, ErrUnauthorised
 		}
 
-		err = errors.New("Response status code is not 200")
+		err = fmt.Errorf("response status code is %d", response.StatusCode)
 		log.ErrorR(request, err, nil)
 		return jsonBytes, err
 	}
