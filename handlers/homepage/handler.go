@@ -3,17 +3,21 @@ package homepage
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/dp-frontend-router/resolver"
 	"github.com/ONSdigital/go-ns/log"
-	"io/ioutil"
-	"net/http"
 )
 
 func Handler(w http.ResponseWriter, req *http.Request) {
 	b, err := resolver.Get("/")
-	if err != nil {
+	if err == resolver.ErrUnauthorised {
+		w.WriteHeader(401)
+		return
+	} else if err != nil {
 		log.ErrorR(req, err, log.Data{"failed to resolve request": err.Error()})
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))

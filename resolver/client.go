@@ -2,13 +2,16 @@ package resolver
 
 import (
 	"errors"
-	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/go-ns/log"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/go-ns/log"
 )
+
+var ErrUnauthorised = errors.New("unauthorised")
 
 var Client ResolverClient = &http.Client{
 	Timeout: 5 * time.Second,
@@ -44,6 +47,10 @@ func Get(uri string) ([]byte, error) {
 	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
+		if response.StatusCode == 401 {
+			return nil, ErrUnauthorised
+		}
+
 		err = errors.New("Response status code is not 200")
 		log.ErrorR(request, err, nil)
 		return jsonBytes, err
