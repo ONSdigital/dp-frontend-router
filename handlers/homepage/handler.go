@@ -12,9 +12,11 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 )
 
+const xRequestIDHeaderParam = "X-Request-Id"
+
 func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-		b, err := resolver.Get("/")
+		b, err := resolver.Get("/", req.Header.Get(xRequestIDHeaderParam))
 		if err == resolver.ErrUnauthorised {
 			log.ErrorR(req, err, log.Data{"unauthorised user": err.Error()})
 			babbageProxy.ServeHTTP(w, req)

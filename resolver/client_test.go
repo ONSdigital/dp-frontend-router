@@ -12,9 +12,10 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-var requestedUrl string
+var requestedURL string
+var xRequestID = "123456"
 
-type fakeHttpCli struct {
+type fakeHTTPCli struct {
 	statusCode      int
 	isErrorResponse bool
 	error           error
@@ -22,8 +23,8 @@ type fakeHttpCli struct {
 	bodyError       bool
 }
 
-func (faker *fakeHttpCli) Do(req *http.Request) (*http.Response, error) {
-	requestedUrl = req.URL.Path
+func (faker *fakeHTTPCli) Do(req *http.Request) (*http.Response, error) {
+	requestedURL = req.URL.Path
 	rdr := bytes.NewReader([]byte(faker.responseStr))
 	if faker.isErrorResponse {
 		fmt.Println("1")
@@ -39,18 +40,18 @@ func TestResolverGet(t *testing.T) {
 	url := "/some/resource"
 	responseStr := "Hello Kitty"
 	Convey("Client returns a 200 status code and the expected bytes for a successful response.", t, func() {
-		Client = &fakeHttpCli{statusCode: 200, responseStr: responseStr}
-		b, err := Get(url)
+		Client = &fakeHTTPCli{statusCode: 200, responseStr: responseStr}
+		b, err := Get(url, xRequestID)
 		So(err, ShouldBeNil)
 		So(string(b), ShouldEqual, responseStr)
-		So(requestedUrl, ShouldEqual, url)
+		So(requestedURL, ShouldEqual, url)
 
 	})
 
 	Convey("Client returns error if get request fails.", t, func() {
 		expectedErr := errors.New("Somthing went wrong")
-		Client = &fakeHttpCli{statusCode: 500, isErrorResponse: true, error: expectedErr}
-		b, err := Get("/")
+		Client = &fakeHTTPCli{statusCode: 500, isErrorResponse: true, error: expectedErr}
+		b, err := Get("/", xRequestID)
 		So(err, ShouldEqual, expectedErr)
 		So(string(b), ShouldEqual, "")
 	})
@@ -60,8 +61,8 @@ func TestResolverGet(t *testing.T) {
 		responseBodyReader = func(r io.Reader) ([]byte, error) {
 			return make([]byte, 0), errors.New("Error reading body")
 		}
-		Client = &fakeHttpCli{statusCode: 500, bodyError: true, error: expectedErr}
-		b, err := Get("/")
+		Client = &fakeHTTPCli{statusCode: 500, bodyError: true, error: expectedErr}
+		b, err := Get("/", xRequestID)
 		So(err.Error(), ShouldEqual, expectedErr.Error())
 		So(string(b), ShouldEqual, "")
 	})
@@ -69,8 +70,8 @@ func TestResolverGet(t *testing.T) {
 	Convey("Client returns empty bytes slice and error is response status is not 200", t, func() {
 		expectedErr := errors.New("response status code is 500")
 		responseBodyReader = ioutil.ReadAll
-		Client = &fakeHttpCli{statusCode: 500, isErrorResponse: false, error: expectedErr}
-		b, err := Get("/")
+		Client = &fakeHTTPCli{statusCode: 500, isErrorResponse: false, error: expectedErr}
+		b, err := Get("/", xRequestID)
 		So(b, ShouldBeEmpty)
 		So(err.Error(), ShouldEqual, expectedErr.Error())
 	})

@@ -12,8 +12,12 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 )
 
+// ErrUnauthorised error for http status code 401.
 var ErrUnauthorised = errors.New("unauthorised")
 
+const xRequestIDHeaderParam = "X-Request-Id"
+
+// Client client for sending requests to the content resolver.
 var Client ResolverClient = &http.Client{
 	Timeout: 5 * time.Second,
 }
@@ -22,17 +26,26 @@ type responseBodyReaderFunc func(r io.Reader) ([]byte, error)
 
 var responseBodyReader = ioutil.ReadAll
 
+// ResolverClient definition of a Content Resolver client
 type ResolverClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-func Get(uri string) ([]byte, error) {
+// Get resolve the requested content.
+func Get(uri string, xRequestID string) ([]byte, error) {
 	var jsonBytes []byte
 
-	request, err := getRequest(uri)
+	request, err := getRequest(uri, xRequestID)
 	if err != nil {
 		return jsonBytes, err
 	}
+
+	log.Debug("resolver.client", log.Data{
+		"method":              "GET",
+		"uri":                 request.URL.Path,
+		"query":               request.URL.RawQuery,
+		xRequestIDHeaderParam: xRequestID,
+	})
 
 	response, err := Client.Do(request)
 	if err != nil {
@@ -59,12 +72,13 @@ func Get(uri string) ([]byte, error) {
 	return jsonBytes, nil
 }
 
-func getRequest(uri string) (*http.Request, error) {
+func getRequest(uri string, xRequestID string) (*http.Request, error) {
 	request, err := http.NewRequest("GET", config.ResolverURL+uri, nil)
 	if err != nil {
 		log.Debug("Error creating new request", nil)
 		log.ErrorR(request, err, nil)
 		return nil, err
 	}
+	request.Header.Add(xRequestIDHeaderParam, xRequestID)
 	return request, nil
 }
