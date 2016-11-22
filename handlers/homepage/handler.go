@@ -15,6 +15,7 @@ import (
 func Handler(w http.ResponseWriter, req *http.Request) {
 	b, err := resolver.Get("/")
 	if err == resolver.ErrUnauthorised {
+		log.ErrorR(req, err, log.Data{"unauthorised user": err.Error()})
 		w.WriteHeader(401)
 		return
 	} else if err != nil {
