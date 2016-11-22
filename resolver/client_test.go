@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	. "github.com/smartystreets/goconvey/convey"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 var requestedUrl string
@@ -66,7 +67,7 @@ func TestResolverGet(t *testing.T) {
 	})
 
 	Convey("Client returns empty bytes slice and error is response status is not 200", t, func() {
-		expectedErr := errors.New("Response status code is not 200")
+		expectedErr := errors.New("response status code is 500")
 		responseBodyReader = ioutil.ReadAll
 		Client = &fakeHttpCli{statusCode: 500, isErrorResponse: false, error: expectedErr}
 		b, err := Get("/")
