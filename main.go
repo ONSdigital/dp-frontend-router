@@ -46,8 +46,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	router.HandleFunc("/", homepage.Handler)
-	router.Handle("/{uri:.*}", createReverseProxy(babbageURL))
+	babbageProxy := createReverseProxy(babbageURL)
+	router.HandleFunc("/", homepage.Handler(babbageProxy))
+	router.Handle("/{uri:.*}", babbageProxy)
 
 	log.Debug("Starting server", log.Data{
 		"bind_addr":    config.BindAddr,
