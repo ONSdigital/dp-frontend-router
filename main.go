@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
@@ -56,8 +57,10 @@ func main() {
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
+	percentA := os.Getenv("PERCENT_A")
+	a, _ := strconv.ParseInt(percentA, 10, 64)
 
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy))
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy, int(a)))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
