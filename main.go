@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
@@ -18,27 +19,18 @@ import (
 	"github.com/justinas/alice"
 )
 
-type config struct {
-	BindAddr    string
-	BabbageURL  string
-	RendererURL string
-}
-
 func main() {
-	cfg := config{
-		BindAddr:    ":20000",
-		BabbageURL:  "https://www.ons.gov.uk",
-		RendererURL: "http://localhost:20010",
-	}
-
 	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
-		cfg.BindAddr = v
+		config.BindAddr = v
 	}
 	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
-		cfg.BabbageURL = v
+		config.BabbageURL = v
+	}
+	if v := os.Getenv("RESOLVER_URL"); len(v) > 0 {
+		config.ResolverURL = v
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
-		cfg.RendererURL = v
+		config.RendererURL = v
 	}
 
 	log.Namespace = "dp-frontend-router"
@@ -50,7 +42,7 @@ func main() {
 		requestID.Handler(16),
 	).Then(router)
 
-	babbageURL, err := url.Parse(cfg.BabbageURL)
+	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
@@ -60,13 +52,18 @@ func main() {
 	percentA := os.Getenv("PERCENT_A")
 	a, _ := strconv.ParseInt(percentA, 10, 64)
 
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy, int(a)))
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, int(a)))
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Debug("Starting server", log.Data{"bind_addr": cfg.BindAddr})
+	log.Debug("Starting server", log.Data{
+		"bind_addr":    config.BindAddr,
+		"babbage_url":  config.BabbageURL,
+		"renderer_url": config.RendererURL,
+		"resolver_url": config.ResolverURL,
+	})
 
 	server := &http.Server{
-		Addr:         cfg.BindAddr,
+		Addr:         config.BindAddr,
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

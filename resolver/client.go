@@ -2,63 +2,83 @@ package resolver
 
 import (
 	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
-	"os"
+	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
 )
 
-type config struct {
-	renderUrl string
+// ErrUnauthorised error for http status code 401.
+var ErrUnauthorised = errors.New("unauthorised")
+
+const xRequestIDHeaderParam = "X-Request-Id"
+
+// Client client for sending requests to the content resolver.
+var Client ResolverClient = &http.Client{
+	Timeout: 5 * time.Second,
 }
 
-var cfg = config{renderUrl: "http://localhost:20020"}
+type responseBodyReaderFunc func(r io.Reader) ([]byte, error)
 
-func init() {
-	if renderUrl := os.Getenv("RESOLVER_URL"); len(renderUrl) > 0 {
-		cfg.renderUrl = renderUrl
-	}
+var responseBodyReader = ioutil.ReadAll
+
+// ResolverClient definition of a Content Resolver client
+type ResolverClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
-// ResolveContent ...
-func Get(uri string) ([]byte, error) {
+// Get resolve the requested content.
+func Get(uri string, xRequestID string) ([]byte, error) {
 	var jsonBytes []byte
 
-	request, err := getRequest(uri)
+	request, err := getRequest(uri, xRequestID)
 	if err != nil {
 		return jsonBytes, err
 	}
 
-	response, err := http.DefaultClient.Do(request)
+	log.Debug("resolver.client", log.Data{
+		"method":              "GET",
+		"uri":                 request.URL.Path,
+		"query":               request.URL.RawQuery,
+		xRequestIDHeaderParam: xRequestID,
+	})
+
+	response, err := Client.Do(request)
 	if err != nil {
-		log.Debug("Error performing request.", nil)
 		log.ErrorR(request, err, nil)
 		return jsonBytes, err
 	}
 
-	jsonBytes, err = ioutil.ReadAll(response.Body)
-	defer response.Body.Close()
-
+	jsonBytes, err = responseBodyReader(response.Body)
 	if err != nil {
 		log.ErrorC("Error reading body", err, nil)
 		return jsonBytes, err
 	}
+	defer response.Body.Close()
 
 	if response.StatusCode != 200 {
-		err = errors.New("Response status code is not 200")
+		if response.StatusCode == 401 {
+			return nil, ErrUnauthorised
+		}
+
+		err = fmt.Errorf("response status code is %d", response.StatusCode)
 		log.ErrorR(request, err, nil)
 		return jsonBytes, err
 	}
 	return jsonBytes, nil
 }
 
-func getRequest(uri string) (*http.Request, error) {
-	request, err := http.NewRequest("GET", cfg.renderUrl+uri, nil)
+func getRequest(uri string, xRequestID string) (*http.Request, error) {
+	request, err := http.NewRequest("GET", config.ResolverURL+uri, nil)
 	if err != nil {
 		log.Debug("Error creating new request", nil)
 		log.ErrorR(request, err, nil)
 		return nil, err
 	}
+	request.Header.Add(xRequestIDHeaderParam, xRequestID)
 	return request, nil
 }

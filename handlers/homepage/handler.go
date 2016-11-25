@@ -6,18 +6,23 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/dp-frontend-router/resolver"
 	"github.com/ONSdigital/go-ns/log"
 )
 
-//Handler ...
-func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) {
+const xRequestIDHeaderParam = "X-Request-Id"
+
+func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-		log.Debug("RendererURL "+rendererURL, nil)
-		b, err := resolver.Get("/")
-		if err != nil {
-			log.ErrorR(req, err, nil)
+		b, err := resolver.Get("/", req.Header.Get(xRequestIDHeaderParam))
+		if err == resolver.ErrUnauthorised {
+			log.ErrorR(req, err, log.Data{"unauthorised user": err.Error()})
+			babbageProxy.ServeHTTP(w, req)
+			return
+		} else if err != nil {
+			log.ErrorR(req, err, log.Data{"failed to resolve request": err.Error()})
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
 			return
@@ -25,7 +30,7 @@ func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) 
 
 		rdr := bytes.NewReader(b)
 
-		rendererReq, err := http.NewRequest("POST", rendererURL+"/homepage", rdr)
+		rendererReq, err := http.NewRequest("POST", config.RendererURL+"/homepage", rdr)
 		if err != nil {
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
@@ -48,7 +53,7 @@ func Handler(rendererURL string) func(w http.ResponseWriter, req *http.Request) 
 		defer res.Body.Close()
 
 		if res.StatusCode != 200 {
-			err = fmt.Errorf("unexpected status code: %d", res.StatusCode)
+			err = fmt.Errorf("Handler.handler: unexpected status code: %d", res.StatusCode)
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
