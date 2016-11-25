@@ -10,3 +10,6 @@ var ResolverURL = "http://localhost:20020"
 
 // The URL of the content renderer
 var RendererURL = "http://localhost:20010"
+
+// The percentage of requests to send to the new homepage
+var HomepageABPercent = 0

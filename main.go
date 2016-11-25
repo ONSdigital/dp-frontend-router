@@ -32,6 +32,10 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
+		a, _ := strconv.ParseInt(v, 10, 64)
+		config.HomepageABPercent = int(a)
+	}
 
 	log.Namespace = "dp-frontend-router"
 
@@ -49,10 +53,7 @@ func main() {
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
-	percentA := os.Getenv("PERCENT_A")
-	a, _ := strconv.ParseInt(percentA, 10, 64)
-
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, int(a)))
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
