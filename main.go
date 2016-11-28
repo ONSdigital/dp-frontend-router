@@ -48,8 +48,9 @@ func main() {
 	}
 
 	babbageProxy := createReverseProxy(babbageURL)
+
 	router.HandleFunc("/", homepage.Handler(babbageProxy))
-	router.Handle("/dd/{uri:.*}", hello.Handler(babbageProxy))
+	router.Get("/hello", hello.Handler)
 	router.Handle("/{uri:.*}", babbageProxy)
 
 	log.Debug("Starting server", log.Data{
@@ -57,6 +58,7 @@ func main() {
 		"babbage_url":  config.BabbageURL,
 		"renderer_url": config.RendererURL,
 		"resolver_url": config.ResolverURL,
+		"hello_url":    config.HelloWorldURL,
 	})
 
 	server := &http.Server{
