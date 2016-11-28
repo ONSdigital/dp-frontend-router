@@ -1,8 +1,9 @@
 package hello
 
 import (
-	"strings"
+	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -12,25 +13,46 @@ import (
 )
 
 func Handler(w http.ResponseWriter, req *http.Request) {
-	rdr := strings.NewReader(`{"greeting":"Hello Router World!"}`)
 
-	rendererReq, err := http.NewRequest("POST", config.RendererURL+"/hello", rdr)
+	// Make call to controller
+	model, _, err := doRequest(req, "GET", config.HelloWorldURL, nil)
 	if err != nil {
 		log.ErrorR(req, err, nil)
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 		return
 	}
 
-	// FIXME there's other headers we want
-	rendererReq.Header.Set("Accept-Language", string(lang.Get(req)))
-	rendererReq.Header.Set("X-Request-Id", req.Header.Get("X-Request-Id"))
+	rdr := bytes.NewReader(model)
 
-	res, err := http.DefaultClient.Do(rendererReq)
+	b, headers, err := doRequest(req, "POST", config.RendererURL+"/hello", rdr)
 	if err != nil {
 		log.ErrorR(req, err, nil)
-		w.WriteHeader(500)
+		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
+		return
+	}
+
+	for hdr, v := range headers {
+		for _, v2 := range v {
+			w.Header().Add(hdr, v2)
+		}
+	}
+	w.WriteHeader(http.StatusOK)
+	w.Write(b)
+}
+
+func doRequest(originalRequest *http.Request, method string, url string, body io.Reader) (responseBody []byte, headers http.Header, err error) {
+	request, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return
+	}
+
+	request.Header.Set("Accept-Language", string(lang.Get(originalRequest)))
+	request.Header.Set("X-Request-Id", originalRequest.Header.Get("X-Request-Id"))
+
+	res, err := http.DefaultClient.Do(request)
+	if err != nil {
 		return
 	}
 
@@ -38,26 +60,14 @@ func Handler(w http.ResponseWriter, req *http.Request) {
 
 	if res.StatusCode != 200 {
 		err = fmt.Errorf("Handler.handler: unexpected status code: %d", res.StatusCode)
-		log.ErrorR(req, err, nil)
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
-		return
 	}
 
-	// FIXME should stream this using a io.Reader etc
-	b, err := ioutil.ReadAll(res.Body)
+	responseBody, err = ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.ErrorR(req, err, nil)
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
 		return
 	}
 
-	for hdr, v := range res.Header {
-		for _, v2 := range v {
-			w.Header().Add(hdr, v2)
-		}
-	}
-	w.WriteHeader(res.StatusCode)
-	w.Write(b)
+	headers = res.Header
+
+	return
 }
