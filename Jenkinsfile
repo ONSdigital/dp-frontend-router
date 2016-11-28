@@ -11,6 +11,7 @@ node {
             sh 'set +e && (git describe --exact-match HEAD || true) > git-tag'
         }
 
+        def branch   = env.JOB_NAME.replaceFirst('.+/', '')
         def revision = revisionFrom(readFile('git-tag').trim(), readFile('git-commit').trim())
 
         stage('Build') {
@@ -40,10 +41,10 @@ node {
             sh "aws s3 cp frontend-router-${revision}.tar.gz s3://${env.S3_REVISIONS_BUCKET}/"
         }
 
-        if (env.JOB_NAME.replaceFirst('.+/', '') != 'develop') return
+        if (branch != 'develop' && branch != 'dd-develop') return
 
         stage('Deploy') {
-            for (group in [env.CODEDEPLOY_FRONTEND_DEPLOYMENT_GROUP, env.CODEDEPLOY_PUBLISHING_DEPLOYMENT_GROUP]) {
+            for (group in deploymentGroupsFor(branch)) {
                 sh sprintf('aws deploy create-deployment %s %s %s,bundleType=tgz,key=%s', [
                     '--application-name frontend-router',
                     "--deployment-group-name ${group}",
@@ -53,6 +54,12 @@ node {
             }
         }
     }
+}
+
+def deploymentGroupsFor(branch) {
+    branch == 'develop'
+        ? [env.CODEDEPLOY_FRONTEND_DEPLOYMENT_GROUP, env.CODEDEPLOY_PUBLISHING_DEPLOYMENT_GROUP]
+        : [env.CODEDEPLOY_DISCOVERY_FRONTEND_DEPLOYMENT_GROUP, env.CODEDEPLOY_DISCOVERY_PUBLISHING_DEPLOYMENT_GROUP]
 }
 
 @NonCPS
