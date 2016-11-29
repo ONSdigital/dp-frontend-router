@@ -15,7 +15,6 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	"github.com/ONSdigital/dp-frontend-router/handlers/hello"
 )
 
 func main() {
@@ -49,8 +48,16 @@ func main() {
 
 	babbageProxy := createReverseProxy(babbageURL)
 
+	dataDiscoveryURL, err := url.Parse(config.HelloWorldURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	dataDiscoveryProxy := createReverseProxy(dataDiscoveryURL)
+
 	router.HandleFunc("/", homepage.Handler(babbageProxy))
-	router.Get("/hello", hello.Handler)
+	router.Handle("/dd/{uri:.*}", dataDiscoveryProxy)
 	router.Handle("/{uri:.*}", babbageProxy)
 
 	log.Debug("Starting server", log.Data{

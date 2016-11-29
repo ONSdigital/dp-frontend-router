@@ -12,4 +12,4 @@ var ResolverURL = "http://localhost:20020"
 var RendererURL = "http://localhost:20010"
 
 // The URL of the hello world controller
-var HelloWorldURL = "http://localhost:20030/hello"
+var HelloWorldURL = "http://localhost:20030"
