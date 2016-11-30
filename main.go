@@ -60,7 +60,7 @@ func main() {
 	dataDiscoveryProxy := createReverseProxy(dataDiscoveryURL)
 
 	router.HandleFunc("/", homepage.Handler(babbageProxy))
-	router.Handle("/dd/{uri:.*}", dataDiscoveryProxy)
+	router.Handle("/dd{uri:(|/.*)}", dataDiscoveryProxy)
 	router.Handle("/{uri:.*}", babbageProxy)
 
 	log.Debug("Starting server", log.Data{
