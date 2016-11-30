@@ -30,6 +30,9 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("DATADISCOVERY_URL"); len(v) > 0 {
+		config.DataDiscoveryURL = v
+	}
 
 	log.Namespace = "dp-frontend-router"
 
@@ -48,7 +51,7 @@ func main() {
 
 	babbageProxy := createReverseProxy(babbageURL)
 
-	dataDiscoveryURL, err := url.Parse(config.HelloWorldURL)
+	dataDiscoveryURL, err := url.Parse(config.DataDiscoveryURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
@@ -61,11 +64,11 @@ func main() {
 	router.Handle("/{uri:.*}", babbageProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":    config.BindAddr,
-		"babbage_url":  config.BabbageURL,
-		"renderer_url": config.RendererURL,
-		"resolver_url": config.ResolverURL,
-		"hello_url":    config.HelloWorldURL,
+		"bind_addr":         config.BindAddr,
+		"babbage_url":       config.BabbageURL,
+		"renderer_url":      config.RendererURL,
+		"resolver_url":      config.ResolverURL,
+		"datadiscovery_url": config.DataDiscoveryURL,
 	})
 
 	server := &http.Server{
