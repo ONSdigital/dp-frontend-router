@@ -33,7 +33,7 @@ func main() {
 		config.RendererURL = v
 	}
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, _ := strconv.ParseInt(v, 10, 64)
+		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {
 			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
 			os.Exit(1)
