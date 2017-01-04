@@ -105,11 +105,14 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		}
 
 		// Use cookie value to direct to a or b handler
-		if cookie.Value == "A" {
+		switch cookie.Value {
+		case "A":
 			a.ServeHTTP(w, req)
-		}
-		if cookie.Value == "B" {
+		case "B":
 			b.ServeHTTP(w, req)
+		default:
+			log.Debug("invalid cookie value, redirecting to handler A", log.Data{"value": cookie.Value})
+			a.ServeHTTP(w, req)
 		}
 	})
 }
