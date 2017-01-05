@@ -132,6 +132,9 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
+		log.DebugR(req, "Proxying request", log.Data{
+			"destination": babbageURL,
+		})
 		director(req)
 		req.Host = babbageURL.Host
 	}
