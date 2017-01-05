@@ -1,11 +1,13 @@
 package main
 
 import (
+	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -30,6 +32,14 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
+		a, _ := strconv.Atoi(v)
+		if a < 0 || a > 100 {
+			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
+			os.Exit(1)
+		}
+		config.HomepageABPercent = int(a)
+	}
 
 	log.Namespace = "dp-frontend-router"
 
@@ -46,9 +56,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	babbageProxy := createReverseProxy(babbageURL)
-	router.HandleFunc("/", homepage.Handler(babbageProxy))
-	router.Handle("/{uri:.*}", babbageProxy)
+	reverseProxy := createReverseProxy(babbageURL)
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
+	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
 		"bind_addr":    config.BindAddr,
@@ -68,6 +78,43 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
+}
+
+//abHandler ... percentA is the percentage of request that handler 'a' is used
+func abHandler(a, b http.Handler, percentA int) http.Handler {
+	if percentA < 0 || percentA > 100 {
+		panic("Percent 'a' but be between 0 and 100")
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// Detect cookie
+		cookie, _ := req.Cookie("homepage-version")
+
+		if cookie == nil {
+			var cookieValue string
+			if rand.Intn(100) < percentA {
+				cookieValue = "A"
+			} else {
+				cookieValue = "B"
+			}
+
+			expiration := time.Now().Add(365 * 24 * time.Hour)
+			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
+			http.SetCookie(w, cookie)
+		}
+
+		// Use cookie value to direct to a or b handler
+		switch cookie.Value {
+		case "A":
+			a.ServeHTTP(w, req)
+		case "B":
+			b.ServeHTTP(w, req)
+		default:
+			log.Debug("invalid cookie value, redirecting to handler A", log.Data{"value": cookie.Value})
+			a.ServeHTTP(w, req)
+		}
+	})
 }
 
 func createReverseProxy(babbageURL *url.URL) http.Handler {
