@@ -18,11 +18,13 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 	return func(w http.ResponseWriter, req *http.Request) {
 		b, err := resolver.Get("/", req.Header.Get(xRequestIDHeaderParam))
 		if err == resolver.ErrUnauthorised {
-			log.ErrorR(req, err, log.Data{"unauthorised user": err.Error()})
+			err = fmt.Errorf("unauthorised user: %s", err)
+			log.ErrorR(req, err, nil)
 			babbageProxy.ServeHTTP(w, req)
 			return
 		} else if err != nil {
-			log.ErrorR(req, err, log.Data{"failed to resolve request": err.Error()})
+			err = fmt.Errorf("failed to resolve request: %s", err)
+			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
 			return
@@ -32,6 +34,7 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 
 		rendererReq, err := http.NewRequest("POST", config.RendererURL+"/homepage", rdr)
 		if err != nil {
+			err = fmt.Errorf("error creating request: %s", err)
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
@@ -44,6 +47,7 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 
 		res, err := http.DefaultClient.Do(rendererReq)
 		if err != nil {
+			err = fmt.Errorf("error rendering page: %s", err)
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
@@ -63,6 +67,7 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 		// FIXME should stream this using a io.Reader etc
 		b, err = ioutil.ReadAll(res.Body)
 		if err != nil {
+			err = fmt.Errorf("error reading response body: %s", err)
 			log.ErrorR(req, err, nil)
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
@@ -74,6 +79,8 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 				w.Header().Add(hdr, v2)
 			}
 		}
+
+		log.DebugR(req, "returning homepage", nil)
 		w.WriteHeader(res.StatusCode)
 		w.Write(b)
 	}

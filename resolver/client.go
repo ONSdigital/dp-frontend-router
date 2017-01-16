@@ -40,22 +40,21 @@ func Get(uri string, xRequestID string) ([]byte, error) {
 		return jsonBytes, err
 	}
 
-	log.Debug("resolver.client", log.Data{
-		"method":              "GET",
-		"uri":                 request.URL.Path,
-		"query":               request.URL.RawQuery,
-		xRequestIDHeaderParam: xRequestID,
+	log.DebugC(xRequestID, "resolver.client", log.Data{
+		"method": "GET",
+		"uri":    request.URL.Path,
+		"query":  request.URL.RawQuery,
 	})
 
 	response, err := Client.Do(request)
 	if err != nil {
-		log.ErrorR(request, err, nil)
+		log.ErrorC(xRequestID, err, nil)
 		return jsonBytes, err
 	}
 
 	jsonBytes, err = responseBodyReader(response.Body)
 	if err != nil {
-		log.ErrorC("Error reading body", err, nil)
+		log.ErrorC(xRequestID, err, nil)
 		return jsonBytes, err
 	}
 	defer response.Body.Close()
@@ -66,7 +65,7 @@ func Get(uri string, xRequestID string) ([]byte, error) {
 		}
 
 		err = fmt.Errorf("response status code is %d", response.StatusCode)
-		log.ErrorR(request, err, nil)
+		log.ErrorC(xRequestID, err, nil)
 		return jsonBytes, err
 	}
 	return jsonBytes, nil
@@ -75,8 +74,8 @@ func Get(uri string, xRequestID string) ([]byte, error) {
 func getRequest(uri string, xRequestID string) (*http.Request, error) {
 	request, err := http.NewRequest("GET", config.ResolverURL+uri, nil)
 	if err != nil {
-		log.Debug("Error creating new request", nil)
-		log.ErrorR(request, err, nil)
+		err = fmt.Errorf("error creating new request: %s", err)
+		log.ErrorC(xRequestID, err, nil)
 		return nil, err
 	}
 	request.Header.Add(xRequestIDHeaderParam, xRequestID)

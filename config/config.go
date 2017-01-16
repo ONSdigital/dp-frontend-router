@@ -13,3 +13,6 @@ var RendererURL = "http://localhost:20010"
 
 // The URL of the Data Discovery frontend controller
 var DataDiscoveryURL = "http://localhost:20030"
+
+// The percentage of requests to send to the new homepage
+var HomepageABPercent = 0
