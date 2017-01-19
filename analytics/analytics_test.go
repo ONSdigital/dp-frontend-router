@@ -1,4 +1,4 @@
-package search
+package analytics
 
 import (
 	. "github.com/smartystreets/goconvey/convey"
@@ -66,7 +66,7 @@ func TestNewSearchAnalytics(t *testing.T) {
 	Convey("When NewSearchAnalytics is invoked with a valid redirect URL", t, func() {
 		result := NewSearchAnalytics(url)
 
-		expected := &Analytics{
+		expected := &Model{
 			url:        requestedURI,
 			term:       term,
 			searchType: searchType,
@@ -83,7 +83,7 @@ func TestNewSearchAnalytics(t *testing.T) {
 	Convey("When NewSearchAnalytics is invoked with a redirect URL missing a string parameter (url, term, type).", t, func() {
 		url, _ := url.Parse(validURLBase + "?term=" + term + "&type=" + searchType + "&pageIndex=1" + "&linkIndex=1" + "&pageSize=10")
 		result := NewSearchAnalytics(url)
-		expected := &Analytics{
+		expected := &Model{
 			url:        "",
 			term:       term,
 			searchType: searchType,
@@ -100,7 +100,7 @@ func TestNewSearchAnalytics(t *testing.T) {
 	Convey("When NewSearchAnalytics is invoked with a redirect URL missing an int parameter(pageIndex, linkIndex, pageSize).", t, func() {
 		url, _ := url.Parse(validURLBase + "?url=" + requestedURI + "&term=" + term + "&type=" + searchType + "&linkIndex=1" + "&pageSize=10")
 		result := NewSearchAnalytics(url)
-		expected := &Analytics{
+		expected := &Model{
 			url:        requestedURI,
 			term:       term,
 			searchType: searchType,
@@ -117,7 +117,7 @@ func TestNewSearchAnalytics(t *testing.T) {
 	Convey("When NewSearchAnalytics is invoked with a redirect URL with non int value for an int parameter (pageIndex, linkIndex, pageSize).", t, func() {
 		url, _ := url.Parse(validURLBase + "?url=" + requestedURI + "&term=" + term + "&type=" + searchType + "&pageIndex=abcd" + "&linkIndex=1" + "&pageSize=10")
 		result := NewSearchAnalytics(url)
-		expected := &Analytics{
+		expected := &Model{
 			url:        requestedURI,
 			term:       term,
 			searchType: searchType,

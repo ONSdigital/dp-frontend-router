@@ -1,4 +1,4 @@
-package search
+package analytics
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ const timestampKey = "timestamp"
 
 // AnalyticsService - defines a Stats Service Interface
 type AnalyticsService interface {
-	CaptureAndRedirect(analytics *Analytics, w http.ResponseWriter, req *http.Request)
+	CaptureAndRedirect(analytics *Model, w http.ResponseWriter, req *http.Request)
 }
 
 // AnalyticsServiceImpl - Implementation of the StatsService interface.
@@ -27,8 +27,8 @@ type AnalyticsServiceImpl struct {
 	Redirect func(w http.ResponseWriter, r *http.Request, urlStr string, code int)
 }
 
-// Analytics - Type to encapsulate Search Statistic data.
-type Analytics struct {
+// Model - Type to encapsulate Search Statistic data.
+type Model struct {
 	url        string
 	term       string
 	searchType string
@@ -43,38 +43,38 @@ func NewAnalyticsServiceImpl() *AnalyticsServiceImpl {
 }
 
 // GetURL - Get the URL of the search result the user clicked.
-func (a *Analytics) GetURL() string {
+func (a *Model) GetURL() string {
 	return a.url
 }
 
 // GetPageIndex - Get the Page index of the search result the use clicked.
-func (a *Analytics) GetPageIndex() int {
+func (a *Model) GetPageIndex() int {
 	return a.pageIndex
 }
 
 // GetLinkIndex - Get the index of the link on the search result page the user clicked.
-func (a *Analytics) GetLinkIndex() int {
+func (a *Model) GetLinkIndex() int {
 	return a.linkIndex
 }
 
 // GetSearchTerm - Get the search term used.
-func (a *Analytics) GetSearchTerm() string {
+func (a *Model) GetSearchTerm() string {
 	return a.term
 }
 
 // GetSearchType - Get the type of search - search or list page etc.
-func (a *Analytics) GetSearchType() string {
+func (a *Model) GetSearchType() string {
 	return a.searchType
 }
 
 // GetPageSize - Get the Page size value used when searching.
-func (a *Analytics) GetPageSize() int {
+func (a *Model) GetPageSize() int {
 	return a.pageSize
 }
 
 // NewSearchAnalytics - Creates a new Statistics struct to encapsulate the  Extracted analytics values from the URL.
-func NewSearchAnalytics(url *url.URL) *Analytics {
-	return &Analytics{
+func NewSearchAnalytics(url *url.URL) *Model {
+	return &Model{
 		url:        url.Query().Get(urlParam),
 		term:       url.Query().Get(termParam),
 		searchType: url.Query().Get(searchTypeParam),
@@ -100,7 +100,7 @@ func extractIntParam(url *url.URL, name string) int {
 }
 
 // CaptureAndRedirect - captures the analytics values
-func (s *AnalyticsServiceImpl) CaptureAndRedirect(analytics *Analytics, w http.ResponseWriter, req *http.Request) {
+func (s *AnalyticsServiceImpl) CaptureAndRedirect(analytics *Model, w http.ResponseWriter, req *http.Request) {
 	log.Debug("Capturing Search Results event.", log.Data{
 		urlParam:        analytics.url,
 		termParam:       analytics.term,

@@ -10,10 +10,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/analytics/handlers"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
-	"github.com/ONSdigital/dp-frontend-router/handlers/search"
-	"github.com/ONSdigital/dp-frontend-router/statistics"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
@@ -42,8 +41,6 @@ func main() {
 		}
 		config.HomepageABPercent = int(a)
 	}
-
-	handlers.SetAnalyticsService(search.NewAnalyticsServiceImpl())
 
 	log.Namespace = "dp-frontend-router"
 
