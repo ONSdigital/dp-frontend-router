@@ -13,12 +13,12 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/search"
+	"github.com/ONSdigital/dp-frontend-router/statistics"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	"github.com/ONSdigital/dp-frontend-router/search"
 )
 
 func main() {
@@ -43,7 +43,7 @@ func main() {
 		config.HomepageABPercent = int(a)
 	}
 
-	handlers.SearchStatsService = &search.SearchStatsServiceImpl{}
+	handlers.SetAnalyticsService(search.NewAnalyticsServiceImpl())
 
 	log.Namespace = "dp-frontend-router"
 
