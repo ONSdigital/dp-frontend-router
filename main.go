@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ONSdigital/dp-frontend-router/analytics/handlers"
 	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
@@ -58,7 +58,7 @@ func main() {
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
-	router.HandleFunc("/redir", handlers.CaptureSearchStats)
+	router.HandleFunc("/redir", analytics.HandleSearch)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 

@@ -3,7 +3,6 @@ package analytics
 import (
 	"fmt"
 	"github.com/ONSdigital/go-ns/log"
-	"net/http"
 	"net/url"
 	"strconv"
 	"time"
@@ -17,15 +16,13 @@ const termParam = "term"
 const searchTypeParam = "type"
 const timestampKey = "timestamp"
 
-// AnalyticsService - defines a Stats Service Interface
-type AnalyticsService interface {
-	CaptureAndRedirect(analytics *Model, w http.ResponseWriter, req *http.Request)
+// Service - defines a Stats Service Interface
+type Service interface {
+	CaptureAnalyticsData(analytics *Model) string
 }
 
-// AnalyticsServiceImpl - Implementation of the StatsService interface.
-type AnalyticsServiceImpl struct {
-	Redirect func(w http.ResponseWriter, r *http.Request, urlStr string, code int)
-}
+// ServiceImpl - Implementation of the StatsService interface.
+type ServiceImpl struct{}
 
 // Model - Type to encapsulate Search Statistic data.
 type Model struct {
@@ -37,9 +34,9 @@ type Model struct {
 	linkIndex  int
 }
 
-// NewAnalyticsServiceImpl - Creates a new AnalyticsServiceImpl with the default Redirect implementation.
-func NewAnalyticsServiceImpl() *AnalyticsServiceImpl {
-	return &AnalyticsServiceImpl{Redirect: http.Redirect}
+// NewServiceImpl - Creates a new Analytics ServiceImpl.
+func NewServiceImpl() *ServiceImpl {
+	return &ServiceImpl{}
 }
 
 // GetURL - Get the URL of the search result the user clicked.
@@ -72,8 +69,8 @@ func (a *Model) GetPageSize() int {
 	return a.pageSize
 }
 
-// NewSearchAnalytics - Creates a new Statistics struct to encapsulate the  Extracted analytics values from the URL.
-func NewSearchAnalytics(url *url.URL) *Model {
+// NewAnalyticsModel - Creates a new Statistics struct to encapsulate the extracted analytics values from the URL.
+func NewAnalyticsModel(url *url.URL) *Model {
 	return &Model{
 		url:        url.Query().Get(urlParam),
 		term:       url.Query().Get(termParam),
@@ -99,8 +96,8 @@ func extractIntParam(url *url.URL, name string) int {
 	return intValue
 }
 
-// CaptureAndRedirect - captures the analytics values
-func (s *AnalyticsServiceImpl) CaptureAndRedirect(analytics *Model, w http.ResponseWriter, req *http.Request) {
+// CaptureAnalyticsData - captures the analytics values
+func (s *ServiceImpl) CaptureAnalyticsData(analytics *Model) string {
 	log.Debug("Capturing Search Results event.", log.Data{
 		urlParam:        analytics.url,
 		termParam:       analytics.term,
@@ -110,5 +107,5 @@ func (s *AnalyticsServiceImpl) CaptureAndRedirect(analytics *Model, w http.Respo
 		pageSizeParam:   analytics.pageSize,
 		timestampKey:    time.Now(),
 	})
-	s.Redirect(w, req, analytics.GetURL(), http.StatusTemporaryRedirect)
+	return analytics.url
 }
