@@ -21,10 +21,10 @@ type Service interface {
 	CaptureAnalyticsData(analytics *Model) string
 }
 
-// ServiceImpl - Implementation of the StatsService interface.
+// ServiceImpl - Implementation of the Analytics Service interface.
 type ServiceImpl struct{}
 
-// Model - Type to encapsulate Search Statistic data.
+// Model - Type to encapsulate Search Analytics data.
 type Model struct {
 	url        string
 	term       string
@@ -69,7 +69,7 @@ func (a *Model) GetPageSize() int {
 	return a.pageSize
 }
 
-// NewAnalyticsModel - Creates a new Statistics struct to encapsulate the extracted analytics values from the URL.
+// NewAnalyticsModel - Creates a new Analytics model to encapsulate the extracted values from the URL.
 func NewAnalyticsModel(url *url.URL) *Model {
 	return &Model{
 		url:        url.Query().Get(urlParam),
