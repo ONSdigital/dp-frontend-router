@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Internal server error - Office for National Statistics</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta charset="utf-8"/>
+    <meta content="width=device-width,initial-scale=1.0,user-scalable=1" name="viewport">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="theme-color" content="#58595B">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#58595B">
+
+		{{`<!--[if lte IE 8]>` | safeHTML}}
+      <link rel="stylesheet" href="{{.PatternLibraryAssetsPath}}/css/old-ie.css">
+		{{`<![endif]-->` | safeHTML}}
+    {{`<!--[if IE 9]>` | safeHTML}}
+      <link rel="stylesheet" href="{{.PatternLibraryAssetsPath}}/css/ie-9.css">
+    {{`<![endif]-->` | safeHTML}}
+		{{`<!--[if gt IE 9]><!-->` | safeHTML}}
+      <link rel="stylesheet" href="{{.PatternLibraryAssetsPath}}/css/main.css">
+    {{`<!--<![endif]-->` | safeHTML}}
+</head>
+<body class="{{ .Type }}">
+
+    {{ template "partials/header" . }}
+
+    <main id="main" role="main" tabindex="-1">
+        {{yield}}
+    </main>
+
+    {{ template "partials/footer" }}
+
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+      ga('create', 'UA-56892037-3', {'allowAnchor': true});
+      ga('send', 'pageview', {'page': location.pathname + getSearch() + location.hash});
+      function getSearch(){
+          {{/* TODO - When search is moved to renderer we'll need to add search term into page GA response
+          // if(location.pathname === '/search'){
+          //     var numberOfResults = {{#if result.numberOfResults}} {{result.numberOfResults}} {{else}} 0 {{/if}};
+          //     return location.search + '&numberOfResults=' + numberOfResults;
+          // } else {
+          //     return location.search;
+          // } */}}
+          return
+      }
+
+      // Measure time on page - credit to http://help.analyticsedge.com/googleanalytics/measuring-time-on-bounce-page/
+      function timer11(){ga('send', 'event', 'TimeOnPage', '1', '11-30 seconds', { 'nonInteraction': 1 });}
+      function timer31(){ga('send', 'event', 'TimeOnPage', '2', '31-60 seconds', { 'nonInteraction': 1 });}
+      function timer61(){ga('send', 'event', 'TimeOnPage', '3', '61-180 seconds', { 'nonInteraction': 1 });}
+      function timer181(){ga('send', 'event', 'TimeOnPage', '4', '181-600 seconds', { 'nonInteraction': 1 });}
+      function timer601(){ga('send', 'event', 'TimeOnPage', '5', '601-1800 seconds', { 'nonInteraction': 1 });}
+      function timer1801(){ga('send', 'event', 'TimeOnPage', '6', '1801+ seconds', { 'nonInteraction': 1 });}
+      ga('send', 'event', 'TimeOnPage', '0', '0-10 seconds', { 'nonInteraction': 1 });
+      setTimeout(timer11,11000);
+      setTimeout(timer31,31000);
+      setTimeout(timer61,61000);
+      setTimeout(timer181,181000);
+      setTimeout(timer601,601000);
+      setTimeout(timer1801,1801000);
+    </script>
+</body>
+</html>
