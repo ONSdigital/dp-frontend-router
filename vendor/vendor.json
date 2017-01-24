@@ -22,7 +22,6 @@
 		},
 		{
 			"checksumSHA1": "bc51V8C9zf7U4bbsblh+7Cbe9lM=",
-			"origin": "github.com/ONSdigital/dp-frontend-router/vendor/github.com/ONSdigital/go-ns/render",
 			"path": "github.com/ONSdigital/go-ns/render",
 			"revision": "bc66177e78ff92143848188c78ac5f112ce8ef4c",
 			"revisionTime": "2017-01-23T15:55:35Z"
@@ -98,6 +97,12 @@
 			"path": "github.com/smartystreets/goconvey/convey/reporting",
 			"revision": "7befa7fd6e2e8ca28d2b94f2d39111929904b08d",
 			"revisionTime": "2016-09-28T20:55:23Z"
+		},
+		{
+			"checksumSHA1": "m4QwaQdvaqDo6Fp4BoykRkEFQ8E=",
+			"path": "github.com/unrolled/render",
+			"revision": "526faf80cd4b305bb8134abea8d20d5ced74faa6",
+			"revisionTime": "2016-10-03T17:53:27Z"
 		}
 	],
 	"rootPath": "github.com/ONSdigital/dp-frontend-router"
