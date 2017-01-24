@@ -36,6 +36,7 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 	// Attempt to render an error page
 	if err := rI.callRenderer(code, title, description); err != nil {
 		log.ErrorR(rI.req, err, nil)
+		log.DebugR(rI.req, "rendering disaster page", nil)
 
 		// Calling the renderer failed, render the disaster page
 		render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
