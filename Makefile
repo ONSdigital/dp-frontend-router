@@ -7,7 +7,7 @@ debug: generate
 
 generate: ${GOPATH}/bin/go-bindata
 	# build the production version
-	go generate ./...
+	cd assets; ${GOPATH}/bin/go-bindata -o templates.go -pkg assets templates/...
 	{ echo "// +build production"; cat assets/templates.go; } > assets/templates.go.new
 	mv assets/templates.go.new assets/templates.go
 	# build the dev version
