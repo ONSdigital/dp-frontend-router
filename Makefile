@@ -5,7 +5,7 @@ debug: generate
 	go build -tags 'debug' -o build/dp-frontend-router
 	HUMAN_LOG=1 DEBUG=1 ./build/dp-frontend-router
 
-generate:
+generate: ${GOPATH}/bin/go-bindata
 	# build the production version
 	go generate ./...
 	{ echo "// +build production"; cat assets/templates.go; } > assets/templates.go.new
@@ -14,5 +14,8 @@ generate:
 	cd assets; go-bindata -debug -o debug.go -pkg assets templates/...
 	{ echo "// +build debug"; cat assets/debug.go; } > assets/debug.go.new
 	mv assets/debug.go.new assets/debug.go
+
+${GOPATH}/bin/go-bindata:
+	go get -u github.com/jteeuwen/go-bindata
 
 .PHONY: build debug
