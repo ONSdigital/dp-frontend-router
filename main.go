@@ -110,6 +110,14 @@ func main() {
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
 func abHandler(a, b http.Handler, percentA int) http.Handler {
+	if percentA == 0 {
+		log.Debug("percentA is 0, defaulting to handler B", nil)
+		return b
+	} else if percentA == 100 {
+		log.Debug("percentA is 100, defaulting to handler A", nil)
+		return a
+	}
+
 	if percentA < 0 || percentA > 100 {
 		panic("Percent 'a' but be between 0 and 100")
 	}
@@ -119,6 +127,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Detect cookie
 		cookie, _ := req.Cookie("homepage-version")
 
+	RETRY:
 		if cookie == nil {
 			var cookieValue string
 			if rand.Intn(100) < percentA {
@@ -139,8 +148,9 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		case "B":
 			b.ServeHTTP(w, req)
 		default:
-			log.Debug("invalid cookie value, redirecting to handler A", log.Data{"value": cookie.Value})
-			a.ServeHTTP(w, req)
+			log.Debug("invalid cookie value, reselecting", log.Data{"value": cookie.Value})
+			cookie = nil
+			goto RETRY
 		}
 	})
 }
