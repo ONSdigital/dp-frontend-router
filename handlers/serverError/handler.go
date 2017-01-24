@@ -1,6 +1,10 @@
 package serverError
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -29,19 +33,73 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 }
 
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
-	// TODO ask dp-frontend-renderer to render the error page
-	// failing that, render this "disaster" page
+	// Attempt to render an error page
+	if err := rI.callRenderer(code, title, description); err != nil {
+		log.ErrorR(rI.req, err, nil)
 
-	render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
-		"URI":                      rI.req.URL.Path,
-		"Language":                 lang.Get(rI.req),
-		"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
-		"SiteDomain":               config.SiteDomain,
-		"Error": map[string]interface{}{
-			"Title":       title,
-			"Description": description,
-		},
-	})
+		// Calling the renderer failed, render the disaster page
+		render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
+			"URI":                      rI.req.URL.Path,
+			"Language":                 lang.Get(rI.req),
+			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
+			"SiteDomain":               config.SiteDomain,
+			"Error": map[string]interface{}{
+				"Title":       title,
+				"Description": description,
+			},
+		})
+	}
+}
+
+func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
+	data := map[string]interface{}{
+		"code":        code,
+		"title":       title,
+		"description": description,
+	}
+
+	b, err := json.Marshal(&data)
+	if err != nil {
+		return fmt.Errorf("error marshaling data: %s", err)
+	}
+
+	rendererReq, err := http.NewRequest("POST", config.RendererURL+"/error", bytes.NewReader(b))
+	if err != nil {
+		err = fmt.Errorf("error creating request: %s", err)
+		return err
+	}
+
+	// FIXME there's other headers we want
+	rendererReq.Header.Set("Accept-Language", string(lang.Get(rI.req)))
+	rendererReq.Header.Set("X-Request-Id", rI.req.Header.Get("X-Request-Id"))
+
+	res, err := http.DefaultClient.Do(rendererReq)
+	if err != nil {
+		return fmt.Errorf("error rendering page: %s", err)
+	}
+
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
+	}
+
+	b, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %s", err)
+	}
+
+	for hdr, v := range res.Header {
+		for _, v2 := range v {
+			rI.ResponseWriter.Header().Add(hdr, v2)
+		}
+	}
+
+	log.DebugR(rI.req, "returning error page", nil)
+	rI.ResponseWriter.WriteHeader(res.StatusCode)
+	rI.ResponseWriter.Write(b)
+
+	return nil
 }
 
 func (rI *responseInterceptor) Write(b []byte) (int, error) {
