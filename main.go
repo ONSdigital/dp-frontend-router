@@ -92,10 +92,13 @@ func main() {
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":    config.BindAddr,
-		"babbage_url":  config.BabbageURL,
-		"renderer_url": config.RendererURL,
-		"resolver_url": config.ResolverURL,
+		"bind_addr":           config.BindAddr,
+		"babbage_url":         config.BabbageURL,
+		"renderer_url":        config.RendererURL,
+		"resolver_url":        config.ResolverURL,
+		"homepage_ab_percent": config.HomepageABPercent,
+		"site_domain":         config.SiteDomain,
+		"assets_path":         config.PatternLibraryAssetsPath,
 	})
 
 	server := &http.Server{
