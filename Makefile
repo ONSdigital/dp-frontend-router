@@ -15,6 +15,9 @@ generate: ${GOPATH}/bin/go-bindata
 	{ echo "// +build debug"; cat assets/debug.go; } > assets/debug.go.new
 	mv assets/debug.go.new assets/debug.go
 
+test:
+	go test -tags 'production' ./...
+
 ${GOPATH}/bin/go-bindata:
 	go get -u github.com/jteeuwen/go-bindata
 

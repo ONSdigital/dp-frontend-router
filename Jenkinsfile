@@ -19,7 +19,7 @@ node {
         }
 
         stage('Test') {
-            sh "GOPATH=${gopath} go test ./..."
+            sh "GOPATH=${gopath} make test"
         }
 
         stage('Image') {
