@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"math/rand"
 	"net"
 	"net/http"
@@ -10,13 +11,17 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
+	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/go-ns/render"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
+	unrolled "github.com/unrolled/render"
 )
 
 func main() {
@@ -32,6 +37,13 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
+		config.PatternLibraryAssetsPath = v
+	}
+	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
+		config.SiteDomain = v
+	}
+
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {
@@ -41,10 +53,29 @@ func main() {
 		config.HomepageABPercent = int(a)
 	}
 
+	var err error
+	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	log.Namespace = "dp-frontend-router"
+
+	render.Renderer = unrolled.New(unrolled.Options{
+		Asset:         assets.Asset,
+		AssetNames:    assets.AssetNames,
+		IsDevelopment: config.DebugMode,
+		Layout:        "main",
+		Funcs: []template.FuncMap{{
+			"safeHTML": func(s string) template.HTML {
+				return template.HTML(s)
+			},
+		}},
+	})
 
 	router := pat.New()
 	alice := alice.New(
+		serverError.Handler,
 		timeout.Handler(10*time.Second),
 		log.Handler,
 		requestID.Handler(16),
@@ -61,10 +92,13 @@ func main() {
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":    config.BindAddr,
-		"babbage_url":  config.BabbageURL,
-		"renderer_url": config.RendererURL,
-		"resolver_url": config.ResolverURL,
+		"bind_addr":           config.BindAddr,
+		"babbage_url":         config.BabbageURL,
+		"renderer_url":        config.RendererURL,
+		"resolver_url":        config.ResolverURL,
+		"homepage_ab_percent": config.HomepageABPercent,
+		"site_domain":         config.SiteDomain,
+		"assets_path":         config.PatternLibraryAssetsPath,
 	})
 
 	server := &http.Server{
