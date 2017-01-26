@@ -22,6 +22,7 @@ source $CONFIG && docker run -d              \
   --env=DATADISCOVERY_URL=$DATADISCOVERY_URL \
   --env=RENDERER_URL=$RENDERER_URL           \
   --env=RESOLVER_URL=$RESOLVER_URL           \
+  --env=SPLASH_PAGE=$SPLASH_PAGE             \
   --name=frontend-router                     \
   --net=$DOCKER_NETWORK                      \
   --restart=always                           \
