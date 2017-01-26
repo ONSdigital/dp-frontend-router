@@ -15,11 +15,11 @@ node {
         def revision = revisionFrom(readFile('git-tag').trim(), readFile('git-commit').trim())
 
         stage('Build') {
-            sh "GOPATH=${gopath} go build -o build/dp-frontend-router"
+            sh "GOPATH=${gopath} make"
         }
 
         stage('Test') {
-            sh "GOPATH=${gopath} go test ./..."
+            sh "GOPATH=${gopath} make test"
         }
 
         stage('Image') {
