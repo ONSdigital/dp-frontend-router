@@ -54,9 +54,10 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 
 func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
 	data := map[string]interface{}{
-		"code":        code,
-		"title":       title,
-		"description": description,
+		"error": map[string]interface{}{
+			"title":       title,
+			"description": description,
+		},
 	}
 
 	b, err := json.Marshal(&data)

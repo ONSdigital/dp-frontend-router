@@ -22,3 +22,6 @@ var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/6cc1837"
 
 // The site domain
 var SiteDomain = "ons.gov.uk"
+
+// Splash page
+var SplashPage = ""

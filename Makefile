@@ -19,6 +19,6 @@ test:
 	go test -tags 'production' ./...
 
 ${GOPATH}/bin/go-bindata:
-	go get -u github.com/jteeuwen/go-bindata
+	go get -u github.com/jteeuwen/go-bindata/go-bindata
 
 .PHONY: build debug

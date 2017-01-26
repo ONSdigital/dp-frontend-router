@@ -15,6 +15,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
+	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
@@ -42,6 +43,9 @@ func main() {
 	}
 	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
 		config.SiteDomain = v
+	}
+	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
+		config.SplashPage = v
 	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
@@ -74,12 +78,16 @@ func main() {
 	})
 
 	router := pat.New()
-	alice := alice.New(
-		serverError.Handler,
-		timeout.Handler(10*time.Second),
-		log.Handler,
+	middleware := []alice.Constructor{
 		requestID.Handler(16),
-	).Then(router)
+		log.Handler,
+		serverError.Handler,
+		timeout.Handler(10 * time.Second),
+	}
+	if len(config.SplashPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.SplashPage))
+	}
+	alice := alice.New(middleware...).Then(router)
 
 	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
@@ -99,6 +107,7 @@ func main() {
 		"homepage_ab_percent": config.HomepageABPercent,
 		"site_domain":         config.SiteDomain,
 		"assets_path":         config.PatternLibraryAssetsPath,
+		"splash_page":         config.SplashPage,
 	})
 
 	server := &http.Server{
