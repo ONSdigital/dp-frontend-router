@@ -19,7 +19,8 @@ func Handler(splashPage string) func(http.Handler) http.Handler {
 				log.ErrorR(req, err, nil)
 			}
 			if c == nil || c.Value != "y" {
-				if req.Method != "POST" {
+				v := req.FormValue("confirm")
+				if req.Method != "POST" || v != "y" {
 					if err := callRenderer(w, req, splashPage); err != nil {
 						w.WriteHeader(500)
 					}
