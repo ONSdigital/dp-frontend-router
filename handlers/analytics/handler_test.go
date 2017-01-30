@@ -1,7 +1,7 @@
 package analytics
 
 import (
-	"github.com/ONSdigital/dp-frontend-router/analytics"
+	"errors"
 	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
@@ -13,15 +13,24 @@ const validURL = "http://localhost:20000/redir?url=/economy/inflationandpriceind
 
 // Mock
 type mockAnalyticsService struct {
-	args []*analytics.Model
+	args          []url.Values
+	mockBehaviour func(r *http.Request, m *mockAnalyticsService) (string, error)
 }
 
-func (m *mockAnalyticsService) CaptureAnalyticsData(analytics *analytics.Model) string {
-	m.args = append(m.args, analytics)
-	return analytics.GetURL()
+func (m *mockAnalyticsService) CaptureAnalyticsData(r *http.Request) (string, error) {
+	m.args = append(m.args, r.URL.Query())
+	return m.mockBehaviour(r, m)
 }
 
-type MockArgs struct {
+func successBehavior(r *http.Request, m *mockAnalyticsService) (string, error) {
+	return r.URL.Query().Get("url"), nil
+}
+
+func errorBehavior(r *http.Request, m *mockAnalyticsService) (string, error) {
+	return "", errors.New("Error!")
+}
+
+type MockRedirArgs struct {
 	response http.ResponseWriter
 	request  *http.Request
 	urlStr   string
@@ -29,22 +38,25 @@ type MockArgs struct {
 }
 
 type MockHttpRedir struct {
-	args []*MockArgs
+	args []*MockRedirArgs
 }
 
 func (m *MockHttpRedir) mockRedirector(w http.ResponseWriter, r *http.Request, urlStr string, code int) {
-	m.args = append(m.args, &MockArgs{w, r, urlStr, code})
+	m.args = append(m.args, &MockRedirArgs{w, r, urlStr, code})
 }
 
-func TestCaptureSearchStats(t *testing.T) {
+func TestHandleSearch(t *testing.T) {
 	requestedURL, _ := url.Parse(validURL)
 
 	Convey("Given valid input parameters", t, func() {
 
-		analyticsServiceMock := &mockAnalyticsService{make([]*analytics.Model, 0)}
-		analyticsService = analyticsServiceMock
+		serviceMock := &mockAnalyticsService{
+			args:          make([]url.Values, 0),
+			mockBehaviour: successBehavior,
+		}
 
-		mockRedir := &MockHttpRedir{args: make([]*MockArgs, 0)}
+		service = serviceMock
+		mockRedir := &MockHttpRedir{args: make([]*MockRedirArgs, 0)}
 		redirector = mockRedir.mockRedirector
 
 		resp := httptest.NewRecorder()
@@ -53,9 +65,9 @@ func TestCaptureSearchStats(t *testing.T) {
 		Convey("When the search redirect handler is invoked", func() {
 			HandleSearch(resp, req)
 
-			Convey("Then analyticsService is called 1 time with the expected parameters", func() {
-				So(len(analyticsServiceMock.args), ShouldEqual, 1)
-				So(analyticsServiceMock.args[0], ShouldResemble, analytics.NewAnalyticsModel(requestedURL))
+			Convey("Then service is called 1 time with the expected parameters", func() {
+				So(len(serviceMock.args), ShouldEqual, 1)
+				So(serviceMock.args[0], ShouldResemble, requestedURL.Query())
 			})
 
 			Convey("And Redirect is called 1 time with the expected parameters. ", func() {
@@ -65,7 +77,32 @@ func TestCaptureSearchStats(t *testing.T) {
 				So(args.request, ShouldResemble, req)
 				So(args.urlStr, ShouldResemble, requestedURL.Query().Get("url"))
 				So(args.code, ShouldResemble, http.StatusTemporaryRedirect)
-				So(len(analyticsServiceMock.args), ShouldEqual, 1)
+				So(len(serviceMock.args), ShouldEqual, 1)
+			})
+		})
+
+		Convey("When the handler is invoked and the service returns an error", func() {
+			serviceMock := &mockAnalyticsService{
+				args:          make([]url.Values, 0),
+				mockBehaviour: errorBehavior,
+			}
+			service = serviceMock
+			resp := httptest.NewRecorder()
+			req := httptest.NewRequest("GET", requestedURL.RequestURI(), nil)
+
+			HandleSearch(resp, req)
+
+			Convey("Then a BAD REQUEST status is returned.", func() {
+				So(resp.Code, ShouldEqual, 400)
+			})
+
+			Convey("And the service is called 1 time with the expected args", func() {
+				So(len(serviceMock.args), ShouldEqual, 1)
+				So(serviceMock.args[0], ShouldResemble, requestedURL.Query())
+			})
+
+			Convey("And the redirected is never invoked", func() {
+				So(len(mockRedir.args), ShouldEqual, 0)
 			})
 		})
 	})
