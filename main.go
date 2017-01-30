@@ -1,6 +1,7 @@
 package main
 
 import (
+	"html/template"
 	"math/rand"
 	"net"
 	"net/http"
@@ -10,14 +11,19 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
+	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
+	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/go-ns/render"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
+	unrolled "github.com/unrolled/render"
 )
 
 func main() {
@@ -33,6 +39,16 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
+		config.PatternLibraryAssetsPath = v
+	}
+	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
+		config.SiteDomain = v
+	}
+	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
+		config.SplashPage = v
+	}
+
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {
@@ -42,14 +58,37 @@ func main() {
 		config.HomepageABPercent = int(a)
 	}
 
+	var err error
+	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	log.Namespace = "dp-frontend-router"
 
+	render.Renderer = unrolled.New(unrolled.Options{
+		Asset:         assets.Asset,
+		AssetNames:    assets.AssetNames,
+		IsDevelopment: config.DebugMode,
+		Layout:        "main",
+		Funcs: []template.FuncMap{{
+			"safeHTML": func(s string) template.HTML {
+				return template.HTML(s)
+			},
+		}},
+	})
+
 	router := pat.New()
-	alice := alice.New(
-		timeout.Handler(10*time.Second),
-		log.Handler,
+	middleware := []alice.Constructor{
 		requestID.Handler(16),
-	).Then(router)
+		log.Handler,
+		serverError.Handler,
+		timeout.Handler(10 * time.Second),
+	}
+	if len(config.SplashPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.SplashPage))
+	}
+	alice := alice.New(middleware...).Then(router)
 
 	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
@@ -63,10 +102,14 @@ func main() {
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":    config.BindAddr,
-		"babbage_url":  config.BabbageURL,
-		"renderer_url": config.RendererURL,
-		"resolver_url": config.ResolverURL,
+		"bind_addr":           config.BindAddr,
+		"babbage_url":         config.BabbageURL,
+		"renderer_url":        config.RendererURL,
+		"resolver_url":        config.ResolverURL,
+		"homepage_ab_percent": config.HomepageABPercent,
+		"site_domain":         config.SiteDomain,
+		"assets_path":         config.PatternLibraryAssetsPath,
+		"splash_page":         config.SplashPage,
 	})
 
 	server := &http.Server{
@@ -84,6 +127,14 @@ func main() {
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
 func abHandler(a, b http.Handler, percentA int) http.Handler {
+	if percentA == 0 {
+		log.Debug("percentA is 0, defaulting to handler B", nil)
+		return b
+	} else if percentA == 100 {
+		log.Debug("percentA is 100, defaulting to handler A", nil)
+		return a
+	}
+
 	if percentA < 0 || percentA > 100 {
 		panic("Percent 'a' but be between 0 and 100")
 	}
@@ -93,6 +144,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Detect cookie
 		cookie, _ := req.Cookie("homepage-version")
 
+	RETRY:
 		if cookie == nil {
 			var cookieValue string
 			if rand.Intn(100) < percentA {
@@ -113,8 +165,9 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		case "B":
 			b.ServeHTTP(w, req)
 		default:
-			log.Debug("invalid cookie value, redirecting to handler A", log.Data{"value": cookie.Value})
-			a.ServeHTTP(w, req)
+			log.Debug("invalid cookie value, reselecting", log.Data{"value": cookie.Value})
+			cookie = nil
+			goto RETRY
 		}
 	})
 }

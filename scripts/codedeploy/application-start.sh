@@ -21,6 +21,7 @@ source $CONFIG && docker run -d    \
   --env=BIND_ADDR=$BIND_ADDR       \
   --env=RENDERER_URL=$RENDERER_URL \
   --env=RESOLVER_URL=$RESOLVER_URL \
+  --env=SPLASH_PAGE=$SPLASH_PAGE   \
   --name=frontend-router           \
   --net=$DOCKER_NETWORK            \
   --restart=always                 \
