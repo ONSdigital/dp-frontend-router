@@ -11,9 +11,16 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 )
 
-func Handler(splashPage string) func(http.Handler) http.Handler {
+func Handler(splashPage string, enabled bool) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if !enabled {
+				if err := callRenderer(w, req, splashPage); err != nil {
+					w.WriteHeader(500)
+				}
+				return
+			}
+
 			c, err := req.Cookie("splash")
 			if err != nil && err != http.ErrNoCookie {
 				log.ErrorR(req, err, nil)
