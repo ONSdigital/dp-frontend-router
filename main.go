@@ -97,7 +97,7 @@ func main() {
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
-	router.HandleFunc("/redir", analytics.HandleSearch)
+	router.HandleFunc("/redir/{data:.*}", analytics.HandleSearch)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 

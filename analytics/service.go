@@ -1,12 +1,12 @@
 package analytics
 
 import (
-	"fmt"
-	"github.com/ONSdigital/go-ns/log"
-	"net/url"
-	"strconv"
-	"net/http"
 	"errors"
+	"fmt"
+	"net/http"
+
+	"github.com/ONSdigital/go-ns/log"
+	"github.com/dgrijalva/jwt-go"
 )
 
 const pageIndexParam = "pageIndex"
@@ -30,40 +30,64 @@ func NewServiceImpl() *ServiceImpl {
 	return &ServiceImpl{}
 }
 
-func extractIntParam(url *url.URL, name string) int {
-	value := url.Query().Get(name)
-	if len(value) == 0 {
-		log.Debug(fmt.Sprintf("parameter '%s' was nil, default value will be used.", name), nil)
-		return 0
-	}
-
-	intValue, err := strconv.Atoi(value)
-	if err != nil {
-		log.Debug(fmt.Sprintf("'%s' was could not be parsed to int. Default value will be used.", name), nil)
-		return 0
-	}
-	return intValue
-}
-
 // CaptureAnalyticsData - captures the analytics values
 func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
-	url := r.URL.Query().Get(urlParam)
+	data := r.URL.Query().Get(":data")
+
+	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return []byte("secret"), nil
+	})
+
+	if err != nil {
+		log.ErrorR(r, err, nil)
+		return "", errors.New("Invalid redirect data")
+	}
+
+	log.DebugR(r, "token", log.Data{"token": token})
+
+	var url, term, listType string
+	var pageIndex, linkIndex, pageSize float64
+
+	var claims jwt.MapClaims
+	var ok bool
+	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
+		log.ErrorR(r, errors.New("error validating token"), nil)
+		return "", errors.New("error validating token")
+	}
+
+	if s, ok := claims["uri"].(string); ok {
+		url = s
+	}
+	if s, ok := claims["term"].(string); ok {
+		term = s
+	}
+	if s, ok := claims["listType"].(string); ok {
+		listType = s
+	}
+	if s, ok := claims["page"].(float64); ok {
+		pageIndex = s
+	}
+	if s, ok := claims["index"].(float64); ok {
+		linkIndex = s
+	}
+	if s, ok := claims["pageSize"].(float64); ok {
+		pageSize = s
+	}
+
 	if len(url) == 0 {
-		log.Error(errors.New("Failed to redirect to search results as parameter URL was missing."), nil)
+		log.ErrorR(r, errors.New("Failed to redirect to search results as parameter URL was missing."), nil)
 		return "", errors.New("400: URL is a mandatory parameter.")
 	}
 
-	term := r.URL.Query().Get(termParam)
-	searchType := r.URL.Query().Get(searchTypeParam)
-	pageIndex := extractIntParam(r.URL, pageIndexParam)
-	linkIndex := extractIntParam(r.URL, linkIndexParam)
-	pageSize := extractIntParam(r.URL, pageSizeParam)
-
 	// TODO implement.
-	log.Debug("CaptureAnalyticsData", log.Data{
+	log.DebugR(r, "CaptureAnalyticsData", log.Data{
 		urlParam:        url,
 		termParam:       term,
-		searchTypeParam: searchType,
+		searchTypeParam: listType,
 		pageIndexParam:  pageIndex,
 		linkIndexParam:  linkIndex,
 		pageSizeParam:   pageSize,
