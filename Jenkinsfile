@@ -24,7 +24,6 @@ node {
 
         stage('Image') {
             docker.withRegistry("https://${env.ECR_REPOSITORY_URI}", { ->
-                sh '$(aws ecr get-login)'
                 docker.build('frontend-router', '--no-cache --pull --rm .').push(revision)
             })
         }
