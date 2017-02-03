@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -39,7 +40,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte("secret"), nil
+		return []byte(config.RedirectSecret), nil
 	})
 
 	if err != nil {

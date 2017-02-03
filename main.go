@@ -48,6 +48,9 @@ func main() {
 	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
 		config.SplashPage = v
 	}
+	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
+		config.RedirectSecret = v
+	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)

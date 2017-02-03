@@ -25,3 +25,6 @@ var SiteDomain = "ons.gov.uk"
 
 // Splash page
 var SplashPage = ""
+
+// Redirect secret
+var RedirectSecret = "secret"
