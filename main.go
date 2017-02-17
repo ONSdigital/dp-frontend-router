@@ -135,6 +135,7 @@ func securityHandler(h http.Handler) http.Handler {
 		if req.URL.Path != "/embed" {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		}
+		h.ServeHTTP(w, req)
 	})
 }
 
