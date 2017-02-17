@@ -84,6 +84,7 @@ func main() {
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
+		securityHandler,
 		serverError.Handler,
 		timeout.Handler(10 * time.Second),
 	}
