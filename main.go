@@ -128,6 +128,15 @@ func main() {
 	}
 }
 
+// securityHandler ...
+func securityHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/embed" {
+			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		}
+	})
+}
+
 //abHandler ... percentA is the percentage of request that handler 'a' is used
 func abHandler(a, b http.Handler, percentA int) http.Handler {
 	if percentA == 0 {
