@@ -84,6 +84,7 @@ func main() {
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
+		securityHandler,
 		serverError.Handler,
 		timeout.Handler(10 * time.Second),
 	}
@@ -126,6 +127,16 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
+}
+
+// securityHandler ...
+func securityHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/embed" {
+			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		}
+		h.ServeHTTP(w, req)
+	})
 }
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
