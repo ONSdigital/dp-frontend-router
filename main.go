@@ -108,6 +108,7 @@ func main() {
 	dataDiscoveryProxy := createReverseProxy(dataDiscoveryURL)
 
 	babbageProxy := createReverseProxy(babbageURL)
+	router.Handle("/robots.txt", http.HandlerFunc(robotsHandler))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(babbageProxy)), babbageProxy, config.HomepageABPercent))
 	router.Handle("/dd{uri:(|/.*)}", dataDiscoveryProxy)
 	router.Handle("/{uri:.*}", babbageProxy)
@@ -216,4 +217,11 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 		req.Host = babbageURL.Host
 	}
 	return proxy
+}
+
+func robotsHandler(w http.ResponseWriter, req *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+	w.Write([]byte(`User-agent: *
+Disallow: /
+`))
 }
