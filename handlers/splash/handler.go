@@ -11,9 +11,17 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 )
 
+var allowedURIs = map[string]bool{
+	"/robots.txt": true,
+}
+
 func Handler(splashPage string) func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if _, ok := allowedURIs[req.URL.Path]; ok {
+				h.ServeHTTP(w, req)
+				return
+			}
 			c, err := req.Cookie("splash")
 			if err != nil && err != http.ErrNoCookie {
 				log.ErrorR(req, err, nil)
