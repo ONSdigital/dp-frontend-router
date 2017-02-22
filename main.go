@@ -50,6 +50,9 @@ func main() {
 	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
 		config.SplashPage = v
 	}
+	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
+		config.DisabledPage = v
+	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
@@ -88,8 +91,10 @@ func main() {
 		serverError.Handler,
 		timeout.Handler(10 * time.Second),
 	}
-	if len(config.SplashPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.SplashPage))
+	if len(config.DisabledPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
+	} else if len(config.SplashPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.SplashPage, true))
 	}
 	alice := alice.New(middleware...).Then(router)
 

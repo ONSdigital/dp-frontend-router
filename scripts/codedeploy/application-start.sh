@@ -23,6 +23,7 @@ source $CONFIG && docker run -d              \
   --env=RENDERER_URL=$RENDERER_URL           \
   --env=RESOLVER_URL=$RESOLVER_URL           \
   --env=SPLASH_PAGE=$SPLASH_PAGE             \
+  --env=SITE_DOMAIN=$SITE_DOMAIN             \
   --name=frontend-router                     \
   --net=$DOCKER_NETWORK                      \
   --restart=always                           \

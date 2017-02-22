@@ -28,3 +28,6 @@ var SiteDomain = "ons.gov.uk"
 
 // Splash page
 var SplashPage = ""
+
+// Disabled page
+var DisabledPage = ""

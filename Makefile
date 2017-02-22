@@ -1,9 +1,11 @@
+BINPATH ?= build
+
 build: generate
-	go build -tags 'production' -o build/dp-frontend-router
+	go build -tags 'production' -o $(BINPATH)/dp-frontend-router
 
 debug: generate
-	go build -tags 'debug' -o build/dp-frontend-router
-	HUMAN_LOG=1 DEBUG=1 ./build/dp-frontend-router
+	go build -tags 'debug' -o $(BINPATH)/dp-frontend-router
+	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
 generate: ${GOPATH}/bin/go-bindata
 	# build the production version
