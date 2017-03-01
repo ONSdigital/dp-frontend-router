@@ -41,7 +41,7 @@ func Handler(splashPage string, enabled bool) func(http.Handler) http.Handler {
 					}
 					return
 				}
-				http.SetCookie(w, &http.Cookie{Name: "splash", Value: "y"})
+				http.SetCookie(w, &http.Cookie{Name: "splash", Value: "y", Path: "/"})
 				http.Redirect(w, req, req.URL.String(), http.StatusFound)
 				return
 			}
