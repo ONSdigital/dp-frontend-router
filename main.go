@@ -14,9 +14,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
-	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
+	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -80,6 +82,12 @@ func main() {
 		}},
 	})
 
+	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
@@ -87,6 +95,9 @@ func main() {
 		securityHandler,
 		serverError.Handler,
 		timeout.Handler(10 * time.Second),
+		allRoutes.Handler(map[string]http.Handler{
+			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+		}),
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
