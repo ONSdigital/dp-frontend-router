@@ -40,6 +40,12 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.DatasetControllerURL = v
+	}
+	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
+		config.ZebedeeURL = v
+	}
 	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
 		config.PatternLibraryAssetsPath = v
 	}

@@ -14,6 +14,9 @@ var RendererURL = "http://localhost:20010"
 // The URL of the dataset controller
 var DatasetControllerURL = "http://localhost:20200"
 
+// The URL of Zebedee API
+var ZebedeeURL = "http://localhost:8082"
+
 // The percentage of requests to send to the new homepage
 var HomepageABPercent = 0
 
