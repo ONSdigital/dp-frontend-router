@@ -43,6 +43,9 @@ func main() {
 	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
 		config.DatasetControllerURL = v
 	}
+	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.FilterDatasetControllerURL = v
+	}
 	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
 		config.ZebedeeURL = v
 	}
@@ -94,6 +97,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
@@ -120,17 +129,20 @@ func main() {
 
 	reverseProxy := createReverseProxy(babbageURL)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
+	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
+	router.Handle("/jobs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":           config.BindAddr,
-		"babbage_url":         config.BabbageURL,
-		"renderer_url":        config.RendererURL,
-		"resolver_url":        config.ResolverURL,
-		"homepage_ab_percent": config.HomepageABPercent,
-		"site_domain":         config.SiteDomain,
-		"assets_path":         config.PatternLibraryAssetsPath,
-		"splash_page":         config.SplashPage,
+		"bind_addr":              config.BindAddr,
+		"babbage_url":            config.BabbageURL,
+		"dataset_controller_url": config.DatasetControllerURL,
+		"renderer_url":           config.RendererURL,
+		"resolver_url":           config.ResolverURL,
+		"homepage_ab_percent":    config.HomepageABPercent,
+		"site_domain":            config.SiteDomain,
+		"assets_path":            config.PatternLibraryAssetsPath,
+		"splash_page":            config.SplashPage,
 	})
 
 	server := &http.Server{
