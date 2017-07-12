@@ -14,9 +14,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
-	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
+	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -37,6 +39,15 @@ func main() {
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
+	}
+	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.DatasetControllerURL = v
+	}
+	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.FilterDatasetControllerURL = v
+	}
+	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
+		config.ZebedeeURL = v
 	}
 	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
 		config.PatternLibraryAssetsPath = v
@@ -80,6 +91,18 @@ func main() {
 		}},
 	})
 
+	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
@@ -87,6 +110,9 @@ func main() {
 		securityHandler,
 		serverError.Handler,
 		timeout.Handler(10 * time.Second),
+		allRoutes.Handler(map[string]http.Handler{
+			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+		}),
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
@@ -103,17 +129,20 @@ func main() {
 
 	reverseProxy := createReverseProxy(babbageURL)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
+	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
+	router.Handle("/jobs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":           config.BindAddr,
-		"babbage_url":         config.BabbageURL,
-		"renderer_url":        config.RendererURL,
-		"resolver_url":        config.ResolverURL,
-		"homepage_ab_percent": config.HomepageABPercent,
-		"site_domain":         config.SiteDomain,
-		"assets_path":         config.PatternLibraryAssetsPath,
-		"splash_page":         config.SplashPage,
+		"bind_addr":              config.BindAddr,
+		"babbage_url":            config.BabbageURL,
+		"dataset_controller_url": config.DatasetControllerURL,
+		"renderer_url":           config.RendererURL,
+		"resolver_url":           config.ResolverURL,
+		"homepage_ab_percent":    config.HomepageABPercent,
+		"site_domain":            config.SiteDomain,
+		"assets_path":            config.PatternLibraryAssetsPath,
+		"splash_page":            config.SplashPage,
 	})
 
 	server := &http.Server{
