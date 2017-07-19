@@ -130,7 +130,7 @@ func main() {
 	reverseProxy := createReverseProxy(babbageURL)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
-	router.Handle("/jobs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
