@@ -4,8 +4,12 @@ job "dp-frontend-router" {
   type        = "service"
 
   update {
-    stagger      = "10s"
+    stagger      = "20s"
     max_parallel = 1
+  }
+
+  constraint {
+    distinct_hosts = true
   }
 
   group "web" {
@@ -16,17 +20,15 @@ job "dp-frontend-router" {
       value     = "web"
     }
 
-    task "dp-frontend-router" {
+    task "dp-frontend-router-web" {
       driver = "docker"
 
-      artifact {
-        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
-      }
-
       config {
-        command = "${NOMAD_TASK_DIR}/start-task"
+        image = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
 
-        args = ["./dp-frontend-router"]
+        port_map {
+          http = 8080
+        }
       }
 
       service {
@@ -43,14 +45,41 @@ job "dp-frontend-router" {
           port "http" {}
         }
       }
+    }
+  }
 
-      template {
-        source      = "${NOMAD_TASK_DIR}/vars-template"
-        destination = "${NOMAD_TASK_DIR}/vars"
+  group "publising" {
+    count = "{{PUBLISHING_TASK_COUNT}}"
+
+    constraint {
+      attribute = "${node.class}"
+      value     = "publishing"
+    }
+
+    task "dp-frontend-router-publishing" {
+      driver = "docker"
+
+      config {
+        image = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
+
+        port_map {
+          http = 8080
+        }
       }
 
-      vault {
-        policies = ["dp-frontend-router"]
+      service {
+        name = "dp-frontend-router"
+        port = "http"
+        tags = ["publishing"]
+      }
+
+      resources {
+        cpu    = "{{PUBLISHING_RESOURCE_CPU}}"
+        memory = "{{PUBLISHING_RESOURCE_CPU}}"
+
+        network {
+          port "http" {}
+        }
       }
     }
   }
