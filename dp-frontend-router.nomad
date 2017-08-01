@@ -8,10 +8,6 @@ job "dp-frontend-router" {
     max_parallel = 1
   }
 
-  constraint {
-    distinct_hosts = true
-  }
-
   group "web" {
     count = "{{WEB_TASK_COUNT}}"
 
@@ -23,8 +19,16 @@ job "dp-frontend-router" {
     task "dp-frontend-router-web" {
       driver = "docker"
 
+      artifact {
+        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
+      }
+
       config {
-        image = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
+        command = "${NOMAD_TASK_DIR}/start-task"
+
+        args = ["./dp-frontend-router"]
+
+        image = "{{ECR_URL}}:concourse-{{REVISION}}"
 
         port_map {
           http = 8080
@@ -45,6 +49,15 @@ job "dp-frontend-router" {
           port "http" {}
         }
       }
+
+      template {
+        source      = "${NOMAD_TASK_DIR}/vars-template"
+        destination = "${NOMAD_TASK_DIR}/vars"
+      }
+
+      vault {
+        policies = ["dp-frontend-router-web"]
+      }
     }
   }
 
@@ -59,8 +72,16 @@ job "dp-frontend-router" {
     task "dp-frontend-router-publishing" {
       driver = "docker"
 
+      artifact {
+        source = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
+      }
+
       config {
-        image = "s3::https://s3-eu-west-1.amazonaws.com/{{DEPLOYMENT_BUCKET}}/dp-frontend-router/{{REVISION}}.tar.gz"
+        command = "${NOMAD_TASK_DIR}/start-task"
+
+        args = ["./dp-frontend-router"]
+
+        image = "{{ECR_URL}}:concourse-{{REVISION}}"
 
         port_map {
           http = 8080
@@ -75,11 +96,20 @@ job "dp-frontend-router" {
 
       resources {
         cpu    = "{{PUBLISHING_RESOURCE_CPU}}"
-        memory = "{{PUBLISHING_RESOURCE_CPU}}"
+        memory = "{{PUBLISHING_RESOURCE_MEM}}"
 
         network {
           port "http" {}
         }
+      }
+
+      template {
+        source      = "${NOMAD_TASK_DIR}/vars-template"
+        destination = "${NOMAD_TASK_DIR}/vars"
+      }
+
+      vault {
+        policies = ["dp-frontend-router-publishing"]
       }
     }
   }
