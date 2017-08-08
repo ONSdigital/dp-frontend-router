@@ -205,7 +205,6 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 			"destination": babbageURL,
 		})
 		director(req)
-		req.Host = babbageURL.Host
 	}
 	return proxy
 }
