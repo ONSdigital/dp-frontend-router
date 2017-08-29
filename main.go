@@ -15,11 +15,13 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/healthcheck"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	"github.com/ONSdigital/go-ns/handlers/timeout"
+	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
 	"github.com/gorilla/pat"
@@ -104,6 +106,23 @@ func main() {
 	}
 
 	router := pat.New()
+
+	dc := healthcheck.New(config.DatasetControllerURL, "dataset-controller")
+	fdc := healthcheck.New(config.FilterDatasetControllerURL, "filter-dataset-controller")
+	bc := healthcheck.New(config.BabbageURL, "babbage")
+
+	go func() {
+		for {
+			timer := time.NewTimer(time.Second * 60)
+
+			hc.MonitorExternal(dc, fdc, bc)
+
+			<-timer.C
+		}
+	}()
+
+	router.Path("/healthcheck").HandlerFunc(hc.Do)
+
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
