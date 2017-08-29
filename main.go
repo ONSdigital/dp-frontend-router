@@ -110,12 +110,13 @@ func main() {
 	dc := healthcheck.New(config.DatasetControllerURL, "dataset-controller")
 	fdc := healthcheck.New(config.FilterDatasetControllerURL, "filter-dataset-controller")
 	bc := healthcheck.New(config.BabbageURL, "babbage")
+	rc := healthcheck.New(config.RendererURL, "renderer")
 
 	go func() {
 		for {
 			timer := time.NewTimer(time.Second * 60)
 
-			hc.MonitorExternal(dc, fdc, bc)
+			hc.MonitorExternal(dc, fdc, bc, rc)
 
 			<-timer.C
 		}
