@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -150,6 +151,7 @@ func main() {
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
 	if err := server.ListenAndServe(); err != nil {
@@ -161,7 +163,7 @@ func main() {
 // securityHandler ...
 func securityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" {
+		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)
@@ -234,7 +236,6 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 			"destination": babbageURL,
 		})
 		director(req)
-		req.Host = babbageURL.Host
 	}
 	return proxy
 }
