@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -194,7 +195,7 @@ func main() {
 // securityHandler ...
 func securityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" {
+		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)
@@ -267,7 +268,6 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 			"destination": babbageURL,
 		})
 		director(req)
-		req.Host = babbageURL.Host
 	}
 	return proxy
 }
