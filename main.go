@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"html/template"
 	"math/rand"
 	"net"
@@ -8,6 +9,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"os/signal"
 	"strconv"
 	"time"
 
@@ -24,6 +26,7 @@ import (
 	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
+	"github.com/ONSdigital/go-ns/server"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	unrolled "github.com/unrolled/render"
@@ -112,16 +115,6 @@ func main() {
 	bc := healthcheck.New(config.BabbageURL, "babbage")
 	rc := healthcheck.New(config.RendererURL, "renderer")
 
-	go func() {
-		for {
-			timer := time.NewTimer(time.Second * 60)
-
-			hc.MonitorExternal(dc, fdc, bc, rc)
-
-			<-timer.C
-		}
-	}()
-
 	router.Path("/healthcheck").HandlerFunc(hc.Do)
 
 	middleware := []alice.Constructor{
@@ -165,16 +158,36 @@ func main() {
 		"splash_page":            config.SplashPage,
 	})
 
-	server := &http.Server{
-		Addr:         config.BindAddr,
-		Handler:      alice,
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
+	s := server.New(config.BindAddr, alice)
+	s.HandleOSSignals = false
 
-	if err := server.ListenAndServe(); err != nil {
-		log.Error(err, nil)
-		os.Exit(2)
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			log.Error(err, nil)
+			os.Exit(2)
+		}
+	}()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, os.Kill)
+
+	for {
+		hc.MonitorExternal(dc, fdc, bc, rc)
+		timer := time.NewTimer(time.Second * 60)
+
+		select {
+		case <-timer.C:
+			continue
+		case <-stop:
+			log.Info("shutting service down gracefully", nil)
+			timer.Stop()
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if err := s.Server.Shutdown(ctx); err != nil {
+				log.Error(err, nil)
+			}
+			return
+		}
 	}
 }
 
