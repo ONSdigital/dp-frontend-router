@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"html/template"
 	"math/rand"
 	"net"
@@ -9,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"os/signal"
 	"strconv"
 	"strings"
 	"time"
@@ -18,7 +16,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
-	"github.com/ONSdigital/dp-frontend-router/healthcheck"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
@@ -111,11 +108,6 @@ func main() {
 
 	router := pat.New()
 
-	dc := healthcheck.New(config.DatasetControllerURL, "dataset-controller")
-	fdc := healthcheck.New(config.FilterDatasetControllerURL, "filter-dataset-controller")
-	bc := healthcheck.New(config.BabbageURL, "babbage")
-	rc := healthcheck.New(config.RendererURL, "renderer")
-
 	router.Path("/healthcheck").HandlerFunc(hc.Do)
 
 	middleware := []alice.Constructor{
@@ -160,35 +152,9 @@ func main() {
 	})
 
 	s := server.New(config.BindAddr, alice)
-	s.HandleOSSignals = false
-
-	go func() {
-		if err := s.ListenAndServe(); err != nil {
-			log.Error(err, nil)
-			os.Exit(2)
-		}
-	}()
-
-	stop := make(chan os.Signal, 1)
-	signal.Notify(stop, os.Interrupt, os.Kill)
-
-	for {
-		hc.MonitorExternal(dc, fdc, bc, rc)
-		timer := time.NewTimer(time.Second * 60)
-
-		select {
-		case <-timer.C:
-			continue
-		case <-stop:
-			log.Info("shutting service down gracefully", nil)
-			timer.Stop()
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-			defer cancel()
-			if err := s.Server.Shutdown(ctx); err != nil {
-				log.Error(err, nil)
-			}
-			return
-		}
+	if err := s.ListenAndServe(); err != nil {
+		log.Error(err, nil)
+		os.Exit(2)
 	}
 }
 
