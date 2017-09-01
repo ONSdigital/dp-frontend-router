@@ -45,6 +45,12 @@
 			"revisionTime": "2017-08-30T09:50:52Z"
 		},
 		{
+			"checksumSHA1": "ST3iiJ6vhtfZDnujuW/HGXQCtZM=",
+			"path": "github.com/golang/mock/gomock",
+			"revision": "9e3cfa9279f269a4c4d703dacd64b05184cec28e",
+			"revisionTime": "2017-06-14T19:52:02Z"
+		},
+		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
 			"path": "github.com/gorilla/context",
 			"revision": "08b5f424b9271eedf6f9f0ce86cb9396ed337a42",
