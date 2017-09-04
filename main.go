@@ -17,6 +17,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -80,12 +81,15 @@ func main() {
 		}},
 	})
 
+	redirects.Init(assets.Asset)
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
+		redirects.Handler,
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
@@ -150,7 +154,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	}
 
 	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' but be between 0 and 100")
+		panic("Percent 'a' must be between 0 and 100")
 	}
 	rand.Seed(time.Now().UnixNano())
 
