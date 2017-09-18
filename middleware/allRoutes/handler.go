@@ -1,7 +1,8 @@
 package allRoutes
 
 import (
-	"io"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -42,10 +43,32 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			io.Copy(ioutil.Discard, res.Body)
-			res.Body.Close()
+			b, err := ioutil.ReadAll(res.Body)
+			if err != nil {
+				log.ErrorR(req, err, nil)
+				h.ServeHTTP(w, req)
+				return
+			}
+			defer res.Body.Close()
+
+			zebResp := struct {
+				Type        string `json:"type"`
+				Description struct {
+					DatasetID string `json:"datasetId"`
+				} `json:"description"`
+			}{}
+			if err := json.Unmarshal(b, &zebResp); err != nil {
+				log.ErrorR(req, err, nil)
+				h.ServeHTTP(w, req)
+				return
+			}
 
 			pageType := res.Header.Get("ONS-Page-Type")
+
+			if len(zebResp.Description.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
+				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.Description.DatasetID), 302)
+				return
+			}
 
 			if h, ok := routesHandler[pageType]; ok {
 				log.DebugR(req, "Using handler for page type", log.Data{"pageType": pageType, "url": contentURL})
