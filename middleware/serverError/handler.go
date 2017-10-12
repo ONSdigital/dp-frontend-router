@@ -23,9 +23,13 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 	if status >= 500 {
-		log.DebugR(rI.req, "Intercepted error response", nil)
+		log.DebugR(rI.req, "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
-		rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties.</p>")
+		if status == 500 {
+			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties.</p>")
+		} else {
+			rI.renderErrorPage(503, "Service temporarily unavailable", `<p>The service is temporarily unavailable, please check our <a href="https://twitter.com/onsdigital">twitter</a> feed for updates.</p>`)
+		}
 		return
 	}
 	rI.writeHeaders()
