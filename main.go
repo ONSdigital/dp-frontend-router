@@ -138,6 +138,7 @@ func main() {
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
