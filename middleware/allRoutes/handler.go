@@ -3,6 +3,7 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 
@@ -39,17 +40,19 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			statusCode := res.StatusCode
 			if statusCode >= 400 {
 				log.DebugR(req, "Unexpected status code", log.Data{"statusCode": statusCode, "url": contentURL})
+				io.Copy(ioutil.Discard, res.Body)
+				res.Body.Close()
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			b, err := ioutil.ReadAll(res.Body)
+			res.Body.Close()
 			if err != nil {
 				log.ErrorR(req, err, nil)
 				h.ServeHTTP(w, req)
 				return
 			}
-			defer res.Body.Close()
 
 			zebResp := struct {
 				Type        string `json:"type"`
