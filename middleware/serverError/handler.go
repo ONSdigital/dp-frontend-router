@@ -6,12 +6,15 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
 )
+
+var mutex = &sync.Mutex{}
 
 type responseInterceptor struct {
 	http.ResponseWriter
@@ -42,8 +45,13 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 		log.ErrorR(rI.req, err, nil)
 		log.DebugR(rI.req, "rendering disaster page", nil)
 
+		// There is a race condition going on in render.HTML
+		// lock access to it until resource is released
+		mutex.Lock()
+		defer mutex.Unlock()
+
 		// Calling the renderer failed, render the disaster page
-		render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
+		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
 			"URI":                      rI.req.URL.Path,
 			"Language":                 lang.Get(rI.req),
 			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
@@ -53,6 +61,10 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 				"Description": description,
 			},
 		})
+		if err != nil {
+			log.ErrorR(rI.req, err, nil)
+			return
+		}
 	}
 }
 
