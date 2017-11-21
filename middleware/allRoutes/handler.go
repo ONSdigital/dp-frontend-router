@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
@@ -15,9 +16,17 @@ import (
 func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			path := req.URL.Path
+
+			// No point calling zebedee for these paths so skip middleware
+			if ok, err := regexp.MatchString(`^\/(datasets|filter|feedback|healthcheck).*$`, path); ok && err == nil {
+				h.ServeHTTP(w, req)
+				return
+			}
+
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
-			contentURL := config.ZebedeeURL + "/data?uri=" + req.URL.Path
+			contentURL := config.ZebedeeURL + "/data?uri=" + path
 			request, err := http.NewRequest("GET", contentURL, nil)
 			if err != nil {
 				log.ErrorR(req, err, nil)
