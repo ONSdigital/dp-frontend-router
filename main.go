@@ -82,6 +82,7 @@ func main() {
 
 	log.Namespace = "dp-frontend-router"
 
+	log.Debug("overriding default renderer with service assets", nil)
 	render.Renderer = unrolled.New(unrolled.Options{
 		Asset:         assets.Asset,
 		AssetNames:    assets.AssetNames,
