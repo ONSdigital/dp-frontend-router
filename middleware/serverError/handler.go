@@ -45,11 +45,6 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 		log.ErrorR(rI.req, err, nil)
 		log.DebugR(rI.req, "rendering disaster page", nil)
 
-		// There is a race condition going on in render.HTML
-		// lock access to it until resource is released
-		mutex.Lock()
-		defer mutex.Unlock()
-
 		// Calling the renderer failed, render the disaster page
 		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
 			"URI":                      rI.req.URL.Path,
