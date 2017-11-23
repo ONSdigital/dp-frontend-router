@@ -6,15 +6,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"sync"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
 )
-
-var mutex = &sync.Mutex{}
 
 type responseInterceptor struct {
 	http.ResponseWriter
