@@ -73,7 +73,6 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			log.Debug("Zebedee response: ", log.Data{"zebResp": zebResp})
 			pageType := res.Header.Get("ONS-Page-Type")
 
 			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
