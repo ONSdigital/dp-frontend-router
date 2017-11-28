@@ -117,7 +117,6 @@ func main() {
 		"site_domain":         config.SiteDomain,
 		"assets_path":         config.PatternLibraryAssetsPath,
 		"splash_page":         config.SplashPage,
-		"redirects_enabled":   config.RedirectsEnabled,
 	})
 
 	server := &http.Server{
