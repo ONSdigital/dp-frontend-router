@@ -62,11 +62,6 @@ func main() {
 	}
 
 	var err error
-	config.RedirectsEnabled, err = strconv.ParseBool(os.Getenv("REDIRECTS_ENABLED"))
-	if err != nil {
-		log.Error(err, nil)
-	}
-
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Error(err, nil)
@@ -86,7 +81,7 @@ func main() {
 		}},
 	})
 
-	//redirects.Init(assets.Asset)
+	redirects.Init(assets.Asset)
 
 	router := pat.New()
 	middleware := []alice.Constructor{
@@ -94,11 +89,7 @@ func main() {
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
-		//redirects.Handler,
-	}
-	if config.RedirectsEnabled {
-		redirects.Init(assets.Asset)
-		middleware = append(middleware, redirects.Handler)
+		redirects.Handler,
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))

@@ -168,7 +168,7 @@ func redirectsRedirectsCsv() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "redirects/redirects.csv", size: 17871, mode: os.FileMode(420), modTime: time.Unix(1511865269, 0)}
+	info := bindataFileInfo{name: "redirects/redirects.csv", size: 17871, mode: os.FileMode(420), modTime: time.Unix(1511865925, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
