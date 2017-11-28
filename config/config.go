@@ -28,3 +28,6 @@ var SplashPage = ""
 
 // Disabled page
 var DisabledPage = ""
+
+// Redirects enabled
+var RedirectsEnabled = false

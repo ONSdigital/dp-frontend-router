@@ -17,6 +17,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -61,6 +62,11 @@ func main() {
 	}
 
 	var err error
+	config.RedirectsEnabled, err = strconv.ParseBool(os.Getenv("REDIRECTS_ENABLED"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Error(err, nil)
@@ -80,12 +86,19 @@ func main() {
 		}},
 	})
 
+	//redirects.Init(assets.Asset)
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
+		//redirects.Handler,
+	}
+	if config.RedirectsEnabled {
+		redirects.Init(assets.Asset)
+		middleware = append(middleware, redirects.Handler)
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
@@ -113,6 +126,7 @@ func main() {
 		"site_domain":         config.SiteDomain,
 		"assets_path":         config.PatternLibraryAssetsPath,
 		"splash_page":         config.SplashPage,
+		"redirects_enabled":   config.RedirectsEnabled,
 	})
 
 	server := &http.Server{
@@ -150,7 +164,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	}
 
 	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' but be between 0 and 100")
+		panic("Percent 'a' must be between 0 and 100")
 	}
 	rand.Seed(time.Now().UnixNano())
 
