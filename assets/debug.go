@@ -5,6 +5,7 @@
 // templates/main.tmpl
 // templates/partials/footer.tmpl
 // templates/partials/header.tmpl
+// redirects/redirects.csv
 // DO NOT EDIT!
 
 package assets
@@ -33,7 +34,7 @@ type asset struct {
 
 // templatesErrorTmpl reads file data from disk. It returns an error on failure.
 func templatesErrorTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/error.tmpl"
+	path := "/Users/sullid/golang/src/github.com/ONSdigital/dp-frontend-router/assets/templates/error.tmpl"
 	name := "templates/error.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -51,7 +52,7 @@ func templatesErrorTmpl() (*asset, error) {
 
 // templatesMainTmpl reads file data from disk. It returns an error on failure.
 func templatesMainTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/main.tmpl"
+	path := "/Users/sullid/golang/src/github.com/ONSdigital/dp-frontend-router/assets/templates/main.tmpl"
 	name := "templates/main.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -69,7 +70,7 @@ func templatesMainTmpl() (*asset, error) {
 
 // templatesPartialsFooterTmpl reads file data from disk. It returns an error on failure.
 func templatesPartialsFooterTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/footer.tmpl"
+	path := "/Users/sullid/golang/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/footer.tmpl"
 	name := "templates/partials/footer.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -87,8 +88,26 @@ func templatesPartialsFooterTmpl() (*asset, error) {
 
 // templatesPartialsHeaderTmpl reads file data from disk. It returns an error on failure.
 func templatesPartialsHeaderTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/header.tmpl"
+	path := "/Users/sullid/golang/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/header.tmpl"
 	name := "templates/partials/header.tmpl"
+	bytes, err := bindataRead(path, name)
+	if err != nil {
+		return nil, err
+	}
+
+	fi, err := os.Stat(path)
+	if err != nil {
+		err = fmt.Errorf("Error reading asset info %s at %s: %v", name, path, err)
+	}
+
+	a := &asset{bytes: bytes, info: fi}
+	return a, err
+}
+
+// redirectsRedirectsCsv reads file data from disk. It returns an error on failure.
+func redirectsRedirectsCsv() (*asset, error) {
+	path := "/Users/sullid/golang/src/github.com/ONSdigital/dp-frontend-router/assets/redirects/redirects.csv"
+	name := "redirects/redirects.csv"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
 		return nil, err
@@ -159,6 +178,7 @@ var _bindata = map[string]func() (*asset, error){
 	"templates/main.tmpl": templatesMainTmpl,
 	"templates/partials/footer.tmpl": templatesPartialsFooterTmpl,
 	"templates/partials/header.tmpl": templatesPartialsHeaderTmpl,
+	"redirects/redirects.csv": redirectsRedirectsCsv,
 }
 
 // AssetDir returns the file names below a certain
@@ -201,6 +221,9 @@ type bintree struct {
 	Children map[string]*bintree
 }
 var _bintree = &bintree{nil, map[string]*bintree{
+	"redirects": &bintree{nil, map[string]*bintree{
+		"redirects.csv": &bintree{redirectsRedirectsCsv, map[string]*bintree{}},
+	}},
 	"templates": &bintree{nil, map[string]*bintree{
 		"error.tmpl": &bintree{templatesErrorTmpl, map[string]*bintree{}},
 		"main.tmpl": &bintree{templatesMainTmpl, map[string]*bintree{}},

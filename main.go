@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -17,8 +18,8 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/handlers/timeout"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
 	"github.com/gorilla/pat"
@@ -48,8 +49,13 @@ func main() {
 	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
 		config.SplashPage = v
 	}
+
 	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
 		config.RedirectSecret = v
+	}
+
+	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
+		config.DisabledPage = v
 	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
@@ -81,15 +87,20 @@ func main() {
 		}},
 	})
 
+	redirects.Init(assets.Asset)
+
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Handler,
+		securityHandler,
 		serverError.Handler,
-		timeout.Handler(10 * time.Second),
+		redirects.Handler,
 	}
-	if len(config.SplashPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.SplashPage))
+	if len(config.DisabledPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
+	} else if len(config.SplashPage) > 0 {
+		middleware = append(middleware, splash.Handler(config.SplashPage, true))
 	}
 	alice := alice.New(middleware...).Then(router)
 
@@ -120,12 +131,23 @@ func main() {
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
 	}
 
 	if err := server.ListenAndServe(); err != nil {
 		log.Error(err, nil)
 		os.Exit(2)
 	}
+}
+
+// securityHandler ...
+func securityHandler(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
+			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		}
+		h.ServeHTTP(w, req)
+	})
 }
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
@@ -139,7 +161,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	}
 
 	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' but be between 0 and 100")
+		panic("Percent 'a' must be between 0 and 100")
 	}
 	rand.Seed(time.Now().UnixNano())
 
@@ -194,7 +216,6 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 			"destination": babbageURL,
 		})
 		director(req)
-		req.Host = babbageURL.Host
 	}
 	return proxy
 }

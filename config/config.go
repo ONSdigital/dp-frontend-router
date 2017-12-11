@@ -28,3 +28,6 @@ var SplashPage = ""
 
 // Redirect secret
 var RedirectSecret = "secret"
+
+// Disabled page
+var DisabledPage = ""
