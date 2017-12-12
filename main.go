@@ -17,10 +17,10 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
+	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	"github.com/ONSdigital/go-ns/handlers/timeout"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -106,6 +106,7 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
+	redirects.Init(assets.Asset)
 
 	router := pat.New()
 
@@ -116,10 +117,10 @@ func main() {
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
-		timeout.Handler(10 * time.Second),
 		allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
 		}),
+		redirects.Handler,
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
@@ -182,7 +183,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	}
 
 	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' but be between 0 and 100")
+		panic("Percent 'a' must be between 0 and 100")
 	}
 	rand.Seed(time.Now().UnixNano())
 
