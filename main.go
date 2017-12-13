@@ -158,6 +158,7 @@ func main() {
 		"site_domain":            config.SiteDomain,
 		"assets_path":            config.PatternLibraryAssetsPath,
 		"splash_page":            config.SplashPage,
+		"disable_hsts_header":    config.DisableHSTSHeader,
 	})
 
 	s := server.New(config.BindAddr, alice)
