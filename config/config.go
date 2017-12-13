@@ -37,3 +37,6 @@ var SplashPage = ""
 
 // Disabled page
 var DisabledPage = ""
+
+// Disable HSTS header
+var DisableHSTSHeader = false

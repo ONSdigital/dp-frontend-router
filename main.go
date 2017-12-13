@@ -80,6 +80,11 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	config.DisableHSTSHeader, err = strconv.ParseBool(os.Getenv("DISABLE_HSTS_HEADER"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	log.Namespace = "dp-frontend-router"
 
 	log.Debug("overriding default renderer with service assets", nil)
@@ -167,6 +172,9 @@ func securityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		}
+		if !config.DisableHSTSHeader {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
 		}
 		h.ServeHTTP(w, req)
 	})
