@@ -98,7 +98,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 	}
 
 	log.DebugR(rI.req, "returning error page", nil)
-	rI.ResponseWriter.WriteHeader(res.StatusCode)
+	rI.ResponseWriter.WriteHeader(code)
 	rI.ResponseWriter.Write(b)
 
 	return nil
