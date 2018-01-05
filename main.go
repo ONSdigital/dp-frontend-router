@@ -17,10 +17,10 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
+	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	"github.com/ONSdigital/go-ns/handlers/timeout"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -80,6 +80,11 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	config.DisableHSTSHeader, err = strconv.ParseBool(os.Getenv("DISABLE_HSTS_HEADER"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	log.Namespace = "dp-frontend-router"
 
 	log.Debug("overriding default renderer with service assets", nil)
@@ -106,6 +111,7 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
+	redirects.Init(assets.Asset)
 
 	router := pat.New()
 
@@ -116,10 +122,10 @@ func main() {
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
-		timeout.Handler(10 * time.Second),
 		allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
 		}),
+		redirects.Handler,
 	}
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
@@ -152,6 +158,7 @@ func main() {
 		"site_domain":            config.SiteDomain,
 		"assets_path":            config.PatternLibraryAssetsPath,
 		"splash_page":            config.SplashPage,
+		"disable_hsts_header":    config.DisableHSTSHeader,
 	})
 
 	s := server.New(config.BindAddr, alice)
@@ -166,6 +173,9 @@ func securityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		}
+		if !config.DisableHSTSHeader {
+			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
 		}
 		h.ServeHTTP(w, req)
 	})
@@ -182,7 +192,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	}
 
 	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' but be between 0 and 100")
+		panic("Percent 'a' must be between 0 and 100")
 	}
 	rand.Seed(time.Now().UnixNano())
 
