@@ -34,7 +34,7 @@ type asset struct {
 
 // templatesErrorTmpl reads file data from disk. It returns an error on failure.
 func templatesErrorTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/error.tmpl"
+	path := "/Users/mrout/go/src/github.com/ONSdigital/dp-frontend-router/assets/templates/error.tmpl"
 	name := "templates/error.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -52,7 +52,7 @@ func templatesErrorTmpl() (*asset, error) {
 
 // templatesMainTmpl reads file data from disk. It returns an error on failure.
 func templatesMainTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/main.tmpl"
+	path := "/Users/mrout/go/src/github.com/ONSdigital/dp-frontend-router/assets/templates/main.tmpl"
 	name := "templates/main.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -70,7 +70,7 @@ func templatesMainTmpl() (*asset, error) {
 
 // templatesPartialsFooterTmpl reads file data from disk. It returns an error on failure.
 func templatesPartialsFooterTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/footer.tmpl"
+	path := "/Users/mrout/go/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/footer.tmpl"
 	name := "templates/partials/footer.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -88,7 +88,7 @@ func templatesPartialsFooterTmpl() (*asset, error) {
 
 // templatesPartialsHeaderTmpl reads file data from disk. It returns an error on failure.
 func templatesPartialsHeaderTmpl() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/header.tmpl"
+	path := "/Users/mrout/go/src/github.com/ONSdigital/dp-frontend-router/assets/templates/partials/header.tmpl"
 	name := "templates/partials/header.tmpl"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
@@ -106,7 +106,7 @@ func templatesPartialsHeaderTmpl() (*asset, error) {
 
 // redirectsRedirectsCsv reads file data from disk. It returns an error on failure.
 func redirectsRedirectsCsv() (*asset, error) {
-	path := "/Users/iankent/dev/src/github.com/ONSdigital/dp-frontend-router/assets/redirects/redirects.csv"
+	path := "/Users/mrout/go/src/github.com/ONSdigital/dp-frontend-router/assets/redirects/redirects.csv"
 	name := "redirects/redirects.csv"
 	bytes, err := bindataRead(path, name)
 	if err != nil {
