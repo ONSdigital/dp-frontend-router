@@ -11,6 +11,9 @@ var ResolverURL = "http://localhost:20020"
 // The URL of the content renderer
 var RendererURL = "http://localhost:20010"
 
+// The URL of the file downloader service
+var DownloaderURL = "http://localhost:23400"
+
 // The percentage of requests to send to the new homepage
 var HomepageABPercent = 0
 

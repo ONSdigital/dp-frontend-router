@@ -39,6 +39,9 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
+		config.DownloaderURL = v
+	}
 	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
 		config.PatternLibraryAssetsPath = v
 	}
@@ -104,6 +107,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	downloaderURL, err := url.Parse(config.DownloaderURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	router.PathPrefix("/download/").Handler(createReverseProxy(downloaderURL))
 	reverseProxy := createReverseProxy(babbageURL)
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
@@ -113,6 +123,7 @@ func main() {
 		"babbage_url":         config.BabbageURL,
 		"renderer_url":        config.RendererURL,
 		"resolver_url":        config.ResolverURL,
+		"downloader_url":      config.DownloaderURL,
 		"homepage_ab_percent": config.HomepageABPercent,
 		"site_domain":         config.SiteDomain,
 		"assets_path":         config.PatternLibraryAssetsPath,
@@ -190,8 +201,8 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(babbageURL *url.URL) http.Handler {
-	proxy := httputil.NewSingleHostReverseProxy(babbageURL)
+func createReverseProxy(proxyURL *url.URL) http.Handler {
+	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -206,7 +217,7 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 	}
 	proxy.Director = func(req *http.Request) {
 		log.DebugR(req, "Proxying request", log.Data{
-			"destination": babbageURL,
+			"destination": proxyURL,
 		})
 		director(req)
 	}
