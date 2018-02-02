@@ -113,8 +113,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	router.PathPrefix("/download/").Handler(createReverseProxy(downloaderURL))
 	reverseProxy := createReverseProxy(babbageURL)
+	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
