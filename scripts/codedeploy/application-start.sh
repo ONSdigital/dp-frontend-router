@@ -16,14 +16,15 @@ else
   DOCKER_NETWORK=website
 fi
 
-source $CONFIG && docker run -d    \
-  --env=BABBAGE_URL=$BABBAGE_URL   \
-  --env=BIND_ADDR=$BIND_ADDR       \
-  --env=RENDERER_URL=$RENDERER_URL \
-  --env=RESOLVER_URL=$RESOLVER_URL \
-  --env=SPLASH_PAGE=$SPLASH_PAGE   \
-  --env=SITE_DOMAIN=$SITE_DOMAIN   \
-  --name=frontend-router           \
-  --net=$DOCKER_NETWORK            \
-  --restart=always                 \
+source $CONFIG && docker run -d        \
+  --env=BABBAGE_URL=$BABBAGE_URL       \
+  --env=BIND_ADDR=$BIND_ADDR           \
+  --env=RENDERER_URL=$RENDERER_URL     \
+  --env=RESOLVER_URL=$RESOLVER_URL     \
+  --env=DOWNLOADER_URL=$DOWNLOADER_URL \
+  --env=SPLASH_PAGE=$SPLASH_PAGE       \
+  --env=SITE_DOMAIN=$SITE_DOMAIN       \
+  --name=frontend-router               \
+  --net=$DOCKER_NETWORK                \
+  --restart=always                     \
   $ECR_REPOSITORY_URI/frontend-router:$GIT_COMMIT
