@@ -2,11 +2,12 @@ package analytics
 
 import (
 	"errors"
-	. "github.com/smartystreets/goconvey/convey"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 const validURL = "http://localhost:20000/redir?url=/economy/inflationandpriceindices/bulletins/consumerpriceinflation/december2015&pageIndex=1&linkIndex=1&term=cpi"
@@ -55,15 +56,17 @@ func TestHandleSearch(t *testing.T) {
 			mockBehaviour: successBehavior,
 		}
 
-		service = serviceMock
 		mockRedir := &MockHttpRedir{args: make([]*MockRedirArgs, 0)}
-		redirector = mockRedir.mockRedirector
+		sh := &searchHandler{
+			service:    serviceMock,
+			redirector: mockRedir.mockRedirector,
+		}
 
 		resp := httptest.NewRecorder()
 		req := httptest.NewRequest("GET", requestedURL.RequestURI(), nil)
 
 		Convey("When the search redirect handler is invoked", func() {
-			HandleSearch(resp, req)
+			sh.ServeHTTP(resp, req)
 
 			Convey("Then service is called 1 time with the expected parameters", func() {
 				So(len(serviceMock.args), ShouldEqual, 1)
@@ -86,11 +89,11 @@ func TestHandleSearch(t *testing.T) {
 				args:          make([]url.Values, 0),
 				mockBehaviour: errorBehavior,
 			}
-			service = serviceMock
+			sh.service = serviceMock
 			resp := httptest.NewRecorder()
 			req := httptest.NewRequest("GET", requestedURL.RequestURI(), nil)
 
-			HandleSearch(resp, req)
+			sh.ServeHTTP(resp, req)
 
 			Convey("Then a BAD REQUEST status is returned.", func() {
 				So(resp.Code, ShouldEqual, 400)
