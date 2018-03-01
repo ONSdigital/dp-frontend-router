@@ -34,3 +34,6 @@ var RedirectSecret = "secret"
 
 // Disabled page
 var DisabledPage = ""
+
+// SQS URL for analytics data
+var SQSAnalyticsURL = ""

@@ -57,6 +57,10 @@ func main() {
 		config.RedirectSecret = v
 	}
 
+	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
+		config.SQSAnalyticsURL = v
+	}
+
 	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
 		config.DisabledPage = v
 	}
@@ -119,8 +123,14 @@ func main() {
 		os.Exit(1)
 	}
 
+	searchHandler, err := analytics.NewSearchHandler()
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
 	reverseProxy := createReverseProxy(babbageURL)
-	router.HandleFunc("/redir/{data:.*}", analytics.HandleSearch)
+	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
@@ -135,6 +145,7 @@ func main() {
 		"site_domain":         config.SiteDomain,
 		"assets_path":         config.PatternLibraryAssetsPath,
 		"splash_page":         config.SplashPage,
+		"analytics_sqs_url":   config.SQSAnalyticsURL,
 	})
 
 	server := &http.Server{

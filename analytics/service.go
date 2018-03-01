@@ -17,18 +17,26 @@ const urlParam = "url"
 const termParam = "term"
 const searchTypeParam = "type"
 const timestampKey = "timestamp"
+const gaIDParam = "ga"
 
 // Service - defines a Stats Service Interface
 type Service interface {
 	CaptureAnalyticsData(r *http.Request) (string, error)
 }
 
+// ServiceBackend is used to store data output by the analytics service
+type ServiceBackend interface {
+	Store(url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64)
+}
+
 // ServiceImpl - Implementation of the Analytics Service interface.
-type ServiceImpl struct{}
+type ServiceImpl struct {
+	backend ServiceBackend
+}
 
 // NewServiceImpl - Creates a new Analytics ServiceImpl.
-func NewServiceImpl() *ServiceImpl {
-	return &ServiceImpl{}
+func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
+	return &ServiceImpl{backend}
 }
 
 // CaptureAnalyticsData - captures the analytics values
@@ -50,7 +58,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 
 	log.DebugR(r, "token", log.Data{"token": token})
 
-	var url, term, listType string
+	var url, term, listType, gaID string
 	var pageIndex, linkIndex, pageSize float64
 
 	var claims jwt.MapClaims
@@ -79,12 +87,16 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		pageSize = s
 	}
 
-	if len(url) == 0 {
-		log.ErrorR(r, errors.New("Failed to redirect to search results as parameter URL was missing."), nil)
-		return "", errors.New("400: URL is a mandatory parameter.")
+	if c, err := r.Cookie("_ga"); err == nil && c != nil {
+		gaID = c.Value
 	}
 
-	// TODO implement.
+	if len(url) == 0 {
+		log.ErrorR(r, errors.New("failed to redirect to search results as parameter URL was missing"), nil)
+		return "", errors.New("400: URL is a mandatory parameter")
+	}
+
+	// FIXME do we want to log as well as store in backend?
 	log.DebugR(r, "CaptureAnalyticsData", log.Data{
 		urlParam:        url,
 		termParam:       term,
@@ -92,6 +104,12 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		pageIndexParam:  pageIndex,
 		linkIndexParam:  linkIndex,
 		pageSizeParam:   pageSize,
+		gaIDParam:       gaID,
 	})
+
+	if s.backend != nil {
+		s.backend.Store(url, term, listType, gaID, pageIndex, linkIndex, pageSize)
+	}
+
 	return url, nil
 }
