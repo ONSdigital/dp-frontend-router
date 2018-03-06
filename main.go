@@ -85,6 +85,10 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
+		config.TaxonomyDomain = v
+	}
+
 	log.Namespace = "dp-frontend-router"
 
 	log.Debug("overriding default renderer with service assets", nil)
@@ -159,6 +163,7 @@ func main() {
 		"assets_path":            config.PatternLibraryAssetsPath,
 		"splash_page":            config.SplashPage,
 		"disable_hsts_header":    config.DisableHSTSHeader,
+		"taxonomy_domain":        config.TaxonomyDomain,
 	})
 
 	s := server.New(config.BindAddr, alice)
