@@ -27,13 +27,14 @@ func NewSQSBackend(queueURL string) (ServiceBackend, error) {
 	return &sqsBackend{sqs.New(cfg), queueURL}, nil
 }
 
-func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64) {
+func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, gID string, pageIndex, linkIndex, pageSize float64) {
 	var data = map[string]interface{}{
 		"created":   time.Now().Format(time.RFC3339),
 		"url":       url,
 		"term":      term,
 		"listType":  listType,
-		"gaID":      gaID,
+		"gaID":      gaID, // 2 year expiration cookie (_ga)
+		"gID":       gID,  // 24 hour expiration cookie (_gid)
 		"pageIndex": pageIndex,
 		"linkIndex": linkIndex,
 		"pageSize":  pageSize,

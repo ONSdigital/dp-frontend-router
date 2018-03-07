@@ -18,6 +18,7 @@ const termParam = "term"
 const searchTypeParam = "type"
 const timestampKey = "timestamp"
 const gaIDParam = "ga"
+const gIDParam = "gid"
 
 // Service - defines a Stats Service Interface
 type Service interface {
@@ -26,7 +27,7 @@ type Service interface {
 
 // ServiceBackend is used to store data output by the analytics service
 type ServiceBackend interface {
-	Store(req *http.Request, url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64)
+	Store(req *http.Request, url, term, listType, gaID string, gID string, pageIndex, linkIndex, pageSize float64)
 }
 
 // ServiceImpl - Implementation of the Analytics Service interface.
@@ -58,7 +59,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 
 	log.DebugR(r, "token", log.Data{"token": token})
 
-	var url, term, listType, gaID string
+	var url, term, listType, gaID, gID string
 	var pageIndex, linkIndex, pageSize float64
 
 	var claims jwt.MapClaims
@@ -88,7 +89,13 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	if c, err := r.Cookie("_ga"); err == nil && c != nil {
+		// 2 year expiration cookie (_ga)
 		gaID = c.Value
+	}
+
+	if c, err := r.Cookie("_gid"); err == nil && c != nil {
+		// 24 hour expiration cookie (_gid)
+		gID = c.Value
 	}
 
 	if len(url) == 0 {
@@ -105,10 +112,11 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		linkIndexParam:  linkIndex,
 		pageSizeParam:   pageSize,
 		gaIDParam:       gaID,
+		gIDParam:        gID,
 	})
 
 	if s.backend != nil {
-		s.backend.Store(url, term, listType, gaID, pageIndex, linkIndex, pageSize)
+		s.backend.Store(r, url, term, listType, gaID, gID, pageIndex, linkIndex, pageSize)
 	}
 
 	return url, nil
