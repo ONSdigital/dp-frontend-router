@@ -2,6 +2,7 @@ package analytics
 
 import (
 	"encoding/json"
+	"net/http"
 	"time"
 
 	"github.com/ONSdigital/go-ns/log"
@@ -26,7 +27,7 @@ func NewSQSBackend(queueURL string) (ServiceBackend, error) {
 	return &sqsBackend{sqs.New(cfg), queueURL}, nil
 }
 
-func (b *sqsBackend) Store(url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64) {
+func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64) {
 	var data = map[string]interface{}{
 		"created":   time.Now().Format(time.RFC3339),
 		"url":       url,
@@ -40,23 +41,21 @@ func (b *sqsBackend) Store(url, term, listType, gaID string, pageIndex, linkInde
 
 	jb, err := json.Marshal(&data)
 	if err != nil {
-		// TODO handle this
-		log.Error(err, nil)
+		log.ErrorR(req, err, nil)
 		return
 	}
 
 	json := string(jb)
-
 	smr := b.sqsService.SendMessageRequest(&sqs.SendMessageInput{
-		MessageBody: &json, // TODO
+		MessageBody: &json,
 		QueueUrl:    &b.queueURL,
 	})
+
 	smo, err := smr.Send()
 	if err != nil {
-		// TODO handle this
-		log.Error(err, nil)
+		log.ErrorR(req, err, nil)
 		return
 	}
 
-	log.Debug(*smo.MessageId, nil)
+	log.DebugR(req, "stored analytics data in SQS", log.Data{"message_id": *smo.MessageId})
 }

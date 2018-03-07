@@ -26,7 +26,7 @@ type Service interface {
 
 // ServiceBackend is used to store data output by the analytics service
 type ServiceBackend interface {
-	Store(url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64)
+	Store(req *http.Request, url, term, listType, gaID string, pageIndex, linkIndex, pageSize float64)
 }
 
 // ServiceImpl - Implementation of the Analytics Service interface.
