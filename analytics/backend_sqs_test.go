@@ -2,7 +2,6 @@ package analytics
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"testing"
 	"time"
@@ -43,10 +42,9 @@ func TestSQSBackend(t *testing.T) {
 
 		fakeReq, err := http.NewRequest("GET", "/", nil)
 		So(err, ShouldBeNil)
-		backend.Store(fakeReq, "/some/url", "some term", "list type", "gaID", "gID", 10, 20, 30)
 
+		backend.Store(fakeReq, "/some/url", "some term", "list type", "gaID", "gID", 10, 20, 30)
 		So(fake.input, ShouldNotBeNil)
-		log.Printf("%+v", fake.input)
 
 		var input map[string]interface{}
 		err = json.Unmarshal([]byte(*fake.input.MessageBody), &input)
