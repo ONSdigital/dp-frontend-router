@@ -8,12 +8,13 @@ import (
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 )
 
 var _ ServiceBackend = &sqsBackend{}
 
 type sqsBackend struct {
-	sqsService *sqs.SQS
+	sqsService sqsiface.SQSAPI // *sqs.SQS
 	queueURL   string
 }
 
