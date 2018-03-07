@@ -14,8 +14,9 @@ import (
 var _ ServiceBackend = &sqsBackend{}
 
 type sqsBackend struct {
-	sqsService sqsiface.SQSAPI // *sqs.SQS
-	queueURL   string
+	sqsService  sqsiface.SQSAPI // *sqs.SQS
+	queueURL    string
+	sendMessage func(sqs.SendMessageRequest) (*sqs.SendMessageOutput, error)
 }
 
 // NewSQSBackend creates a new SQS backend for storing analytics data
@@ -25,7 +26,9 @@ func NewSQSBackend(queueURL string) (ServiceBackend, error) {
 		return nil, err
 	}
 
-	return &sqsBackend{sqs.New(cfg), queueURL}, nil
+	return &sqsBackend{sqs.New(cfg), queueURL, func(s sqs.SendMessageRequest) (*sqs.SendMessageOutput, error) {
+		return s.Send()
+	}}, nil
 }
 
 func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, gID string, pageIndex, linkIndex, pageSize float64) {
@@ -53,7 +56,7 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 		QueueUrl:    &b.queueURL,
 	})
 
-	smo, err := smr.Send()
+	smo, err := b.sendMessage(smr)
 	if err != nil {
 		log.ErrorR(req, err, nil)
 		return
