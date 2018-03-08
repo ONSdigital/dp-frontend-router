@@ -27,6 +27,30 @@
 			"revisionTime": "2017-01-23T15:55:35Z"
 		},
 		{
+			"checksumSHA1": "SSGYNSaip2sf3h+uiv4IXzzDCJw=",
+			"path": "github.com/aws/aws-sdk-go-v2",
+			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
+			"revisionTime": "2018-02-13T16:58:34Z"
+		},
+		{
+			"checksumSHA1": "PiF1crqg2v7flrZ6RyAPxwFvY8k=",
+			"path": "github.com/aws/aws-sdk-go-v2/aws/external",
+			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
+			"revisionTime": "2018-02-13T16:58:34Z"
+		},
+		{
+			"checksumSHA1": "vW+HjZYkakkFYZQb6HRt4pZRgzc=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/sqs",
+			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
+			"revisionTime": "2018-02-13T16:58:34Z"
+		},
+		{
+			"checksumSHA1": "zydzuI+ekstlWNf6kXnMKDy/pfM=",
+			"path": "github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface",
+			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
+			"revisionTime": "2018-02-13T16:58:34Z"
+		},
+		{
 			"checksumSHA1": "2Fy1Y6Z3lRRX1891WF/+HT4XS2I=",
 			"path": "github.com/dgrijalva/jwt-go",
 			"revision": "2268707a8f0843315e2004ee4f1d021dc08baedf",
