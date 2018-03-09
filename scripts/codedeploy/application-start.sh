@@ -28,6 +28,7 @@ source $CONFIG && docker run -d                      \
   --env=AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
   --env=AWS_REGION=$AWS_REGION                       \
   --env=ANALYTICS_SQS_URL=$ANALYTICS_SQS_URL         \
+  --env=REDIRECT_SECRET=$REDIRECT_SECRET             \
   --name=frontend-router                             \
   --net=$DOCKER_NETWORK                              \
   --restart=always                                   \

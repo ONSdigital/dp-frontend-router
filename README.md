@@ -14,6 +14,7 @@ dp-frontend-router
 | AWS_ACCESS_KEY_ID     |                         | Your AWS access key ID (required for SQS)
 | AWS_SECRET_ACCESS_KEY |                         | Your AWS secret access key
 | AWS_REGION            |                         | AWS region (normally eu-west-1)
+| REDIRECT_SECRET       | secret                  | Pre-shared key for signing/encrypting redirect data
 
 ### Licence
 
