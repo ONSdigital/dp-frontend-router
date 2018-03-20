@@ -4,7 +4,7 @@ job "dp-frontend-router" {
   type        = "service"
 
   update {
-    stagger      = "20s"
+    stagger      = "60s"
     max_parallel = 1
   }
 
