@@ -4,8 +4,11 @@ job "dp-frontend-router" {
   type        = "service"
 
   update {
-    stagger      = "20s"
-    max_parallel = 1
+    stagger          = "60s"
+    min_healthy_time = "30s"
+    healthy_deadline = "2m"
+    max_parallel     = 1
+    auto_revert      = true
   }
 
   group "web" {
