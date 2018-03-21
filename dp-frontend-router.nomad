@@ -16,7 +16,8 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "web"
+      operator  = "regexp"
+      value     = "web.*"
     }
 
     task "dp-frontend-router-web" {
@@ -69,7 +70,8 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "publishing"
+      operator  = "regexp"
+      value     = "publishing.*"
     }
 
     task "dp-frontend-router-publishing" {
