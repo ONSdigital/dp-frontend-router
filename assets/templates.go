@@ -88,11 +88,7 @@ func templatesErrorTmpl() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "templates/error.tmpl", size: 684, mode: os.FileMode(420), modTime: time.Unix(1519374285, 0)}
-=======
-	info := bindataFileInfo{name: "templates/error.tmpl", size: 684, mode: os.FileMode(420), modTime: time.Unix(1513155567, 0)}
->>>>>>> develop
+	info := bindataFileInfo{name: "templates/error.tmpl", size: 684, mode: os.FileMode(420), modTime: time.Unix(1520262232, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -112,11 +108,7 @@ func templatesMainTmpl() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "templates/main.tmpl", size: 3326, mode: os.FileMode(420), modTime: time.Unix(1519374914, 0)}
-=======
-	info := bindataFileInfo{name: "templates/main.tmpl", size: 3324, mode: os.FileMode(420), modTime: time.Unix(1513155567, 0)}
->>>>>>> develop
+	info := bindataFileInfo{name: "templates/main.tmpl", size: 3326, mode: os.FileMode(420), modTime: time.Unix(1521714435, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -136,11 +128,7 @@ func templatesPartialsFooterTmpl() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 3865, mode: os.FileMode(420), modTime: time.Unix(1519374932, 0)}
-=======
-	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 2545, mode: os.FileMode(420), modTime: time.Unix(1513155567, 0)}
->>>>>>> develop
+	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 3865, mode: os.FileMode(420), modTime: time.Unix(1521714435, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -160,11 +148,7 @@ func templatesPartialsHeaderTmpl() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3958, mode: os.FileMode(420), modTime: time.Unix(1519374854, 0)}
-=======
-	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3874, mode: os.FileMode(420), modTime: time.Unix(1513155567, 0)}
->>>>>>> develop
+	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3958, mode: os.FileMode(420), modTime: time.Unix(1521714435, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -184,11 +168,7 @@ func redirectsRedirectsCsv() (*asset, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	info := bindataFileInfo{name: "redirects/redirects.csv", size: 17871, mode: os.FileMode(420), modTime: time.Unix(1519298006, 0)}
-=======
-	info := bindataFileInfo{name: "redirects/redirects.csv", size: 18148, mode: os.FileMode(420), modTime: time.Unix(1518599411, 0)}
->>>>>>> develop
+	info := bindataFileInfo{name: "redirects/redirects.csv", size: 18148, mode: os.FileMode(420), modTime: time.Unix(1521714438, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
