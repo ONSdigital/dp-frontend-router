@@ -78,6 +78,10 @@ func main() {
 		config.DisabledPage = v
 	}
 
+	if v := os.Getenv("ANALYTICS_ENABLED"); len(v) > 0 {
+		config.AnalyticsEnabled = true
+	}
+
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {
@@ -163,14 +167,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	searchHandler, err := analytics.NewSearchHandler()
-	if err != nil {
-		log.Error(err, nil)
-		os.Exit(1)
+	if config.AnalyticsEnabled {
+		searchHandler, err := analytics.NewSearchHandler()
+		if err != nil {
+			log.Error(err, nil)
+			os.Exit(1)
+		}
+		router.Handle("/redir/{data:.*}", searchHandler)
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
-	router.Handle("/redir/{data:.*}", searchHandler)
+
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
