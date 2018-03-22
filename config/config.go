@@ -39,4 +39,4 @@ var DisabledPage = ""
 var SQSAnalyticsURL = ""
 
 // Whether to enable analytics
-var AnalyticsEnabled = false
+var AnalyticsEnabled = true

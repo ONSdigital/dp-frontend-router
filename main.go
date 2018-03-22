@@ -84,6 +84,11 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	config.AnalyticsEnabled, err = strconv.ParseBool(os.Getenv("ANALYTICS_ENABLED"))
+	if err != nil {
+		log.ErrorC("could not parse analytics flag", err, nil)
+	}
+
 	log.Namespace = "dp-frontend-router"
 
 	render.Renderer = unrolled.New(unrolled.Options{
