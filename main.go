@@ -87,11 +87,6 @@ func main() {
 		config.AnalyticsEnabled = true
 	}
 
-	config.AnalyticsEnabled, err = strconv.ParseBool(os.Getenv("ANALYTICS_ENABLED"))
-	if err != nil {
-
-	}
-
 	log.Namespace = "dp-frontend-router"
 
 	render.Renderer = unrolled.New(unrolled.Options{
