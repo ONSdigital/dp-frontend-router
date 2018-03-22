@@ -4,8 +4,11 @@ job "dp-frontend-router" {
   type        = "service"
 
   update {
-    stagger      = "20s"
-    max_parallel = 1
+    stagger          = "60s"
+    min_healthy_time = "30s"
+    healthy_deadline = "2m"
+    max_parallel     = 1
+    auto_revert      = true
   }
 
   group "web" {
@@ -13,7 +16,8 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "web"
+      operator  = "regexp"
+      value     = "web.*"
     }
 
     task "dp-frontend-router-web" {
@@ -66,7 +70,8 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      value     = "publishing"
+      operator  = "regexp"
+      value     = "publishing.*"
     }
 
     task "dp-frontend-router-publishing" {

@@ -14,6 +14,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
@@ -52,6 +53,9 @@ func main() {
 	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
 		config.ZebedeeURL = v
 	}
+	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
+		config.DownloaderURL = v
+	}
 	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
 		config.PatternLibraryAssetsPath = v
 	}
@@ -61,8 +65,21 @@ func main() {
 	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
 		config.SplashPage = v
 	}
+
+	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
+		config.RedirectSecret = v
+	}
+
+	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
+		config.SQSAnalyticsURL = v
+	}
+
 	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
 		config.DisabledPage = v
+	}
+
+	if v := os.Getenv("ANALYTICS_ENABLED"); len(v) > 0 {
+		config.AnalyticsEnabled = true
 	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
@@ -144,7 +161,24 @@ func main() {
 		os.Exit(1)
 	}
 
+	downloaderURL, err := url.Parse(config.DownloaderURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	if config.AnalyticsEnabled {
+		searchHandler, err := analytics.NewSearchHandler()
+		if err != nil {
+			log.Error(err, nil)
+			os.Exit(1)
+		}
+		router.Handle("/redir/{data:.*}", searchHandler)
+	}
+
 	reverseProxy := createReverseProxy(babbageURL)
+
+	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
@@ -164,6 +198,7 @@ func main() {
 		"splash_page":            config.SplashPage,
 		"disable_hsts_header":    config.DisableHSTSHeader,
 		"taxonomy_domain":        config.TaxonomyDomain,
+		"analytics_sqs_url":      config.SQSAnalyticsURL,
 	})
 
 	s := server.New(config.BindAddr, alice)
@@ -233,8 +268,8 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(babbageURL *url.URL) http.Handler {
-	proxy := httputil.NewSingleHostReverseProxy(babbageURL)
+func createReverseProxy(proxyURL *url.URL) http.Handler {
+	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
@@ -249,7 +284,7 @@ func createReverseProxy(babbageURL *url.URL) http.Handler {
 	}
 	proxy.Director = func(req *http.Request) {
 		log.DebugR(req, "Proxying request", log.Data{
-			"destination": babbageURL,
+			"destination": proxyURL,
 		})
 		director(req)
 	}
