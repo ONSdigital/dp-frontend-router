@@ -81,13 +81,9 @@ func main() {
 	}
 
 	analyticsFlag := os.Getenv("ANALYTICS_ENABLED")
-	if len(analyticsFlag) > 0 {
-		config.AnalyticsEnabled, err = strconv.ParseBool(analyticsFlag)
-		if err != nil {
-			log.Trace("could not parse analytics flag, defaulting to true", log.Data{"analytics_flag": analyticsFlag})
-			config.AnalyticsEnabled = true
-		}
-	} else {
+	config.AnalyticsEnabled, err = strconv.ParseBool(analyticsFlag)
+	if err != nil {
+		log.Trace("could not parse analytics flag, defaulting to true", log.Data{"analytics_flag": analyticsFlag})
 		config.AnalyticsEnabled = true
 	}
 
