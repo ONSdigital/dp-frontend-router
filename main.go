@@ -65,10 +65,6 @@ func main() {
 		config.DisabledPage = v
 	}
 
-	if v := os.Getenv("ANALYTICS_ENABLED"); len(v) > 0 {
-		config.AnalyticsEnabled = true
-	}
-
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {
@@ -84,9 +80,20 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	analyticsFlag := os.Getenv("ANALYTICS_ENABLED")
+	if len(analyticsFlag) > 0 {
+		config.AnalyticsEnabled, err = strconv.ParseBool(analyticsFlag)
+		if err != nil {
+			log.Trace("could not parse analytics flag, defaulting to true", log.Data{"analytics_flag": analyticsFlag})
+			config.AnalyticsEnabled = true
+		}
+	} else {
+		config.AnalyticsEnabled = true
+	}
+
 	config.AnalyticsEnabled, err = strconv.ParseBool(os.Getenv("ANALYTICS_ENABLED"))
 	if err != nil {
-		log.ErrorC("could not parse analytics flag", err, nil)
+
 	}
 
 	log.Namespace = "dp-frontend-router"
