@@ -80,13 +80,6 @@ func main() {
 		log.Error(err, nil)
 	}
 
-	analyticsFlag := os.Getenv("ANALYTICS_ENABLED")
-	config.AnalyticsEnabled, err = strconv.ParseBool(analyticsFlag)
-	if err != nil {
-		log.Trace("could not parse analytics flag, defaulting to true", log.Data{"analytics_flag": analyticsFlag})
-		config.AnalyticsEnabled = true
-	}
-
 	log.Namespace = "dp-frontend-router"
 
 	render.Renderer = unrolled.New(unrolled.Options{
@@ -130,17 +123,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	if config.AnalyticsEnabled {
-		searchHandler, err := analytics.NewSearchHandler()
-		if err != nil {
-			log.Error(err, nil)
-			os.Exit(1)
-		}
-		router.Handle("/redir/{data:.*}", searchHandler)
+	searchHandler, err := analytics.NewSearchHandler()
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
 	}
 
 	reverseProxy := createReverseProxy(babbageURL)
-
+	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
