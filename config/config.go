@@ -37,3 +37,6 @@ var DisabledPage = ""
 
 // SQS URL for analytics data
 var SQSAnalyticsURL = ""
+
+// Whether to enable analytics
+var AnalyticsEnabled = false
