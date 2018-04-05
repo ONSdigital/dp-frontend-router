@@ -24,9 +24,18 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
+			contentURL := config.ZebedeeURL + "/data"
+
+			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
+				contentURL += "/" + c.Value + "?uri=" + path
+			} else {
+				contentURL += "?uri=" + path
+			}
+			log.Debug(contentURL, nil)
+
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
-			contentURL := config.ZebedeeURL + "/data?uri=" + path
+
 			request, err := http.NewRequest("GET", contentURL, nil)
 			if err != nil {
 				log.ErrorR(req, err, nil)
@@ -64,10 +73,8 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			}
 
 			zebResp := struct {
-				Type        string `json:"type"`
-				Description struct {
-					DatasetID string `json:"datasetId"`
-				} `json:"description"`
+				Type      string `json:"type"`
+				DatasetID string `json:"apiDatasetId"`
 			}{}
 			if err := json.Unmarshal(b, &zebResp); err != nil {
 				log.ErrorR(req, err, nil)
@@ -75,10 +82,13 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
+			log.Debug(zebResp.Type, nil)
+			log.Debug(zebResp.DatasetID, nil)
+
 			pageType := res.Header.Get("ONS-Page-Type")
 
-			if len(zebResp.Description.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
-				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.Description.DatasetID), 302)
+			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
+				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)
 				return
 			}
 
