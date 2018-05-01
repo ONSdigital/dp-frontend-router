@@ -3,4 +3,3 @@ build
 .tags*
 *.iml
 .idea
-secrets.json
