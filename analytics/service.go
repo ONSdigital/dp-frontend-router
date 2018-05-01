@@ -8,11 +8,8 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/dgrijalva/jwt-go"
-	"io/ioutil"
-	"os"
 	"crypto/sha512"
 	"encoding/hex"
-	"encoding/json"
 	"bytes"
 )
 

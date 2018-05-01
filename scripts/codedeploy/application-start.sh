@@ -29,6 +29,8 @@ source $CONFIG && docker run -d                      \
   --env=AWS_REGION=$AWS_REGION                       \
   --env=ANALYTICS_SQS_URL=$ANALYTICS_SQS_URL         \
   --env=REDIRECT_SECRET=$REDIRECT_SECRET             \
+  --env=GA_SALT=$GA_SALT                             \
+  --env=GA_SUBSTR_INDEX=$GA_SUBSTR_INDEX             \
   --name=frontend-router                             \
   --net=$DOCKER_NETWORK                              \
   --restart=always                                   \
