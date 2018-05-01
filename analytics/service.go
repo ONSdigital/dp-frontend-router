@@ -8,6 +8,12 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
+	"os"
+	"crypto/sha512"
+	"encoding/hex"
+	"encoding/json"
+	"bytes"
 )
 
 const pageIndexParam = "pageIndex"
@@ -19,6 +25,8 @@ const searchTypeParam = "type"
 const timestampKey = "timestamp"
 const gaIDParam = "ga"
 const gIDParam = "gid"
+
+var s = readSecrets()
 
 // Service - defines a Stats Service Interface
 type Service interface {
@@ -38,6 +46,24 @@ type ServiceImpl struct {
 // NewServiceImpl - Creates a new Analytics ServiceImpl.
 func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
 	return &ServiceImpl{backend}
+}
+
+func hashId(id string) string {
+	// Method to hash gaIDs and produce the same result as search
+	var buffer bytes.Buffer
+
+	var slc1 = id[s.SubstringIndex:]
+	var slc2 = id[:s.SubstringIndex]
+
+	buffer.WriteString(slc1)
+	buffer.WriteString(slc2)
+	buffer.WriteString(s.Salt)
+
+	hasher := sha512.New()
+	hasher.Write(buffer.Bytes())
+
+	sha := hex.EncodeToString(hasher.Sum(nil))
+	return sha
 }
 
 // CaptureAnalyticsData - captures the analytics values
@@ -89,13 +115,13 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	if c, err := r.Cookie("_ga"); err == nil && c != nil {
-		// 2 year expiration cookie (_ga)
-		gaID = c.Value
+		// 2 year expiration cookie (_ga) - hash value here before storing
+		gaID = hashId(c.Value)
 	}
 
 	if c, err := r.Cookie("_gid"); err == nil && c != nil {
-		// 24 hour expiration cookie (_gid)
-		gID = c.Value
+		// 24 hour expiration cookie (_gid) - hash value here before storing
+		gID = hashId(c.Value)
 	}
 
 	if len(url) == 0 {
@@ -120,4 +146,41 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	return url, nil
+}
+
+type secrets struct {
+	Salt string `json:"salt"`
+	SubstringIndex int `json:"substr_index"`
+}
+
+func readSecrets() (*secrets) {
+	// Read the secrets file to get the salt and substring index for gaID hashing
+	raw, err := ioutil.ReadFile("./secrets.json")
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	var s secrets
+	err = json.Unmarshal(raw, &s)
+
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	// Make sure values exist
+	if s.Salt == "" {
+		err := errors.New("unable to find salt in secrets.json file")
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	if s.SubstringIndex == 0 {
+		err := errors.New("unable to find substring index in secrets.json file")
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	return &s
 }
