@@ -74,6 +74,19 @@ func main() {
 		config.HomepageABPercent = int(a)
 	}
 
+	if v := os.Getenv("GA_SALT"); len(v) > 0 {
+		config.GaIDSalt = v
+	}
+
+	if v := os.Getenv("GA_SUBSTR_INDEX"); len(v) > 0 {
+		a, _ := strconv.Atoi(v)
+		if a < 0 || a > 10 {
+			log.Debug("GA_SUBSTR_INDEX must be between 0 and 10", nil)
+			os.Exit(1)
+		}
+		config.GaSubstringIndex = int(a)
+	}
+
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {

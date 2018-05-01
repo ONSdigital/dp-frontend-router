@@ -37,3 +37,9 @@ var DisabledPage = ""
 
 // SQS URL for analytics data
 var SQSAnalyticsURL = ""
+
+// Salt for GA ID Hashing
+var GaIDSalt = ""
+
+// Index on which to substring GA IDs
+var GaSubstringIndex = 0
