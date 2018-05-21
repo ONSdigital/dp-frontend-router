@@ -23,7 +23,7 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 	if status >= 400 {
-		log.DebugR(rI.req, "Intercepted error response", log.Data{"url": status})
+		log.DebugR(rI.req, "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
 		if status == 500 {
 			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+rI.req.URL.Path+"'>refreshing the page or trying again later.</a> </p>")
