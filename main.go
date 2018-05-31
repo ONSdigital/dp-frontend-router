@@ -93,11 +93,6 @@ func main() {
 		log.Error(err, nil)
 	}
 
-	config.DisableHSTSHeader, err = strconv.ParseBool(os.Getenv("DISABLE_HSTS_HEADER"))
-	if err != nil {
-		log.Error(err, nil)
-	}
-
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
 		config.TaxonomyDomain = v
 	}
@@ -189,7 +184,6 @@ func main() {
 		"site_domain":            config.SiteDomain,
 		"assets_path":            config.PatternLibraryAssetsPath,
 		"splash_page":            config.SplashPage,
-		"disable_hsts_header":    config.DisableHSTSHeader,
 		"taxonomy_domain":        config.TaxonomyDomain,
 		"analytics_sqs_url":      config.SQSAnalyticsURL,
 	})
@@ -206,9 +200,6 @@ func securityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
 			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
-		}
-		if !config.DisableHSTSHeader {
-			w.Header().Set("Strict-Transport-Security", "max-age=31536000")
 		}
 		h.ServeHTTP(w, req)
 	})

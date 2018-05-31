@@ -44,9 +44,6 @@ var RedirectSecret = "secret"
 // Disabled page
 var DisabledPage = ""
 
-// Disable HSTS header
-var DisableHSTSHeader = false
-
 // TaxonomyDomain is link to website. Used for CMD beta so global links go to website rather than beta domain
 var TaxonomyDomain = ""
 
