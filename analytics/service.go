@@ -51,8 +51,8 @@ func hashId(id string) string {
 	var slc2 = id[:config.GaSubstringIndex]
 
 	buffer.WriteString(slc1)
-	buffer.WriteString(slc2)
 	buffer.WriteString(config.GaIDSalt)
+	buffer.WriteString(slc2)
 
 	hasher := sha512.New()
 	hasher.Write(buffer.Bytes())
