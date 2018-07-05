@@ -3,6 +3,12 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "8GX4z3tt4e6rXHJtJv8q8YZrFwk=",
+			"path": "github.com/ONSdigital/go-ns/common",
+			"revision": "3fdd13a161b0d6221b2405cce8bbe5ec69168ab7",
+			"revisionTime": "2018-07-05T11:25:05Z"
+		},
+		{
 			"checksumSHA1": "J9OiPnhPHFPhQ+R+dq6LFj+dTxE=",
 			"path": "github.com/ONSdigital/go-ns/handlers/requestID",
 			"revision": "474f7605b6424182f199984527c898f508242632",
@@ -43,12 +49,6 @@
 			"path": "github.com/ONSdigital/go-ns/server",
 			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
 			"revisionTime": "2017-08-30T09:50:52Z"
-		},
-		{
-			"checksumSHA1": "SSGYNSaip2sf3h+uiv4IXzzDCJw=",
-			"path": "github.com/aws/aws-sdk-go-v2",
-			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
-			"revisionTime": "2018-02-13T16:58:34Z"
 		},
 		{
 			"checksumSHA1": "b2txlAkxXbktlLrA1hY59cWT0Cw=",
