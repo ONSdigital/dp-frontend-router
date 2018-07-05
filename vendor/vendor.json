@@ -27,10 +27,10 @@
 			"revisionTime": "2017-08-30T09:50:52Z"
 		},
 		{
-			"checksumSHA1": "AjbjbhFVAOP/1NU5HL+uy+X/yJo=",
+			"checksumSHA1": "g9flYl+PBs6cYflFY3EpG6IcJGM=",
 			"path": "github.com/ONSdigital/go-ns/log",
-			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
-			"revisionTime": "2017-08-30T09:50:52Z"
+			"revision": "3fdd13a161b0d6221b2405cce8bbe5ec69168ab7",
+			"revisionTime": "2018-07-05T11:25:05Z"
 		},
 		{
 			"checksumSHA1": "YtiRks0ZOuqkOz5OJHooyGnL6J0=",
@@ -43,18 +43,6 @@
 			"path": "github.com/ONSdigital/go-ns/server",
 			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
 			"revisionTime": "2017-08-30T09:50:52Z"
-		},
-		{
-			"checksumSHA1": "ST3iiJ6vhtfZDnujuW/HGXQCtZM=",
-			"path": "github.com/golang/mock/gomock",
-			"revision": "9e3cfa9279f269a4c4d703dacd64b05184cec28e",
-			"revisionTime": "2017-06-14T19:52:02Z"
-		},
-		{
-			"checksumSHA1": "yIkYzW7bzAD81zHyuCNmEj4+oxQ=",
-			"path": "github.com/gopherjs/gopherjs/js",
-			"revision": "b40cd48c38f9a18eb3db20d163bad78de12cf0b7",
-			"revisionTime": "2017-09-06T18:39:36Z"
 		},
 		{
 			"checksumSHA1": "SSGYNSaip2sf3h+uiv4IXzzDCJw=",
@@ -193,6 +181,18 @@
 			"path": "github.com/go-ini/ini",
 			"revision": "32e4be5f41bb918afb6e37c07426e2ddbcb6647e",
 			"revisionTime": "2018-02-14T10:17:53Z"
+		},
+		{
+			"checksumSHA1": "ST3iiJ6vhtfZDnujuW/HGXQCtZM=",
+			"path": "github.com/golang/mock/gomock",
+			"revision": "9e3cfa9279f269a4c4d703dacd64b05184cec28e",
+			"revisionTime": "2017-06-14T19:52:02Z"
+		},
+		{
+			"checksumSHA1": "yIkYzW7bzAD81zHyuCNmEj4+oxQ=",
+			"path": "github.com/gopherjs/gopherjs/js",
+			"revision": "b40cd48c38f9a18eb3db20d163bad78de12cf0b7",
+			"revisionTime": "2017-09-06T18:39:36Z"
 		},
 		{
 			"checksumSHA1": "g/V4qrXjUGG9B+e3hB+4NAYJ5Gs=",
