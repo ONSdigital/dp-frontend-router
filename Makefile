@@ -5,7 +5,7 @@ build: generate
 
 debug: generate
 	go build -tags 'debug' -o $(BINPATH)/dp-frontend-router
-	DISABLE_HSTS_HEADER=true HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
+	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
 generate: ${GOPATH}/bin/go-bindata
 	# build the production version

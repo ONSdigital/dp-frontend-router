@@ -20,6 +20,9 @@ var FilterDatasetControllerURL = "http://localhost:20001"
 // The URL of Zebedee API
 var ZebedeeURL = "http://localhost:8082"
 
+// The URL of the file downloader service
+var DownloaderURL = "http://localhost:23400"
+
 // The percentage of requests to send to the new homepage
 var HomepageABPercent = 0
 
@@ -35,11 +38,14 @@ var SiteDomain = "ons.gov.uk"
 // Splash page
 var SplashPage = ""
 
+// Redirect secret
+var RedirectSecret = "secret"
+
 // Disabled page
 var DisabledPage = ""
 
-// Disable HSTS header
-var DisableHSTSHeader = false
-
 // TaxonomyDomain is link to website. Used for CMD beta so global links go to website rather than beta domain
 var TaxonomyDomain = ""
+
+// SQS URL for analytics data
+var SQSAnalyticsURL = ""

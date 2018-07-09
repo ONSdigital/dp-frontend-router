@@ -18,6 +18,12 @@ dp-frontend-router
 | DISABLED_PAGE                 |                                         | The disabled page template to use
 | HOMEPAGE_AB_PERCENT           | 0                                       | Percentage of users who get version B
 | DEBUG                         | false                                   | Whether to enable debug mode
+| DOWNLOADER_URL                | http://localhost:23400                  | The URL of dp-file-downloader.
+| ANALYTICS_SQS_URL             |                                         | SQS URL for search analytics; leave blank to disable
+| AWS_ACCESS_KEY_ID             |                                         | Your AWS access key ID (required for SQS)
+| AWS_SECRET_ACCESS_KEY         |                                         | Your AWS secret access key
+| AWS_REGION                    |                                         | AWS region (normally eu-west-1)
+| REDIRECT_SECRET               | secret                                  | Pre-shared key for signing/encrypting redirect data
 
 ### Licence
 
