@@ -11,6 +11,7 @@ dp-frontend-router
 | RENDERER_URL                  | http://localhost:20010                  | The URL of dp-frontend-renderer
 | DATASET_CONTROLLER_URL        | http://localhost:20200                  | The URL of dp-frontend-dataset-controller
 | FILTER_DATASET_CONTROLLER_URL | http://localhost:20001                  | The URL of dp-frontend-filter-dataset-controller
+| GEOGRAPHY_CONTROLLER_URL      | http://localhost:23700                  | The URL of dp-frontend-geography-controller
 | ZEBEDEE_URL                   | http://localhost:8082                   | The URL of zebedee
 | PATTERN_LIBRARY_ASSETS_PATH   | https://cdn.ons.gov.uk/sixteens/6cc1837 | The URL to the sixteens build to use
 | SITE_DOMAIN                   | ons.gov.uk                              | The domain hosting the site
