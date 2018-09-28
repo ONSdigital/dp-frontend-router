@@ -179,10 +179,13 @@ func main() {
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
-	router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	// remov geo from prod
+	if config.GeoFlag == true {
+		router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
+	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
