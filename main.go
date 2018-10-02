@@ -90,11 +90,9 @@ func main() {
 		config.HomepageABPercent = int(a)
 	}
 
-	var err error
-	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
-	if err != nil {
-		log.Error(err, nil)
-	}
+	config.DebugMode = getEnvBool("DEBUG")
+
+	config.GeoEnabled = getEnvBool("GEOGRAPHY_ENABLED")
 
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
 		config.TaxonomyDomain = v
@@ -183,7 +181,7 @@ func main() {
 	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	// remov geo from prod
-	if config.GeoFlag == true {
+	if config.GeoEnabled == true {
 		router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
@@ -288,4 +286,14 @@ func createReverseProxy(proxyURL *url.URL) http.Handler {
 		director(req)
 	}
 	return proxy
+}
+
+//error handling
+func getEnvBool(key string) bool {
+	res, err := strconv.ParseBool(os.Getenv(key))
+	if err != nil {
+		log.Debug(key+" must be a bool", nil)
+		return false
+	}
+	return res
 }
