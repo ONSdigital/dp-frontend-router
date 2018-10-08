@@ -32,7 +32,13 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 
 		rdr := bytes.NewReader(b)
 
-		rendererReq, err := http.NewRequest("POST", config.RendererURL+"/homepage", rdr)
+		cfg, err := config.Get()
+		if err != nil {
+			log.Error(err, nil)
+			return
+		}
+
+		rendererReq, err := http.NewRequest("POST", cfg.RendererURL+"/homepage", rdr)
 		if err != nil {
 			err = fmt.Errorf("error creating request: %s", err)
 			log.ErrorR(req, err, nil)

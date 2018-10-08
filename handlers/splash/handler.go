@@ -43,7 +43,13 @@ func Handler(splashPage string, enabled bool) func(http.Handler) http.Handler {
 }
 
 func callRenderer(w http.ResponseWriter, req *http.Request, splashPage string) error {
-	rendererReq, err := http.NewRequest("POST", config.RendererURL+"/"+splashPage, bytes.NewReader([]byte(`{}`)))
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		return err
+	}
+
+	rendererReq, err := http.NewRequest("POST", cfg.RendererURL+"/"+splashPage, bytes.NewReader([]byte(`{}`)))
 	if err != nil {
 		err = fmt.Errorf("error creating request: %s", err)
 		return err

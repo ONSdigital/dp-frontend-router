@@ -41,6 +41,11 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 }
 
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		return
+	}
 	// Attempt to render an error page
 	if err := rI.callRenderer(code, title, description); err != nil {
 		log.ErrorR(rI.req, err, nil)
@@ -50,9 +55,9 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
 			"URI":                      rI.req.URL.Path,
 			"Language":                 lang.Get(rI.req),
-			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
-			"SiteDomain":               config.SiteDomain,
-			"TaxonomyDomain":           config.TaxonomyDomain,
+			"PatternLibraryAssetsPath": cfg.PatternLibraryAssetsPath,
+			"SiteDomain":               cfg.SiteDomain,
+			"TaxonomyDomain":           cfg.TaxonomyDomain,
 			"Error": map[string]interface{}{
 				"Title":       title,
 				"Description": description,
@@ -66,12 +71,18 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 }
 
 func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		return err
+	}
+
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
 			"description": description,
 		},
-		"taxonomy_domain": config.TaxonomyDomain,
+		"taxonomy_domain": cfg.TaxonomyDomain,
 	}
 
 	b, err := json.Marshal(&data)
@@ -79,7 +90,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		return fmt.Errorf("error marshaling data: %s", err)
 	}
 
-	rendererReq, err := http.NewRequest("POST", config.RendererURL+"/error", bytes.NewReader(b))
+	rendererReq, err := http.NewRequest("POST", cfg.RendererURL+"/error", bytes.NewReader(b))
 	if err != nil {
 		err = fmt.Errorf("error creating request: %s", err)
 		return err

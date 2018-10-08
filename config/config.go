@@ -1,54 +1,70 @@
 package config
 
-var BindAddr = ":20000"
+import (
+	"encoding/json"
 
-// The URL of the babbage instance to use.
-var BabbageURL = "http://localhost:8080"
+	"github.com/kelseyhightower/envconfig"
+)
 
-// The URL of the content resolver.
-var ResolverURL = "http://localhost:20020"
+// Configuration structure which hold information for configuring the import API
+type Configuration struct {
+	BindAddr                   string `envconfig:"BIND_ADDR"`
+	BabbageURL                 string `envconfig:"BABBAGE_URL"`
+	ResolverURL                string `envconfig:"RESOLVER_URL"`
+	RendererURL                string `envconfig:"RENDERER_URL"`
+	DatasetControllerURL       string `envconfig:"DATASET_CONTROLLER_URL"`
+	FilterDatasetControllerURL string `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
+	GeographyControllerURL     string `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
+	GeoEnabled                 bool   `envconfig:"GEOGRAPHY_ENABLED"`
+	ZebedeeURL                 string `envconfig:"ZEBEDEE_URL"`
+	DownloaderURL              string `envconfig:"DOWNLOADER_URL"`
+	HomepageABPercent          int    `envconfig:"HOMEPAGE_AB_PERCENT"`
+	DebugMode                  bool   `envconfig:"DEBUG"`
+	PatternLibraryAssetsPath   string `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	SiteDomain                 string `envconfig:"SITE_DOMAIN"`
+	SplashPage                 string `envconfig:"SPLASH_PAGE"`
+	RedirectSecret             string `envconfig:"REDIRECT_SECRET"`
+	DisabledPage               string `envconfig:"DISABLED_PAGE"`
+	TaxonomyDomain             string `envconfig:"TAXONOMY_DOMAIN"`
+	SQSAnalyticsURL            string `envconfig:"ANALYTICS_SQS_URL"`
+}
 
-// The URL of the content renderer
-var RendererURL = "http://localhost:20010"
+var cfg *Configuration
 
-// The URL of the dataset controller
-var DatasetControllerURL = "http://localhost:20200"
+// Get the application and returns the configuration structure
+func Get() (*Configuration, error) {
+	if cfg != nil {
+		return cfg, nil
+	}
 
-// The URL of the filter dataset controller
-var FilterDatasetControllerURL = "http://localhost:20001"
+	cfg = &Configuration{
+		BindAddr:                   ":20000",
+		BabbageURL:                 "http://localhost:8080",
+		ResolverURL:                "http://localhost:20020",
+		RendererURL:                "http://localhost:20010",
+		DatasetControllerURL:       "http://localhost:20200",
+		FilterDatasetControllerURL: "http://localhost:20001",
+		GeographyControllerURL:     "http://localhost:23700",
+		GeoEnabled:                 false,
+		ZebedeeURL:                 "http://localhost:8082",
+		DownloaderURL:              "http://localhost:23400",
+		HomepageABPercent:          0,
+		DebugMode:                  false,
+		PatternLibraryAssetsPath:   "https://cdn.ons.gov.uk/sixteens/6cc1837",
+		SiteDomain:                 "ons.gov.uk",
+		SplashPage:                 "",
+		RedirectSecret:             "secret",
+		DisabledPage:               "",
+		TaxonomyDomain:             "",
+		SQSAnalyticsURL:            "",
+	}
 
-// The URL of the Geography controller
-var GeographyControllerURL = "http://localhost:23700"
+	return cfg, envconfig.Process("", cfg)
+}
 
-// The URL of Zebedee API
-var ZebedeeURL = "http://localhost:8082"
-
-// The URL of the file downloader service
-var DownloaderURL = "http://localhost:23400"
-
-// The percentage of requests to send to the new homepage
-var HomepageABPercent = 0
-
-// Whether the template rendering engine is in development mode or not
-var DebugMode = false
-
-// The CDN assets path
-var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/6cc1837"
-
-// The site domain
-var SiteDomain = "ons.gov.uk"
-
-// Splash page
-var SplashPage = ""
-
-// Redirect secret
-var RedirectSecret = "secret"
-
-// Disabled page
-var DisabledPage = ""
-
-// TaxonomyDomain is link to website. Used for CMD beta so global links go to website rather than beta domain
-var TaxonomyDomain = ""
-
-// SQS URL for analytics data
-var SQSAnalyticsURL = ""
+// String is implemented to prevent sensitive fields being logged.
+// The config is returned as JSON with sensitive fields omitted.
+func (config Configuration) String() string {
+	json, _ := json.Marshal(config)
+	return string(json)
+}

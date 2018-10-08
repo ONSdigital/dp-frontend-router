@@ -20,8 +20,14 @@ func NewSearchHandler() (http.Handler, error) {
 	var b analytics.ServiceBackend
 	var err error
 
-	if len(config.SQSAnalyticsURL) > 0 {
-		b, err = analytics.NewSQSBackend(config.SQSAnalyticsURL)
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		return nil, err
+	}
+
+	if len(cfg.SQSAnalyticsURL) > 0 {
+		b, err = analytics.NewSQSBackend(cfg.SQSAnalyticsURL)
 		if err != nil {
 			return nil, err
 		}

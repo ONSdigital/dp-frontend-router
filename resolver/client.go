@@ -72,7 +72,13 @@ func Get(uri string, xRequestID string) ([]byte, error) {
 }
 
 func getRequest(uri string, xRequestID string) (*http.Request, error) {
-	request, err := http.NewRequest("GET", config.ResolverURL+uri, nil)
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		return nil, err
+	}
+
+	request, err := http.NewRequest("GET", cfg.ResolverURL+uri, nil)
 	if err != nil {
 		err = fmt.Errorf("error creating new request: %s", err)
 		log.ErrorC(xRequestID, err, nil)

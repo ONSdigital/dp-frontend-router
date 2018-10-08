@@ -8,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -32,81 +31,22 @@ import (
 )
 
 func main() {
-	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
-		config.BindAddr = v
-	}
-	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
-		config.BabbageURL = v
-	}
-	if v := os.Getenv("RESOLVER_URL"); len(v) > 0 {
-		config.ResolverURL = v
-	}
-	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
-		config.RendererURL = v
-	}
-	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.DatasetControllerURL = v
-	}
-	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.FilterDatasetControllerURL = v
-	}
-	if v := os.Getenv("GEOGRAPHY_CONTROLLER_URL"); len(v) > 0 {
-		config.GeographyControllerURL = v
-	}
-	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
-		config.ZebedeeURL = v
-	}
-	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
-		config.DownloaderURL = v
-	}
-	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
-		config.PatternLibraryAssetsPath = v
-	}
-	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
-		config.SiteDomain = v
-	}
-	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
-		config.SplashPage = v
-	}
-
-	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
-		config.RedirectSecret = v
-	}
-
-	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
-		config.SQSAnalyticsURL = v
-	}
-
-	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
-		config.DisabledPage = v
-	}
-
-	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, _ := strconv.Atoi(v)
-		if a < 0 || a > 100 {
-			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
-			os.Exit(1)
-		}
-		config.HomepageABPercent = int(a)
-	}
-
-	var err error
-	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
-	if err != nil {
-		log.Error(err, nil)
-	}
-
-	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
-		config.TaxonomyDomain = v
-	}
 
 	log.Namespace = "dp-frontend-router"
+
+	cfg, err := config.Get()
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
+	log.Info("config on startup", log.Data{"config": cfg})
 
 	log.Debug("overriding default renderer with service assets", nil)
 	render.Renderer = unrolled.New(unrolled.Options{
 		Asset:         assets.Asset,
 		AssetNames:    assets.AssetNames,
-		IsDevelopment: config.DebugMode,
+		IsDevelopment: cfg.DebugMode,
 		Layout:        "main",
 		Funcs: []template.FuncMap{{
 			"safeHTML": func(s string) template.HTML {
@@ -115,19 +55,19 @@ func main() {
 		}},
 	})
 
-	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
+	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
 
-	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
 
-	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
+	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
@@ -149,20 +89,20 @@ func main() {
 		}),
 		redirects.Handler,
 	}
-	if len(config.DisabledPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
-	} else if len(config.SplashPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.SplashPage, true))
+	if len(cfg.DisabledPage) > 0 {
+		middleware = append(middleware, splash.Handler(cfg.DisabledPage, false))
+	} else if len(cfg.SplashPage) > 0 {
+		middleware = append(middleware, splash.Handler(cfg.SplashPage, true))
 	}
 	alice := alice.New(middleware...).Then(router)
 
-	babbageURL, err := url.Parse(config.BabbageURL)
+	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
 
-	downloaderURL, err := url.Parse(config.DownloaderURL)
+	downloaderURL, err := url.Parse(cfg.DownloaderURL)
 	if err != nil {
 		log.Error(err, nil)
 		os.Exit(1)
@@ -177,7 +117,7 @@ func main() {
 	reverseProxy := createReverseProxy(babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
+	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, cfg.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
@@ -186,21 +126,21 @@ func main() {
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":                config.BindAddr,
-		"babbage_url":              config.BabbageURL,
-		"dataset_controller_url":   config.DatasetControllerURL,
-		"geography_controller_url": config.GeographyControllerURL,
-		"renderer_url":             config.RendererURL,
-		"resolver_url":             config.ResolverURL,
-		"homepage_ab_percent":      config.HomepageABPercent,
-		"site_domain":              config.SiteDomain,
-		"assets_path":              config.PatternLibraryAssetsPath,
-		"splash_page":              config.SplashPage,
-		"taxonomy_domain":          config.TaxonomyDomain,
-		"analytics_sqs_url":        config.SQSAnalyticsURL,
+		"bind_addr":                cfg.BindAddr,
+		"babbage_url":              cfg.BabbageURL,
+		"dataset_controller_url":   cfg.DatasetControllerURL,
+		"geography_controller_url": cfg.GeographyControllerURL,
+		"renderer_url":             cfg.RendererURL,
+		"resolver_url":             cfg.ResolverURL,
+		"homepage_ab_percent":      cfg.HomepageABPercent,
+		"site_domain":              cfg.SiteDomain,
+		"assets_path":              cfg.PatternLibraryAssetsPath,
+		"splash_page":              cfg.SplashPage,
+		"taxonomy_domain":          cfg.TaxonomyDomain,
+		"analytics_sqs_url":        cfg.SQSAnalyticsURL,
 	})
 
-	s := server.New(config.BindAddr, alice)
+	s := server.New(cfg.BindAddr, alice)
 	if err := s.ListenAndServe(); err != nil {
 		log.Error(err, nil)
 		os.Exit(2)

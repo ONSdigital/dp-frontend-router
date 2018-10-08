@@ -24,7 +24,13 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			contentURL := config.ZebedeeURL + "/data"
+			cfg, err := config.Get()
+			if err != nil {
+				log.Error(err, nil)
+				return
+			}
+
+			contentURL := cfg.ZebedeeURL + "/data"
 
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentURL += "/" + c.Value + "?uri=" + path
