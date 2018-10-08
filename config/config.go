@@ -21,7 +21,7 @@ var FilterDatasetControllerURL = "http://localhost:20001"
 var GeographyControllerURL = "http://localhost:23700"
 
 // Geography feature is enabled
-var GeoEnabled = false
+var GeographyEnabled = false
 
 // The URL of Zebedee API
 var ZebedeeURL = "http://localhost:8082"
