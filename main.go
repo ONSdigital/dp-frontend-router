@@ -96,6 +96,11 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
 		config.TaxonomyDomain = v
 	}
@@ -179,10 +184,13 @@ func main() {
 	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
-	router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	// remove geo from prod
+	if config.GeographyEnabled == true {
+		router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
+	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
