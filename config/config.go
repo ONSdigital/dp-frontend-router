@@ -15,7 +15,7 @@ type Configuration struct {
 	DatasetControllerURL       string `envconfig:"DATASET_CONTROLLER_URL"`
 	FilterDatasetControllerURL string `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
 	GeographyControllerURL     string `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
-	GeoEnabled                 bool   `envconfig:"GEOGRAPHY_ENABLED"`
+	GeographyEnabled           bool   `envconfig:"GEOGRAPHY_ENABLED"`
 	ZebedeeURL                 string `envconfig:"ZEBEDEE_URL"`
 	DownloaderURL              string `envconfig:"DOWNLOADER_URL"`
 	HomepageABPercent          int    `envconfig:"HOMEPAGE_AB_PERCENT"`
@@ -45,7 +45,7 @@ func Get() (*Configuration, error) {
 		DatasetControllerURL:       "http://localhost:20200",
 		FilterDatasetControllerURL: "http://localhost:20001",
 		GeographyControllerURL:     "http://localhost:23700",
-		GeoEnabled:                 false,
+		GeographyEnabled:           false,
 		ZebedeeURL:                 "http://localhost:8082",
 		DownloaderURL:              "http://localhost:23400",
 		HomepageABPercent:          0,
