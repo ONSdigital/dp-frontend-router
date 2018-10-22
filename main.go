@@ -129,9 +129,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	reverseProxy := createReverseProxy(babbageURL)
+	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
-	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
+	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
@@ -219,7 +219,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(proxyURL *url.URL) http.Handler {
+func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
@@ -236,6 +236,7 @@ func createReverseProxy(proxyURL *url.URL) http.Handler {
 	proxy.Director = func(req *http.Request) {
 		log.DebugR(req, "Proxying request", log.Data{
 			"destination": proxyURL,
+			"proxy_name":  proxyName,
 		})
 		director(req)
 	}
