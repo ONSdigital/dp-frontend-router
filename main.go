@@ -50,6 +50,9 @@ func main() {
 	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
 		config.FilterDatasetControllerURL = v
 	}
+	if v := os.Getenv("GEOGRAPHY_CONTROLLER_URL"); len(v) > 0 {
+		config.GeographyControllerURL = v
+	}
 	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
 		config.ZebedeeURL = v
 	}
@@ -93,6 +96,11 @@ func main() {
 		log.Error(err, nil)
 	}
 
+	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
+	if err != nil {
+		log.Error(err, nil)
+	}
+
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
 		config.TaxonomyDomain = v
 	}
@@ -123,6 +131,13 @@ func main() {
 		log.Error(err, nil)
 		os.Exit(1)
 	}
+
+	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
+	if err != nil {
+		log.Error(err, nil)
+		os.Exit(1)
+	}
+
 	redirects.Init(assets.Asset)
 
 	router := pat.New()
@@ -172,20 +187,25 @@ func main() {
 	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
 	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	// remove geo from prod
+	if config.GeographyEnabled == true {
+		router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
+	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":              config.BindAddr,
-		"babbage_url":            config.BabbageURL,
-		"dataset_controller_url": config.DatasetControllerURL,
-		"renderer_url":           config.RendererURL,
-		"resolver_url":           config.ResolverURL,
-		"homepage_ab_percent":    config.HomepageABPercent,
-		"site_domain":            config.SiteDomain,
-		"assets_path":            config.PatternLibraryAssetsPath,
-		"splash_page":            config.SplashPage,
-		"taxonomy_domain":        config.TaxonomyDomain,
-		"analytics_sqs_url":      config.SQSAnalyticsURL,
+		"bind_addr":                config.BindAddr,
+		"babbage_url":              config.BabbageURL,
+		"dataset_controller_url":   config.DatasetControllerURL,
+		"geography_controller_url": config.GeographyControllerURL,
+		"renderer_url":             config.RendererURL,
+		"resolver_url":             config.ResolverURL,
+		"homepage_ab_percent":      config.HomepageABPercent,
+		"site_domain":              config.SiteDomain,
+		"assets_path":              config.PatternLibraryAssetsPath,
+		"splash_page":              config.SplashPage,
+		"taxonomy_domain":          config.TaxonomyDomain,
+		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
 	s := server.New(config.BindAddr, alice)
