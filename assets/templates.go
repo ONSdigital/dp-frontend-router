@@ -108,7 +108,7 @@ func templatesMainTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/main.tmpl", size: 3324, mode: os.FileMode(420), modTime: time.Unix(1539789908, 0)}
+	info := bindataFileInfo{name: "templates/main.tmpl", size: 3324, mode: os.FileMode(420), modTime: time.Unix(1542014956, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -128,7 +128,7 @@ func templatesPartialsFooterTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 2545, mode: os.FileMode(420), modTime: time.Unix(1539789908, 0)}
+	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 2545, mode: os.FileMode(420), modTime: time.Unix(1542014956, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -148,7 +148,7 @@ func templatesPartialsHeaderTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3874, mode: os.FileMode(420), modTime: time.Unix(1539789908, 0)}
+	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3874, mode: os.FileMode(420), modTime: time.Unix(1542014956, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -168,7 +168,7 @@ func redirectsRedirectsCsv() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "redirects/redirects.csv", size: 20366, mode: os.FileMode(420), modTime: time.Unix(1541615261, 0)}
+	info := bindataFileInfo{name: "redirects/redirects.csv", size: 20366, mode: os.FileMode(420), modTime: time.Unix(1542014990, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
