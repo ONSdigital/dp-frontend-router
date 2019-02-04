@@ -20,14 +20,16 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
+	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	unrolled "github.com/unrolled/render"
 )
 
 func main() {
+	log.Namespace = "dp-frontend-router"
+
 	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
 		config.BindAddr = v
 	}
@@ -66,9 +68,11 @@ func main() {
 	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, _ := strconv.Atoi(v)
-		if a < 0 || a > 100 {
-			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
+		a, err := strconv.Atoi(v)
+		if err != nil {
+			log.Event(nil, "HOMEPAGE_AB_PERCENT is not a number", log.Data{"value": v}, log.Error(err))
+		} else if a < 0 || a > 100 {
+			log.Event(nil, "HOMEPAGE_AB_PERCENT must be between 0 and 100", log.Data{"value": v})
 			os.Exit(1)
 		}
 		config.HomepageABPercent = int(a)
@@ -77,10 +81,8 @@ func main() {
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "DEBUG is not a boolean", log.Data{"value": os.Getenv("DEBUG")}, log.Error(err))
 	}
-
-	log.Namespace = "dp-frontend-router"
 
 	render.Renderer = unrolled.New(unrolled.Options{
 		Asset:         assets.Asset,
@@ -99,7 +101,7 @@ func main() {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		securityHandler,
 		serverError.Handler,
 		redirects.Handler,
@@ -113,19 +115,19 @@ func main() {
 
 	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "error parsing babbage URL", log.Error(err), log.Data{"url": config.BabbageURL})
 		os.Exit(1)
 	}
 
 	downloaderURL, err := url.Parse(config.DownloaderURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "error parsing download URL", log.Error(err), log.Data{"url": config.DownloaderURL})
 		os.Exit(1)
 	}
 
 	searchHandler, err := analytics.NewSearchHandler()
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
 	}
 
@@ -135,7 +137,7 @@ func main() {
 	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Debug("Starting server", log.Data{
+	log.Event(nil, "starting server", log.Data{
 		"bind_addr":           config.BindAddr,
 		"babbage_url":         config.BabbageURL,
 		"renderer_url":        config.RendererURL,
@@ -157,8 +159,10 @@ func main() {
 	}
 
 	if err := server.ListenAndServe(); err != nil {
-		log.Error(err, nil)
-		os.Exit(2)
+		if err != http.ErrServerClosed {
+			log.Event(nil, "error starting server", log.Error(err))
+			os.Exit(2)
+		}
 	}
 }
 
@@ -175,10 +179,10 @@ func securityHandler(h http.Handler) http.Handler {
 //abHandler ... percentA is the percentage of request that handler 'a' is used
 func abHandler(a, b http.Handler, percentA int) http.Handler {
 	if percentA == 0 {
-		log.Debug("percentA is 0, defaulting to handler B", nil)
+		log.Event(nil, "abHandler decision", log.Data{"percentA": percentA, "destination": "b"})
 		return b
 	} else if percentA == 100 {
-		log.Debug("percentA is 100, defaulting to handler A", nil)
+		log.Event(nil, "abHandler decision", log.Data{"percentA": percentA, "destination": "a"})
 		return a
 	}
 
@@ -194,11 +198,14 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	RETRY:
 		if cookie == nil {
 			var cookieValue string
-			if rand.Intn(100) < percentA {
+			sel := rand.Intn(100)
+			if sel < percentA {
 				cookieValue = "A"
 			} else {
 				cookieValue = "B"
 			}
+
+			log.Event(nil, "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
 
 			expiration := time.Now().Add(365 * 24 * time.Hour)
 			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
@@ -208,11 +215,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Use cookie value to direct to a or b handler
 		switch cookie.Value {
 		case "A":
+			log.Event(nil, "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
 			a.ServeHTTP(w, req)
 		case "B":
+			log.Event(nil, "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
 			b.ServeHTTP(w, req)
 		default:
-			log.Debug("invalid cookie value, reselecting", log.Data{"value": cookie.Value})
+			log.Event(nil, "abHandler invalid cookie value, reselecting")
 			cookie = nil
 			goto RETRY
 		}
@@ -234,7 +243,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.DebugR(req, "Proxying request", log.Data{
+		log.Event(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
