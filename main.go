@@ -61,15 +61,6 @@ func main() {
 		config.DisabledPage = v
 	}
 
-	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, _ := strconv.Atoi(v)
-		if a < 0 || a > 100 {
-			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
-			os.Exit(1)
-		}
-		config.HomepageABPercent = int(a)
-	}
-
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
@@ -131,15 +122,14 @@ func main() {
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
-		"bind_addr":           config.BindAddr,
-		"babbage_url":         config.BabbageURL,
-		"renderer_url":        config.RendererURL,
-		"downloader_url":      config.DownloaderURL,
-		"homepage_ab_percent": config.HomepageABPercent,
-		"site_domain":         config.SiteDomain,
-		"assets_path":         config.PatternLibraryAssetsPath,
-		"splash_page":         config.SplashPage,
-		"analytics_sqs_url":   config.SQSAnalyticsURL,
+		"bind_addr":         config.BindAddr,
+		"babbage_url":       config.BabbageURL,
+		"renderer_url":      config.RendererURL,
+		"downloader_url":    config.DownloaderURL,
+		"site_domain":       config.SiteDomain,
+		"assets_path":       config.PatternLibraryAssetsPath,
+		"splash_page":       config.SplashPage,
+		"analytics_sqs_url": config.SQSAnalyticsURL,
 	})
 
 	server := &http.Server{

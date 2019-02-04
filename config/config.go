@@ -11,9 +11,6 @@ var RendererURL = "http://localhost:20010"
 // The URL of the file downloader service
 var DownloaderURL = "http://localhost:23400"
 
-// The percentage of requests to send to the new homepage
-var HomepageABPercent = 0
-
 // Whether the template rendering engine is in development mode or not
 var DebugMode = false
 
