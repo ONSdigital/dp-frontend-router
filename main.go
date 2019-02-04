@@ -15,7 +15,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
@@ -33,9 +32,6 @@ func main() {
 	}
 	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
 		config.BabbageURL = v
-	}
-	if v := os.Getenv("RESOLVER_URL"); len(v) > 0 {
-		config.ResolverURL = v
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
@@ -132,14 +128,12 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Debug("Starting server", log.Data{
 		"bind_addr":           config.BindAddr,
 		"babbage_url":         config.BabbageURL,
 		"renderer_url":        config.RendererURL,
-		"resolver_url":        config.ResolverURL,
 		"downloader_url":      config.DownloaderURL,
 		"homepage_ab_percent": config.HomepageABPercent,
 		"site_domain":         config.SiteDomain,
