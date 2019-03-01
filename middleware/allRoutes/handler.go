@@ -20,7 +20,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(datasets|filter|feedback|healthcheck).*$`, path); ok && err == nil {
-				log.Info("Skipping middelware as non-zebedee request", log.Data{"url": path})
+				log.Info("Skipping content specific handling as not relevant on this path.", log.Data{"url": path})
 				h.ServeHTTP(w, req)
 				return
 			}
