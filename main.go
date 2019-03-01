@@ -82,8 +82,10 @@ func main() {
 	}
 
 	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
-		a, _ := strconv.Atoi(v)
-		config.ContentTypeByteLimit = int(a)
+		a, err := strconv.Atoi(v)
+		if err == nil {
+			config.ContentTypeByteLimit = int(a)
+		}
 	}
 
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {

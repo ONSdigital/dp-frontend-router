@@ -18,15 +18,17 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			path := req.URL.Path
 
+			log.Debug("limit", log.Data{"limit": config.ContentTypeByteLimit})
+
 			// No point calling zebedee for these paths so skip middleware
-			if ok, err := regexp.MatchString(`^\/(datasets|filter|feedback|healthcheck).*$`, path); ok && err == nil {
+			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
 				log.Info("Skipping content specific handling as not relevant on this path.", log.Data{"url": path})
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			// We can skip handling based on content type where the url points to a known/expected file extension
-			if ok, err := regexp.MatchString(`^*(xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
+			if ok, err := regexp.MatchString(`^*\.(xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
 				log.Info("Skipping content specific handling as it's a request to download a known file extension.", log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return
@@ -74,6 +76,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 			// Use a limited reader so we dont oom the router checking for content-type
 			limitReader := io.LimitReader(res.Body, int64(config.ContentTypeByteLimit+1))
+			defer io.Copy(ioutil.Discard, res.Body)
 			b, err := ioutil.ReadAll(limitReader)
 			res.Body.Close()
 
