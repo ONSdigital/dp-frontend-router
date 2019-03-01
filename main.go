@@ -81,6 +81,11 @@ func main() {
 		config.DisabledPage = v
 	}
 
+	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
+		a, _ := strconv.Atoi(v)
+		config.ContentTypeByteLimit = int(a)
+	}
+
 	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
 		a, _ := strconv.Atoi(v)
 		if a < 0 || a > 100 {

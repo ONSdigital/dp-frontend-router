@@ -55,3 +55,6 @@ var TaxonomyDomain = ""
 
 // SQS URL for analytics data
 var SQSAnalyticsURL = ""
+
+// ContentTypeByteLimit respresents the response size at which we stop checking content-type to avoid oom errors
+var ContentTypeByteLimit = 5000000 // 5mb

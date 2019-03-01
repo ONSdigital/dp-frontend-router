@@ -20,6 +20,14 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(datasets|filter|feedback|healthcheck).*$`, path); ok && err == nil {
+				log.Info("Skipping middelware as non-zebedee request", log.Data{"url": path})
+				h.ServeHTTP(w, req)
+				return
+			}
+
+			// We can skip handling based on content type where the url points to a known/expected file extension
+			if ok, err := regexp.MatchString(`^*(xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
+				log.Info("Skipping content specific handling as it's a request to download a known file extension.", log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -64,8 +72,17 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			b, err := ioutil.ReadAll(res.Body)
+			// Use a limited reader so we dont oom the router checking for conten-type
+			limitReader := io.LimitReader(res.Body, int64(config.ContentTypeByteLimit+1))
+			b, err := ioutil.ReadAll(limitReader)
 			res.Body.Close()
+
+			if len(b) == config.ContentTypeByteLimit+1 {
+				log.Info("Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", nil)
+				h.ServeHTTP(w, req)
+				return
+			}
+
 			if err != nil {
 				log.ErrorR(req, err, nil)
 				h.ServeHTTP(w, req)
