@@ -72,7 +72,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			// Use a limited reader so we dont oom the router checking for conten-type
+			// Use a limited reader so we dont oom the router checking for content-type
 			limitReader := io.LimitReader(res.Body, int64(config.ContentTypeByteLimit+1))
 			b, err := ioutil.ReadAll(limitReader)
 			res.Body.Close()
