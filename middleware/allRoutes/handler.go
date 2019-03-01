@@ -18,8 +18,6 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			path := req.URL.Path
 
-			log.Debug("limit", log.Data{"limit": config.ContentTypeByteLimit})
-
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
 				log.Info("Skipping content specific handling as not relevant on this path.", log.Data{"url": path})
