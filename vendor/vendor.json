@@ -27,6 +27,12 @@
 			"revisionTime": "2017-01-23T15:55:35Z"
 		},
 		{
+			"checksumSHA1": "r2PdGOPVGXt0WTdGQXN5aHfp0RM=",
+			"path": "github.com/ONSdigital/log.go/log",
+			"revision": "93cc21caa3b378645874496cca0d8204bdf0f891",
+			"revisionTime": "2019-02-14T09:59:51Z"
+		},
+		{
 			"checksumSHA1": "SSGYNSaip2sf3h+uiv4IXzzDCJw=",
 			"path": "github.com/aws/aws-sdk-go-v2",
 			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
