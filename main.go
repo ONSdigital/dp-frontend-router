@@ -159,6 +159,8 @@ func securityHandler(h http.Handler) http.Handler {
 }
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
+//
+// FIXME this isn't used anymore, it could be removed, but seems like it might be useful?
 func abHandler(a, b http.Handler, percentA int) http.Handler {
 	if percentA == 0 {
 		log.Event(nil, "abHandler decision", log.Data{"percentA": percentA, "destination": "b"})
