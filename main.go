@@ -15,7 +15,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
@@ -35,9 +34,6 @@ func main() {
 	}
 	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
 		config.BabbageURL = v
-	}
-	if v := os.Getenv("RESOLVER_URL"); len(v) > 0 {
-		config.ResolverURL = v
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
@@ -65,17 +61,6 @@ func main() {
 
 	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
 		config.DisabledPage = v
-	}
-
-	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, err := strconv.Atoi(v)
-		if err != nil {
-			log.Event(nil, "HOMEPAGE_AB_PERCENT is not a number", log.Data{"value": v}, log.Error(err))
-		} else if a < 0 || a > 100 {
-			log.Event(nil, "HOMEPAGE_AB_PERCENT must be between 0 and 100", log.Data{"value": v})
-			os.Exit(1)
-		}
-		config.HomepageABPercent = int(a)
 	}
 
 	var err error
@@ -134,20 +119,17 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "starting server", log.Data{
-		"bind_addr":           config.BindAddr,
-		"babbage_url":         config.BabbageURL,
-		"renderer_url":        config.RendererURL,
-		"resolver_url":        config.ResolverURL,
-		"downloader_url":      config.DownloaderURL,
-		"homepage_ab_percent": config.HomepageABPercent,
-		"site_domain":         config.SiteDomain,
-		"assets_path":         config.PatternLibraryAssetsPath,
-		"splash_page":         config.SplashPage,
-		"analytics_sqs_url":   config.SQSAnalyticsURL,
+		"bind_addr":         config.BindAddr,
+		"babbage_url":       config.BabbageURL,
+		"renderer_url":      config.RendererURL,
+		"downloader_url":    config.DownloaderURL,
+		"site_domain":       config.SiteDomain,
+		"assets_path":       config.PatternLibraryAssetsPath,
+		"splash_page":       config.SplashPage,
+		"analytics_sqs_url": config.SQSAnalyticsURL,
 	})
 
 	server := &http.Server{
