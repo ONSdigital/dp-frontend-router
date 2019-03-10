@@ -9,8 +9,8 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
-	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
+	"github.com/ONSdigital/log.go/log"
 )
 
 type responseInterceptor struct {
@@ -23,7 +23,7 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 	if status >= 500 {
-		log.DebugR(rI.req, "Intercepted error response", nil)
+		log.Event(rI.req.Context(), "intercepted error response")
 		rI.intercepted = true
 		rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties.</p>")
 		return
@@ -35,8 +35,7 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
 	// Attempt to render an error page
 	if err := rI.callRenderer(code, title, description); err != nil {
-		log.ErrorR(rI.req, err, nil)
-		log.DebugR(rI.req, "rendering disaster page", nil)
+		log.Event(rI.req.Context(), "rendering disaster page", log.Error(err))
 
 		// Calling the renderer failed, render the disaster page
 		render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
@@ -97,7 +96,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		}
 	}
 
-	log.DebugR(rI.req, "returning error page", nil)
+	log.Event(rI.req.Context(), "returning error page")
 	rI.ResponseWriter.WriteHeader(code)
 	rI.ResponseWriter.Write(b)
 

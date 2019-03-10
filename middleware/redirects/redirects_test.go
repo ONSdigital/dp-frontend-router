@@ -9,7 +9,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	. "github.com/smartystreets/goconvey/convey"
@@ -118,7 +118,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 	}
@@ -136,7 +136,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -160,7 +160,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -184,7 +184,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -208,7 +208,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,

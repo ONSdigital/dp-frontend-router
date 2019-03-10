@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/go-ns/log"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/ONSdigital/log.go/log"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 const pageIndexParam = "pageIndex"
@@ -53,11 +53,10 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	})
 
 	if err != nil {
-		log.ErrorR(r, err, nil)
 		return "", errors.New("Invalid redirect data")
 	}
 
-	log.DebugR(r, "token", log.Data{"token": token})
+	log.Event(r.Context(), "jwt token", log.Data{"token": token})
 
 	var url, term, listType, gaID, gID string
 	var pageIndex, linkIndex, pageSize float64
@@ -65,7 +64,6 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	var claims jwt.MapClaims
 	var ok bool
 	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
-		log.ErrorR(r, errors.New("error validating token"), nil)
 		return "", errors.New("error validating token")
 	}
 
@@ -99,12 +97,11 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	if len(url) == 0 {
-		log.ErrorR(r, errors.New("failed to redirect to search results as parameter URL was missing"), nil)
-		return "", errors.New("400: URL is a mandatory parameter")
+		return "", errors.New("url is a mandatory parameter")
 	}
 
 	// FIXME do we want to log as well as store in backend?
-	log.DebugR(r, "CaptureAnalyticsData", log.Data{
+	log.Event(r.Context(), "search analytics data", log.Data{
 		urlParam:        url,
 		termParam:       term,
 		searchTypeParam: listType,
