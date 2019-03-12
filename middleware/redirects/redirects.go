@@ -56,7 +56,7 @@ func Init(asset func(name string) ([]byte, error)) {
 					continue
 				}
 
-				log.Event(nil, "adding redirct", log.Data{"from": record[0], "to": record[1]})
+				log.Event(nil, "adding redirect", log.Data{"from": record[0], "to": record[1]})
 				redirects[record[0]] = record[1]
 			} else {
 				log.Event(nil, "redirect is missing 'to' value", log.Data{"line": line})
