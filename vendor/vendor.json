@@ -3,6 +3,11 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "/IgtMOBRqTxEAfVs7ATBXQMVRf4=",
+			"path": "errors",
+			"revision": ""
+		},
+		{
 			"checksumSHA1": "8GX4z3tt4e6rXHJtJv8q8YZrFwk=",
 			"path": "github.com/ONSdigital/go-ns/common",
 			"revision": "3fdd13a161b0d6221b2405cce8bbe5ec69168ab7",
