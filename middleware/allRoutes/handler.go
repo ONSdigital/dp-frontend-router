@@ -26,7 +26,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			}
 
 			// We can skip handling based on content type where the url points to a known/expected file extension
-			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
+			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xlsx)$`, req.URL.String()); ok && err == nil {
 				log.Info("Skipping content specific handling as it's a request to download a known file extension.", log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return

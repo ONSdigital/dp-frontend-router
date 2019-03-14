@@ -21,7 +21,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
@@ -157,7 +156,7 @@ func main() {
 		securityHandler,
 		serverError.Handler,
 		allRoutes.Handler(map[string]http.Handler{
-			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+			"dataset_landing_page": createReverseProxy(datasetControllerURL),
 		}),
 		redirects.Handler,
 	}
@@ -294,9 +293,9 @@ func createReverseProxy(proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.DebugR(req, "Proxying request", log.Data{
-			"destination": proxyURL,
-		})
+		log.InfoCtx(req.Context(), "Proxying request", log.Data{
+		"destination": proxyURL,
+	})
 		director(req)
 	}
 	return proxy
