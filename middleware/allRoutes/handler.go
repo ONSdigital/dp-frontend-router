@@ -40,33 +40,33 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			} else {
 				contentURL += "?uri=" + path
 			}
-			log.Debug(contentURL, nil)
+			log.DebugCtx(ctx, contentURL, nil)
 
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
 
 			request, err := http.NewRequest("GET", contentURL, nil)
 			if err != nil {
-				log.ErrorR(req, err, nil)
+				log.ErrorCtx(ctx, err, nil)
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			if c, err := req.Cookie(`access_token`); err == nil && len(c.Value) > 0 {
 				request.Header.Set(`X-Florence-Token`, c.Value)
-				log.Debug(c.Value, nil)
+				log.DebugCtx(ctx, c.Value, nil)
 			}
 
 			res, err := http.DefaultClient.Do(request)
 			if err != nil {
-				log.ErrorR(req, err, nil)
+				log.ErrorCtx(ctx, err, nil)
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			statusCode := res.StatusCode
 			if statusCode >= 400 {
-				log.DebugR(req, "Unexpected status code", log.Data{"statusCode": statusCode, "url": contentURL})
+				log.DebugCtx(ctx, "Unexpected status code", log.Data{"statusCode": statusCode, "url": contentURL})
 				io.Copy(ioutil.Discard, res.Body)
 				res.Body.Close()
 				h.ServeHTTP(w, req)
@@ -80,13 +80,13 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			res.Body.Close()
 
 			if len(b) == config.ContentTypeByteLimit+1 {
-				log.Info("Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", nil)
+				log.InfoCtx(ctx,"Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", nil)
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			if err != nil {
-				log.ErrorR(req, err, nil)
+				log.ErrorCtx(ctx, err, nil)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -96,7 +96,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				DatasetID string `json:"apiDatasetId"`
 			}{}
 			if err := json.Unmarshal(b, &zebResp); err != nil {
-				log.ErrorR(req, err, nil)
+				log.ErrorCtx(ctx, err, nil)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -112,7 +112,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			}
 
 			if h, ok := routesHandler[pageType]; ok {
-				log.DebugR(req, "Using handler for page type", log.Data{"pageType": pageType, "url": contentURL})
+				log.DebugCtx(ctx, "Using handler for page type", log.Data{"pageType": pageType, "url": contentURL})
 				h.ServeHTTP(w, req)
 				return
 			}
