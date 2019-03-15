@@ -32,8 +32,9 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				for i := range b {
 					b[i] = letters[rand.Intn(len(letters))]
 				}
-				req.Header.Set("X-Request-Id", string(b))
-				log.Info("allRoutes handler: RequestID needed to be set.",nil)
+				requestID = string(b)
+				req.Header.Set("X-Request-Id", requestID)
+				log.Info("allRoutes handler: RequestID needed to be set.",log.Data{"requestID": requestID})
 			}
 
 			// ---------------------------------
@@ -42,18 +43,19 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			logData := log.Data{
 				"path":path,
 				"url":req.URL.String(),
+				"requestID":requestID,
 			}
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
-				log.InfoCtx(ctx, "Skipping content specific handling as not relevant on this path.", logData)
+				log.InfoCtx(ctx, "allRoutes handler: Skipping content specific handling as not relevant on this path.", logData)
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			// We can skip handling based on content type where the url points to a known/expected file extension
 			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xlsx)$`, req.URL.String()); ok && err == nil {
-				log.InfoCtx(ctx,"Skipping content specific handling as it's a request to download a known file extension.", logData)
+				log.InfoCtx(ctx,"allRoutes handler: Skipping content specific handling as it's a request to download a known file extension.", logData)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -66,14 +68,14 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				contentURL += "?uri=" + path
 			}
 			logData["content_url"] = contentURL
-			log.DebugCtx(ctx, "Allroutes handler: created content URL.", logData)
+			log.DebugCtx(ctx, "allRoutes handler: created content URL.", logData)
 
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
 
 			request, err := http.NewRequest("GET", contentURL, nil)
 			if err != nil {
-				log.ErrorCtx(ctx, errors.WithMessage(err, "Allroutes handler. Failed to get content"), logData)
+				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: Failed to create GETcontent request"), logData)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -81,22 +83,28 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			if c, err := req.Cookie(`access_token`); err == nil && len(c.Value) > 0 {
 				request.Header.Set(`X-Florence-Token`, c.Value)
 				logData["X-Florence-Token"] = c.Value
-				log.InfoCtx(ctx, "Allroutes handler. Created new token value.", logData)
+				log.InfoCtx(ctx, "allRoutes handler: Created new token value.", logData)
 			}
 
 			res, err := http.DefaultClient.Do(request)
 			if err != nil {
-				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: Error while attepting to get content"), nil)
+				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: Error while attepting to get content"), logData)
 				h.ServeHTTP(w, req)
 				return
 			}
 
+			// TODO - shoudn't be needed?
+			defer io.Copy(ioutil.Discard, res.Body)
+			defer res.Body.Close()
+
 			logData["status_code"] = res.StatusCode
-			log.InfoCtx(ctx, "allRoutes: content request complete", logData)
+			log.InfoCtx(ctx, "allRoutes handler: content request complete", logData)
 
 			statusCode := res.StatusCode
 			if statusCode >= 400 {
-				log.DebugCtx(ctx, "Unexpected status code", log.Data{"statusCode": statusCode, "url": contentURL})
+				logData["statusCode"] = statusCode
+				logData["url"] = contentURL
+				log.DebugCtx(ctx, "allRoutes handler: Unexpected status code", logData)
 				io.Copy(ioutil.Discard, res.Body)
 				res.Body.Close()
 				h.ServeHTTP(w, req)
@@ -110,7 +118,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			res.Body.Close()
 
 			if len(b) == config.ContentTypeByteLimit+1 {
-				log.InfoCtx(ctx,"Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", logData)
+				log.InfoCtx(ctx,"allRoutes handler: Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", logData)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -134,23 +142,28 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			logData["zebedee response type"] = zebResp.Type
 			logData["zebedee response dataset id"] = zebResp.DatasetID
 
-			log.Info("Zebedee content response recieved.", logData)
+			log.Info("allRoutes handler: Zebedee content response recieved.", logData)
 			log.Debug(zebResp.DatasetID, nil)
 
 
 			pageType := res.Header.Get("ONS-Page-Type")
 
+			logData["pageType"] = pageType
+			logData["url"] = contentURL
+
 			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
+				log.DebugCtx(ctx, "allRoutes handler: Redirecting to api_dataset_landing_page", logData)
 				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)
 				return
 			}
 
 			if h, ok := routesHandler[pageType]; ok {
-				log.DebugCtx(ctx, "Using handler for page type", log.Data{"pageType": pageType, "url": contentURL})
+				log.DebugCtx(ctx, "allRoutes handler: Using handler for page type", logData)
 				h.ServeHTTP(w, req)
 				return
 			}
 
+			log.DebugCtx(ctx, "allRoutes handler: request passed through entire handler.", logData)
 			h.ServeHTTP(w, req)
 		})
 	}
