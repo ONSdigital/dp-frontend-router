@@ -4,15 +4,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"regexp"
-
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/pkg/errors"
 	"math/rand"
 )
+
+
+// recoverable http serve
+func rServeHttp(h http.Handler, w http.ResponseWriter, req *http.Request, logData log.Data) {
+	defer recovery(logData, req.Context())
+	h.ServeHTTP(w, req)
+}
+
+func recovery(logData log.Data, ctx context.Context) {
+	if r := recover(); r!= nil {
+		logData["recover"] = r
+		log.DebugCtx(ctx,"allRoutes handler: recovering from failed httpServe.", logData)
+	}
+}
 
 //Handler ...
 func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Handler {
@@ -49,14 +63,14 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
 				log.InfoCtx(ctx, "allRoutes handler: Skipping content specific handling as not relevant on this path.", logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
 			// We can skip handling based on content type where the url points to a known/expected file extension
 			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xlsx)$`, req.URL.String()); ok && err == nil {
 				log.InfoCtx(ctx,"allRoutes handler: Skipping content specific handling as it's a request to download a known file extension.", logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
@@ -89,7 +103,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			res, err := http.DefaultClient.Do(request)
 			if err != nil {
 				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: Error while attepting to get content"), logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
@@ -107,7 +121,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				log.DebugCtx(ctx, "allRoutes handler: Unexpected status code", logData)
 				io.Copy(ioutil.Discard, res.Body)
 				res.Body.Close()
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
@@ -119,13 +133,13 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 			if len(b) == config.ContentTypeByteLimit+1 {
 				log.InfoCtx(ctx,"allRoutes handler: Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
 			if err != nil {
 				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: error while attmepting limited read."), logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
@@ -135,7 +149,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			}{}
 			if err := json.Unmarshal(b, &zebResp); err != nil {
 				log.ErrorCtx(ctx, errors.WithMessage(err, "allRoutes handler: error while attempting to unmarshall json."), logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
@@ -159,12 +173,13 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 			if h, ok := routesHandler[pageType]; ok {
 				log.DebugCtx(ctx, "allRoutes handler: Using handler for page type", logData)
-				h.ServeHTTP(w, req)
+				rServeHttp(h, w, req, logData)
 				return
 			}
 
 			log.DebugCtx(ctx, "allRoutes handler: request passed through entire handler.", logData)
-			h.ServeHTTP(w, req)
+			rServeHttp(h, w, req, logData)
 		})
 	}
 }
+
