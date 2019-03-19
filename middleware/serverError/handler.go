@@ -22,6 +22,9 @@ type responseInterceptor struct {
 }
 
 func (rI *responseInterceptor) WriteHeader(status int) {
+
+	log.Debug("calling WriteHeader method of responseInterceptor.", nil)
+
 	if status >= 400 {
 		log.DebugR(rI.req, "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
@@ -42,6 +45,9 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
 	// Attempt to render an error page
+
+	log.Debug("calling renderErrorPage method of responseInterceptor.", nil)
+
 	if err := rI.callRenderer(code, title, description); err != nil {
 		log.ErrorR(rI.req, err, nil)
 		log.DebugR(rI.req, "rendering disaster page", nil)
@@ -66,6 +72,9 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 }
 
 func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
+
+	log.Debug("calling callRenderer method on responseInterceptor.", nil)
+
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
