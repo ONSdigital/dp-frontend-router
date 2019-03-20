@@ -66,17 +66,14 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			skip := false
 			// We can skip handling based on content type where the url points to a known/expected file extension
 			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xlsx)$`, req.URL.String()); ok && err == nil {
-				skip = true
 				log.InfoCtx(ctx, "allRoutes handler: Skipping content specific handling as it's a request to download a known file extension.", logData)
 				rServeHttp(h, w, req, logData)
 
 				return
 			}
 
-			if skip == false {
 
 				contentURL := config.ZebedeeURL + "/data"
 
@@ -182,7 +179,6 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 
 				log.DebugCtx(ctx, "allRoutes handler: request passed through entire handler.", logData)
 				rServeHttp(h, w, req, logData)
-			}
 		})
 
 	}

@@ -46,15 +46,18 @@ func Init(asset func(name string) ([]byte, error)) {
 func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
-		log.DebugCtx(req.Context(), "Request is hitting redirect handler", nil)
+		requestID := req.Header.Get("X-Request-Id")
+		logData := log.Data{"requestID": requestID}
+
+		log.DebugCtx(req.Context(), "Request is hitting redirect handler", logData)
 
 		if redirect, ok := redirects[req.URL.Path]; ok {
-			log.DebugCtx(req.Context(), "Redirected "+req.URL.Path+" to "+redirect, nil)
+			log.DebugCtx(req.Context(), "Redirected "+req.URL.Path+" to "+redirect, logData)
 			http.Redirect(w, req, redirect, http.StatusTemporaryRedirect)
 			return
 		}
 
-		log.DebugCtx(req.Context(), "Request is serving from redirect handler", nil)
+		log.DebugCtx(req.Context(), "Request is serving from redirect handler", logData)
 
 		h.ServeHTTP(w, req)
 	})

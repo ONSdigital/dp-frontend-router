@@ -23,10 +23,14 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 
-	log.Debug("calling WriteHeader method of responseInterceptor.", nil)
+	requestID := rI.req.Header.Get(("X-Request-Id"))
+	logData := log.Data{"requestID": requestID}
+
+	log.Debug("calling WriteHeader method of responseInterceptor.", logData)
 
 	if status >= 400 {
-		log.DebugR(rI.req, "Intercepted error response", log.Data{"status": status})
+		logData["status"] = status
+		log.DebugR(rI.req, "Intercepted error response", logData)
 		rI.intercepted = true
 		if status == 500 {
 			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+rI.req.URL.Path+"'>refreshing the page or trying again later.</a> </p>")
@@ -46,11 +50,14 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
 	// Attempt to render an error page
 
-	log.Debug("calling renderErrorPage method of responseInterceptor.", nil)
+	requestID := rI.req.Header.Get(("X-Request-Id"))
+	logData := log.Data{"requestID": requestID}
+
+	log.Debug("calling renderErrorPage method of responseInterceptor.", logData)
 
 	if err := rI.callRenderer(code, title, description); err != nil {
-		log.ErrorR(rI.req, err, nil)
-		log.DebugR(rI.req, "rendering disaster page", nil)
+		log.ErrorR(rI.req, err, logData)
+		log.DebugR(rI.req, "rendering disaster page", logData)
 
 		// Calling the renderer failed, render the disaster page
 		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
@@ -73,7 +80,10 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 
 func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
 
-	log.Debug("calling callRenderer method on responseInterceptor.", nil)
+	requestID := rI.req.Header.Get(("X-Request-Id"))
+	logData := log.Data{"requestID": requestID}
+
+	log.Debug("calling callRenderer method on responseInterceptor.", logData)
 
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
@@ -158,6 +168,12 @@ func (rI *responseInterceptor) Header() http.Header {
 
 func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+
+		requestID := req.Header.Get(("X-Request-Id"))
+		logData := log.Data{"requestID": requestID}
+
+		log.Debug("serverError handler: serving with responseInterceptor.", logData)
+
 		h.ServeHTTP(&responseInterceptor{w, req, false, false, make(http.Header)}, req)
 	})
 }
