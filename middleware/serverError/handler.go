@@ -24,22 +24,28 @@ type responseInterceptor struct {
 func (rI *responseInterceptor) WriteHeader(status int) {
 
 	requestID := rI.req.Header.Get(("X-Request-Id"))
-	logData := log.Data{"requestID": requestID}
+	logData := log.Data{"requestID": requestID, "status":status}
 
 	log.Debug("calling WriteHeader method of responseInterceptor.", logData)
 
 	if status >= 400 {
 		logData["status"] = status
-		log.DebugR(rI.req, "Intercepted error response", logData)
+
+		log.DebugCtx(rI.req.Context(), "Intercepted error response", logData)
+
 		rI.intercepted = true
 		if status == 500 {
 			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+rI.req.URL.Path+"'>refreshing the page or trying again later.</a> </p>")
+			log.DebugCtx(rI.req.Context(), "renderErrorPage 500", logData)
 		} else if status == 404 {
 			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
+			log.DebugCtx(rI.req.Context(), "renderErrorPage 404", logData)
 		} else if status == 401 {
 			rI.renderErrorPage(401, "401 - You do not have permission to view this web page", `<p>This page may exist, but you do not currently have permission to view it. If you believe this to be incorrect please contact a system administrator.</p>`)
+			log.DebugCtx(rI.req.Context(), "renderErrorPage 401", logData)
 		} else {
 			rI.renderErrorPage(503, "Service temporarily unavailable", `<p>The service is temporarily unavailable, please check our <a href="https://twitter.com/onsdigital">twitter</a> feed for updates.</p>`)
+			log.DebugCtx(rI.req.Context(), "renderErrorPage 503", logData)
 		}
 		return
 	}
@@ -53,11 +59,17 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 	requestID := rI.req.Header.Get(("X-Request-Id"))
 	logData := log.Data{"requestID": requestID}
 
-	log.Debug("calling renderErrorPage method of responseInterceptor.", logData)
+	log.DebugCtx(rI.req.Context(), "serverError handler: rendering error page.", logData)
 
 	if err := rI.callRenderer(code, title, description); err != nil {
-		log.ErrorR(rI.req, err, logData)
-		log.DebugR(rI.req, "rendering disaster page", logData)
+
+		log.DebugCtx(rI.req.Context(), "serverError handler: calling renderer.", logData)
+
+		//log.ErrorR(rI.req, err, logData)
+		log.ErrorCtx(rI.req.Context(), err, logData)
+
+		//log.DebugR(rI.req, "rendering disaster page", logData)
+		log.DebugCtx(rI.req.Context(), "rendering disaster page", logData)
 
 		// Calling the renderer failed, render the disaster page
 		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
@@ -72,7 +84,8 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 			},
 		})
 		if err != nil {
-			log.ErrorR(rI.req, err, nil)
+			log.ErrorCtx(rI.req.Context(), err, logData)
+			//log.ErrorR(rI.req, err, nil)
 			return
 		}
 	}
@@ -130,7 +143,9 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		}
 	}
 
-	log.DebugR(rI.req, "returning error page", nil)
+	//log.DebugR(rI.req, "returning error page", nil)
+	log.DebugCtx(rI.req.Context(), "returning an error page", logData)
+
 	rI.ResponseWriter.WriteHeader(code)
 	rI.ResponseWriter.Write(b)
 
@@ -172,7 +187,7 @@ func Handler(h http.Handler) http.Handler {
 		requestID := req.Header.Get(("X-Request-Id"))
 		logData := log.Data{"requestID": requestID}
 
-		log.Debug("serverError handler: serving with responseInterceptor.", logData)
+		log.DebugCtx(req.Context(), "serverError handler: serving with responseInterceptor.", logData)
 
 		h.ServeHTTP(&responseInterceptor{w, req, false, false, make(http.Header)}, req)
 	})
