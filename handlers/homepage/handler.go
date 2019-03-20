@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"context"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
@@ -16,7 +17,15 @@ const xRequestIDHeaderParam = "X-Request-Id"
 
 func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-		b, err := resolver.Get("/", req.Header.Get(xRequestIDHeaderParam))
+
+		requestID := req.Header.Get(xRequestIDHeaderParam)
+		logData := log.Data{"requestID":requestID}
+
+		log.InfoCtx(req.Context(), "homepage handler: request received.", logData)
+
+		defer recovery(logData, req.Context())
+
+		b, err := resolver.Get("/", requestID)
 		if err == resolver.ErrUnauthorised {
 			err = fmt.Errorf("unauthorised user: %s", err)
 			log.ErrorR(req, err, nil)
@@ -83,5 +92,12 @@ func Handler(babbageProxy http.Handler) func(w http.ResponseWriter, req *http.Re
 		log.DebugR(req, "returning homepage", nil)
 		w.WriteHeader(res.StatusCode)
 		w.Write(b)
+	}
+}
+
+func recovery(logData log.Data, ctx context.Context) {
+	if r := recover(); r != nil {
+		logData["recover"] = r
+		log.DebugCtx(ctx, "homepage handler: recovering.", logData)
 	}
 }

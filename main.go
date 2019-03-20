@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"context"
 
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -293,10 +294,21 @@ func createReverseProxy(proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.InfoCtx(req.Context(), "Proxying request", log.Data{
-			"destination": proxyURL,
-		})
+
+		requestID := req.Header.Get(("X-Request-Id"))
+		logData := log.Data{"requestID": requestID, "destination": proxyURL}
+
+		log.InfoCtx(req.Context(), "Proxying request", logData)
+
+		defer recovery(logData, req.Context())
 		director(req)
 	}
 	return proxy
+}
+
+func recovery(logData log.Data, ctx context.Context) {
+	if r := recover(); r != nil {
+		logData["recover"] = r
+		log.DebugCtx(ctx, "reverse proxy: recovering from failed httpServe.", logData)
+	}
 }
