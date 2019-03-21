@@ -25,7 +25,6 @@ import (
 	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
-	"github.com/ONSdigital/go-ns/server"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	unrolled "github.com/unrolled/render"
@@ -215,7 +214,14 @@ func main() {
 		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
-	s := server.New(config.BindAddr, alice)
+	s := &http.Server{
+		Addr:         config.BindAddr,
+		Handler:      alice,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
 	if err := s.ListenAndServe(); err != nil {
 		log.Error(err, nil)
 		os.Exit(2)
