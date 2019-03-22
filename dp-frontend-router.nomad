@@ -43,6 +43,13 @@ job "dp-frontend-router" {
         name = "dp-frontend-router"
         port = "http"
         tags = ["web"]
+
+        check {
+          type     = "http"
+          path     = "/healthcheck"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
 
       resources {
@@ -65,7 +72,7 @@ job "dp-frontend-router" {
     }
   }
 
-  group "publising" {
+  group "publishing" {
     count = "{{PUBLISHING_TASK_COUNT}}"
 
     constraint {
@@ -97,6 +104,13 @@ job "dp-frontend-router" {
         name = "dp-frontend-router"
         port = "http"
         tags = ["publishing"]
+
+        check {
+          type     = "http"
+          path     = "/healthcheck"
+          interval = "10s"
+          timeout  = "2s"
+        }
       }
 
       resources {
