@@ -15,7 +15,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/handlers/homepage"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
@@ -36,9 +35,6 @@ func main() {
 	}
 	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
 		config.BabbageURL = v
-	}
-	if v := os.Getenv("RESOLVER_URL"); len(v) > 0 {
-		config.ResolverURL = v
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
@@ -85,15 +81,6 @@ func main() {
 		if err == nil {
 			config.ContentTypeByteLimit = int(a)
 		}
-	}
-
-	if v := os.Getenv("HOMEPAGE_AB_PERCENT"); len(v) > 0 {
-		a, _ := strconv.Atoi(v)
-		if a < 0 || a > 100 {
-			log.Debug("HOMEPAGE_AB_PERCENT must be between 0 and 100", nil)
-			os.Exit(1)
-		}
-		config.HomepageABPercent = int(a)
 	}
 
 	var err error
@@ -185,17 +172,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	reverseProxy := createReverseProxy(babbageURL)
+	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
-	router.Handle("/download/{uri:.*}", createReverseProxy(downloaderURL))
-	router.Handle("/", abHandler(http.HandlerFunc(homepage.Handler(reverseProxy)), reverseProxy, config.HomepageABPercent))
-	router.Handle("/datasets/{uri:.*}", createReverseProxy(datasetControllerURL))
-	router.Handle("/feedback{uri:.*}", createReverseProxy(datasetControllerURL))
-	router.Handle("/filters/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
-	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy(filterDatasetControllerURL))
+	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
+	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
+	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
+	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	// remove geo from prod
 	if config.GeographyEnabled == true {
-		router.Handle("/geography{uri:.*}", createReverseProxy(geographyControllerURL))
+		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
@@ -205,8 +191,6 @@ func main() {
 		"dataset_controller_url":   config.DatasetControllerURL,
 		"geography_controller_url": config.GeographyControllerURL,
 		"renderer_url":             config.RendererURL,
-		"resolver_url":             config.ResolverURL,
-		"homepage_ab_percent":      config.HomepageABPercent,
 		"site_domain":              config.SiteDomain,
 		"assets_path":              config.PatternLibraryAssetsPath,
 		"splash_page":              config.SplashPage,
@@ -285,7 +269,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(proxyURL *url.URL) http.Handler {
+func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
@@ -302,6 +286,7 @@ func createReverseProxy(proxyURL *url.URL) http.Handler {
 	proxy.Director = func(req *http.Request) {
 		log.DebugR(req, "Proxying request", log.Data{
 			"destination": proxyURL,
+			"proxy_name":  proxyName,
 		})
 		director(req)
 	}
