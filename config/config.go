@@ -8,6 +8,9 @@ var BabbageURL = "http://localhost:8080"
 // The URL of the content renderer
 var RendererURL = "http://localhost:20010"
 
+// Dataset routes enabled
+var DatasetRoutesEnabled = false
+
 // The URL of the dataset controller
 var DatasetControllerURL = "http://localhost:20200"
 

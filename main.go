@@ -142,16 +142,21 @@ func main() {
 		log.Handler,
 		securityHandler,
 		serverError.Handler,
-		allRoutes.Handler(map[string]http.Handler{
-			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}),
 		redirects.Handler,
 	}
+
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
 	} else if len(config.SplashPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.SplashPage, true))
 	}
+
+	if config.DatasetRoutesEnabled == true {
+		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
+			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+		}))
+	}
+
 	alice := alice.New(middleware...).Then(router)
 
 	babbageURL, err := url.Parse(config.BabbageURL)
@@ -175,10 +180,13 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
-	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
-	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
-	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
+
+	if config.DatasetRoutesEnabled == true {
+		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
+		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
+		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
+	}
 	// remove geo from prod
 	if config.GeographyEnabled == true {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
