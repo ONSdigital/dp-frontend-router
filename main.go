@@ -39,6 +39,9 @@ func main() {
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
 	}
+	if v := os.Gentenv("DATASET_ROUTES_ENABLED"); len(v) > 0 {
+		config.DatasetRoutesEnabled = v
+	}
 	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
 		config.DatasetControllerURL = v
 	}
