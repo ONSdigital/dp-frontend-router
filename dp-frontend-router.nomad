@@ -16,8 +16,14 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      operator  = "regexp"
-      value     = "web.*"
+      value     = "web"
+    }
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
     }
 
     task "dp-frontend-router-web" {
@@ -77,8 +83,14 @@ job "dp-frontend-router" {
 
     constraint {
       attribute = "${node.class}"
-      operator  = "regexp"
-      value     = "publishing.*"
+      value     = "publishing"
+    }
+
+    restart {
+      attempts = 3
+      delay    = "15s"
+      interval = "1m"
+      mode     = "delay"
     }
 
     task "dp-frontend-router-publishing" {
