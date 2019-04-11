@@ -45,7 +45,12 @@
 			"revisionTime": "2017-11-22T09:55:22Z"
 		},
 		{
-<<<<<<< HEAD
+			"checksumSHA1": "kfEPqmTD+a9Mo+pqCeiJb6OGrDE=",
+			"path": "github.com/ONSdigital/go-ns/server",
+			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
+			"revisionTime": "2017-08-30T09:50:52Z"
+		},
+		{
 			"checksumSHA1": "r2PdGOPVGXt0WTdGQXN5aHfp0RM=",
 			"path": "github.com/ONSdigital/log.go/log",
 			"revision": "93cc21caa3b378645874496cca0d8204bdf0f891",
@@ -56,12 +61,6 @@
 			"path": "github.com/aws/aws-sdk-go-v2",
 			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
 			"revisionTime": "2018-02-13T16:58:34Z"
-=======
-			"checksumSHA1": "kfEPqmTD+a9Mo+pqCeiJb6OGrDE=",
-			"path": "github.com/ONSdigital/go-ns/server",
-			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
-			"revisionTime": "2017-08-30T09:50:52Z"
->>>>>>> develop
 		},
 		{
 			"checksumSHA1": "b2txlAkxXbktlLrA1hY59cWT0Cw=",
@@ -224,6 +223,12 @@
 			"path": "github.com/gorilla/pat",
 			"revision": "cf955c3d1f2c27ee96f93e9738085c762ff5f49d",
 			"revisionTime": "2016-04-13T04:16:32Z"
+		},
+		{
+			"checksumSHA1": "+HUsIuEnSLik8Jrrw9MDdxmhT5c=",
+			"path": "github.com/hokaccha/go-prettyjson",
+			"revision": "f579f869bbfea48a61fbea09207cadd1aaeceb83",
+			"revisionTime": "2018-09-20T04:03:06Z"
 		},
 		{
 			"checksumSHA1": "blwbl9vPvRLtL5QlZgfpLvsFiZ4=",
