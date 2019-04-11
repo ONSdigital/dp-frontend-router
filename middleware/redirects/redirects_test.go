@@ -85,7 +85,7 @@ a,b,c`)
 		shouldError = false
 		returnBytes = []byte(`a
 a`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirects must have two fields")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'to' URL empty, check logs")
 	})
 
 	Convey("Init should add entries to redirects", t, func() {
@@ -102,13 +102,13 @@ c,d`)
 	Convey("Init should panic if redirect has no from url", t, func() {
 		shouldError = false
 		returnBytes = []byte(`,b`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirect from URL must not be empty")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'from' URL empty, check logs")
 	})
 
 	Convey("Init should panic if redirect has no to url", t, func() {
 		shouldError = false
 		returnBytes = []byte(`a,`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirect to URL must not be empty")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'to' URL empty, check logs")
 	})
 
 }
