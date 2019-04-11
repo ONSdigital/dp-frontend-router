@@ -88,17 +88,17 @@ func main() {
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
-		log.Event(nil, "DEBUG is not a boolean", log.Data{"value": os.Getenv("DEBUG")}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DebugMode", "value": os.Getenv("DEBUG")}, log.Error(err))
 	}
 
 	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
 	if err != nil {
-		log.Event(nil, "error parsing GEOGRAPHY_ENABLED value", log.Error(err), log.Data{"value": os.Getenv("GEOGRAPHY_ENABLED")})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyEnabled", "value": os.Getenv("GEOGRAPHY_ENABLED")}, log.Error(err))
 	}
 
 	config.DatasetRoutesEnabled, err = strconv.ParseBool(os.Getenv("DATASET_ROUTES_ENABLED"))
 	if err != nil {
-		log.Event(nil, "error parsing DATASET_ROUTES_ENABLED value", log.Error(err), log.Data{"value": os.Getenv("DATASET_ROUTES_ENABLED")})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetRoutesEnabled", "value": os.Getenv("DATASET_ROUTES_ENABLED")}, log.Error(err))
 	}
 
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
@@ -123,19 +123,19 @@ func main() {
 
 	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "error parsing dataset controller url", log.Error(err), log.Data{"url": config.DatasetControllerURL})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": config.DatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "error parsing filter dataset controller url", log.Error(err), log.Data{"url": config.FilterDatasetControllerURL})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": config.FilterDatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
 	if err != nil {
-		log.Event(nil, "error parsing geography controller url", log.Error(err), log.Data{"url": config.GeographyControllerURL})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": config.GeographyControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
@@ -169,13 +169,13 @@ func main() {
 
 	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
-		log.Event(nil, "error parsing babbage URL", log.Error(err), log.Data{"url": config.BabbageURL})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": config.BabbageURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	downloaderURL, err := url.Parse(config.DownloaderURL)
 	if err != nil {
-		log.Event(nil, "error parsing download URL", log.Error(err), log.Data{"url": config.DownloaderURL})
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": config.DownloaderURL}, log.Error(err))
 		os.Exit(1)
 	}
 
