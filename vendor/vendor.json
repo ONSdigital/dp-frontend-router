@@ -189,6 +189,12 @@
 			"revisionTime": "2017-02-01T22:58:49Z"
 		},
 		{
+			"checksumSHA1": "BxH9xJUqczhpL57gfKZe2/VlBHY=",
+			"path": "github.com/fatih/color",
+			"revision": "3f9d52f7176a6927daacff70a3e8d1dc2025c53e",
+			"revisionTime": "2018-10-10T23:13:11Z"
+		},
+		{
 			"checksumSHA1": "oSwR5RN8idtBQrpnQSy13t8ruoU=",
 			"path": "github.com/go-ini/ini",
 			"revision": "32e4be5f41bb918afb6e37c07426e2ddbcb6647e",
