@@ -15,10 +15,13 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
 	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
+	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
+	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/go-ns/render"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
@@ -37,6 +40,18 @@ func main() {
 	}
 	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
 		config.RendererURL = v
+	}
+	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.DatasetControllerURL = v
+	}
+	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
+		config.FilterDatasetControllerURL = v
+	}
+	if v := os.Getenv("GEOGRAPHY_CONTROLLER_URL"); len(v) > 0 {
+		config.GeographyControllerURL = v
+	}
+	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
+		config.ZebedeeURL = v
 	}
 	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
 		config.DownloaderURL = v
@@ -63,11 +78,36 @@ func main() {
 		config.DisabledPage = v
 	}
 
+	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
+		a, err := strconv.Atoi(v)
+		if err == nil {
+			config.ContentTypeByteLimit = int(a)
+		}
+	}
+
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
 		log.Event(nil, "DEBUG is not a boolean", log.Data{"value": os.Getenv("DEBUG")}, log.Error(err))
 	}
+
+	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
+	if err != nil {
+		log.Event(nil, "error parsing GEOGRAPHY_ENABLED value", log.Error(err), log.Data{"value": os.Getenv("GEOGRAPHY_ENABLED")})
+	}
+
+	config.DatasetRoutesEnabled, err = strconv.ParseBool(os.Getenv("DATASET_ROUTES_ENABLED"))
+	if err != nil {
+		log.Event(nil, "error parsing DATASET_ROUTES_ENABLED value", log.Error(err), log.Data{"value": os.Getenv("DATASET_ROUTES_ENABLED")})
+	}
+
+	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
+		config.TaxonomyDomain = v
+	}
+
+	log.Namespace = "dp-frontend-router"
+
+	log.Event(nil, "overriding default renderer with service assets")
 
 	render.Renderer = unrolled.New(unrolled.Options{
 		Asset:         assets.Asset,
@@ -81,9 +121,30 @@ func main() {
 		}},
 	})
 
+	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
+	if err != nil {
+		log.Event(nil, "error parsing dataset controller url", log.Error(err), log.Data{"url": config.DatasetControllerURL})
+		os.Exit(1)
+	}
+
+	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	if err != nil {
+		log.Event(nil, "error parsing filter dataset controller url", log.Error(err), log.Data{"url": config.FilterDatasetControllerURL})
+		os.Exit(1)
+	}
+
+	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
+	if err != nil {
+		log.Event(nil, "error parsing geography controller url", log.Error(err), log.Data{"url": config.GeographyControllerURL})
+		os.Exit(1)
+	}
+
 	redirects.Init(assets.Asset)
 
 	router := pat.New()
+
+	router.Path("/healthcheck").HandlerFunc(hc.Do)
+
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Middleware,
@@ -91,11 +152,19 @@ func main() {
 		serverError.Handler,
 		redirects.Handler,
 	}
+
 	if len(config.DisabledPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
 	} else if len(config.SplashPage) > 0 {
 		middleware = append(middleware, splash.Handler(config.SplashPage, true))
 	}
+
+	if config.DatasetRoutesEnabled == true {
+		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
+			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+		}))
+	}
+
 	alice := alice.New(middleware...).Then(router)
 
 	babbageURL, err := url.Parse(config.BabbageURL)
@@ -119,20 +188,34 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
+
+	if config.DatasetRoutesEnabled == true {
+		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
+		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
+		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
+	}
+	// remove geo from prod
+	if config.GeographyEnabled == true {
+		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
+	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Event(nil, "starting server", log.Data{
-		"bind_addr":         config.BindAddr,
-		"babbage_url":       config.BabbageURL,
-		"renderer_url":      config.RendererURL,
-		"downloader_url":    config.DownloaderURL,
-		"site_domain":       config.SiteDomain,
-		"assets_path":       config.PatternLibraryAssetsPath,
-		"splash_page":       config.SplashPage,
-		"analytics_sqs_url": config.SQSAnalyticsURL,
+	log.Event(nil, "Starting server", log.Data{
+		"bind_addr":                config.BindAddr,
+		"babbage_url":              config.BabbageURL,
+		"dataset_controller_url":   config.DatasetControllerURL,
+		"geography_controller_url": config.GeographyControllerURL,
+		"downloader_url":           config.DownloaderURL,
+		"renderer_url":             config.RendererURL,
+		"site_domain":              config.SiteDomain,
+		"assets_path":              config.PatternLibraryAssetsPath,
+		"splash_page":              config.SplashPage,
+		"taxonomy_domain":          config.TaxonomyDomain,
+		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
-	server := &http.Server{
+	s := &http.Server{
 		Addr:         config.BindAddr,
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
@@ -140,11 +223,9 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	if err := server.ListenAndServe(); err != nil {
-		if err != http.ErrServerClosed {
-			log.Event(nil, "error starting server", log.Error(err))
-			os.Exit(2)
-		}
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Event(nil, "error starting server", log.Error(err))
+		os.Exit(2)
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ONSdigital/dp-frontend-router/handlers/serverError"
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"

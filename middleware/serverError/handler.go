@@ -22,10 +22,18 @@ type responseInterceptor struct {
 }
 
 func (rI *responseInterceptor) WriteHeader(status int) {
-	if status >= 500 {
-		log.Event(rI.req.Context(), "intercepted error response")
+	if status >= 400 {
+		log.Event(rI.req.Context(), "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
-		rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties.</p>")
+		if status == 500 {
+			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+rI.req.URL.Path+"'>refreshing the page or trying again later.</a> </p>")
+		} else if status == 404 {
+			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
+		} else if status == 401 {
+			rI.renderErrorPage(401, "401 - You do not have permission to view this web page", `<p>This page may exist, but you do not currently have permission to view it. If you believe this to be incorrect please contact a system administrator.</p>`)
+		} else {
+			rI.renderErrorPage(503, "Service temporarily unavailable", `<p>The service is temporarily unavailable, please check our <a href="https://twitter.com/onsdigital">twitter</a> feed for updates.</p>`)
+		}
 		return
 	}
 	rI.writeHeaders()
@@ -38,16 +46,21 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 		log.Event(rI.req.Context(), "rendering disaster page", log.Error(err))
 
 		// Calling the renderer failed, render the disaster page
-		render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
+		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
 			"URI":                      rI.req.URL.Path,
 			"Language":                 lang.Get(rI.req),
 			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
 			"SiteDomain":               config.SiteDomain,
+			"TaxonomyDomain":           config.TaxonomyDomain,
 			"Error": map[string]interface{}{
 				"Title":       title,
 				"Description": description,
 			},
 		})
+		if err != nil {
+			log.Event(rI.req.Context(), "error calling renderer", log.Error(err))
+			return
+		}
 	}
 }
 
@@ -57,6 +70,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 			"title":       title,
 			"description": description,
 		},
+		"taxonomy_domain": config.TaxonomyDomain,
 	}
 
 	b, err := json.Marshal(&data)
