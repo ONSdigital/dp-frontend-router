@@ -22,14 +22,16 @@ import (
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
-	"github.com/ONSdigital/go-ns/log"
 	"github.com/ONSdigital/go-ns/render"
+	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	unrolled "github.com/unrolled/render"
 )
 
 func main() {
+	log.Namespace = "dp-frontend-router"
+
 	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
 		config.BindAddr = v
 	}
@@ -86,17 +88,17 @@ func main() {
 	var err error
 	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DebugMode", "value": os.Getenv("DEBUG")}, log.Error(err))
 	}
 
 	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyEnabled", "value": os.Getenv("GEOGRAPHY_ENABLED")}, log.Error(err))
 	}
 
 	config.DatasetRoutesEnabled, err = strconv.ParseBool(os.Getenv("DATASET_ROUTES_ENABLED"))
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetRoutesEnabled", "value": os.Getenv("DATASET_ROUTES_ENABLED")}, log.Error(err))
 	}
 
 	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
@@ -105,7 +107,8 @@ func main() {
 
 	log.Namespace = "dp-frontend-router"
 
-	log.Debug("overriding default renderer with service assets", nil)
+	log.Event(nil, "overriding default renderer with service assets")
+
 	render.Renderer = unrolled.New(unrolled.Options{
 		Asset:         assets.Asset,
 		AssetNames:    assets.AssetNames,
@@ -120,19 +123,19 @@ func main() {
 
 	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": config.DatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": config.FilterDatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": config.GeographyControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
@@ -144,7 +147,7 @@ func main() {
 
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		securityHandler,
 		serverError.Handler,
 		redirects.Handler,
@@ -166,19 +169,19 @@ func main() {
 
 	babbageURL, err := url.Parse(config.BabbageURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": config.BabbageURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	downloaderURL, err := url.Parse(config.DownloaderURL)
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": config.DownloaderURL}, log.Error(err))
 		os.Exit(1)
 	}
 
 	searchHandler, err := analytics.NewSearchHandler()
 	if err != nil {
-		log.Error(err, nil)
+		log.Event(nil, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
 	}
 
@@ -198,11 +201,12 @@ func main() {
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Debug("Starting server", log.Data{
+	log.Event(nil, "Starting server", log.Data{
 		"bind_addr":                config.BindAddr,
 		"babbage_url":              config.BabbageURL,
 		"dataset_controller_url":   config.DatasetControllerURL,
 		"geography_controller_url": config.GeographyControllerURL,
+		"downloader_url":           config.DownloaderURL,
 		"renderer_url":             config.RendererURL,
 		"site_domain":              config.SiteDomain,
 		"assets_path":              config.PatternLibraryAssetsPath,
@@ -219,8 +223,8 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
-	if err := s.ListenAndServe(); err != nil {
-		log.Error(err, nil)
+	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Event(nil, "error starting server", log.Error(err))
 		os.Exit(2)
 	}
 }
@@ -236,12 +240,14 @@ func securityHandler(h http.Handler) http.Handler {
 }
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
+//
+// FIXME this isn't used anymore, it could be removed, but seems like it might be useful?
 func abHandler(a, b http.Handler, percentA int) http.Handler {
 	if percentA == 0 {
-		log.Debug("percentA is 0, defaulting to handler B", nil)
+		log.Event(nil, "abHandler decision", log.Data{"percentA": percentA, "destination": "b"})
 		return b
 	} else if percentA == 100 {
-		log.Debug("percentA is 100, defaulting to handler A", nil)
+		log.Event(nil, "abHandler decision", log.Data{"percentA": percentA, "destination": "a"})
 		return a
 	}
 
@@ -257,11 +263,14 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	RETRY:
 		if cookie == nil {
 			var cookieValue string
-			if rand.Intn(100) < percentA {
+			sel := rand.Intn(100)
+			if sel < percentA {
 				cookieValue = "A"
 			} else {
 				cookieValue = "B"
 			}
+
+			log.Event(nil, "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
 
 			expiration := time.Now().Add(365 * 24 * time.Hour)
 			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
@@ -271,11 +280,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Use cookie value to direct to a or b handler
 		switch cookie.Value {
 		case "A":
+			log.Event(nil, "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
 			a.ServeHTTP(w, req)
 		case "B":
+			log.Event(nil, "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
 			b.ServeHTTP(w, req)
 		default:
-			log.Debug("invalid cookie value, reselecting", log.Data{"value": cookie.Value})
+			log.Event(nil, "abHandler invalid cookie value, reselecting")
 			cookie = nil
 			goto RETRY
 		}
@@ -297,7 +308,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.DebugR(req, "Proxying request", log.Data{
+		log.Event(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})

@@ -5,40 +5,66 @@ import (
 	"encoding/csv"
 	"net/http"
 
-	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/log.go/log"
 )
 
 var redirects = make(map[string]string)
 
+// PanicOnInitError (when true) causes Init() to panic if redirects.csv
+// contains invalid data
+var PanicOnInitError = true
+
 func Init(asset func(name string) ([]byte, error)) {
 	b, err := asset("redirects/redirects.csv")
 	if err != nil {
-		log.Error(err, nil)
-		panic("Can't find redirects.csv")
+		log.Event(nil, "can't find redirects.csv", log.Error(err))
+		if PanicOnInitError {
+			panic("Can't find redirects.csv")
+		}
+		return
 	}
+
 	reader := csv.NewReader(bytes.NewReader(b))
 	records, err := reader.ReadAll()
 	if err != nil {
-		log.Error(err, nil)
-		panic("Unable to read CSV")
+		log.Event(nil, "error reading redirects.csv", log.Error(err))
+		if PanicOnInitError {
+			panic("Unable to read CSV")
+		}
+		return
 	}
 
 	if len(records) == 0 {
 		return
 	}
 
-	if len(records[0]) != 2 {
-		panic("Redirects must have two fields")
-	}
+	for line, record := range records {
+		if len(record) > 0 {
+			if len(record[0]) == 0 {
+				log.Event(nil, "redirect 'from' URL empty", log.Data{"line": line})
+				if PanicOnInitError {
+					panic("redirect 'from' URL empty, check logs")
+				}
+				continue
+			}
+			if len(record) > 1 {
+				if len(record[1]) == 0 {
+					log.Event(nil, "redirect 'to' URL empty", log.Data{"line": line})
+					if PanicOnInitError {
+						panic("redirect 'to' URL empty, check logs")
+					}
+					continue
+				}
 
-	for _, record := range records {
-		if len(record[0]) == 0 {
-			panic("Redirect from URL must not be empty")
+				log.Event(nil, "adding redirect", log.Data{"from": record[0], "to": record[1]})
+				redirects[record[0]] = record[1]
+			} else {
+				log.Event(nil, "redirect is missing 'to' value", log.Data{"line": line})
+				if PanicOnInitError {
+					panic("redirect 'to' URL empty, check logs")
+				}
+			}
 		}
-		if len(record[1]) == 0 {
-			panic("Redirect to URL must not be empty")
-		}
-		redirects[record[0]] = record[1]
 	}
 }
 
@@ -47,7 +73,7 @@ func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 
 		if redirect, ok := redirects[req.URL.Path]; ok {
-			log.Debug("Redirected "+req.URL.Path+" to "+redirect, nil)
+			log.Event(req.Context(), "redirect found", log.Data{"location": redirect}, log.HTTP(req, 0, 0, nil, nil))
 			http.Redirect(w, req, redirect, http.StatusTemporaryRedirect)
 			return
 		}

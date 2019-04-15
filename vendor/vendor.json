@@ -51,6 +51,18 @@
 			"revisionTime": "2017-08-30T09:50:52Z"
 		},
 		{
+			"checksumSHA1": "r2PdGOPVGXt0WTdGQXN5aHfp0RM=",
+			"path": "github.com/ONSdigital/log.go/log",
+			"revision": "93cc21caa3b378645874496cca0d8204bdf0f891",
+			"revisionTime": "2019-02-14T09:59:51Z"
+		},
+		{
+			"checksumSHA1": "SSGYNSaip2sf3h+uiv4IXzzDCJw=",
+			"path": "github.com/aws/aws-sdk-go-v2",
+			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
+			"revisionTime": "2018-02-13T16:58:34Z"
+		},
+		{
 			"checksumSHA1": "b2txlAkxXbktlLrA1hY59cWT0Cw=",
 			"path": "github.com/aws/aws-sdk-go-v2/aws",
 			"revision": "5e8e36f10a8c52315dcbb311319d78acb9c3bf83",
@@ -177,6 +189,12 @@
 			"revisionTime": "2017-02-01T22:58:49Z"
 		},
 		{
+			"checksumSHA1": "BxH9xJUqczhpL57gfKZe2/VlBHY=",
+			"path": "github.com/fatih/color",
+			"revision": "3f9d52f7176a6927daacff70a3e8d1dc2025c53e",
+			"revisionTime": "2018-10-10T23:13:11Z"
+		},
+		{
 			"checksumSHA1": "oSwR5RN8idtBQrpnQSy13t8ruoU=",
 			"path": "github.com/go-ini/ini",
 			"revision": "32e4be5f41bb918afb6e37c07426e2ddbcb6647e",
@@ -213,6 +231,12 @@
 			"revisionTime": "2016-04-13T04:16:32Z"
 		},
 		{
+			"checksumSHA1": "+HUsIuEnSLik8Jrrw9MDdxmhT5c=",
+			"path": "github.com/hokaccha/go-prettyjson",
+			"revision": "f579f869bbfea48a61fbea09207cadd1aaeceb83",
+			"revisionTime": "2018-09-20T04:03:06Z"
+		},
+		{
 			"checksumSHA1": "blwbl9vPvRLtL5QlZgfpLvsFiZ4=",
 			"path": "github.com/jmespath/go-jmespath",
 			"revision": "c2b33e8439af944379acbdd9c3a5fe0bc44bd8a5",
@@ -229,6 +253,18 @@
 			"path": "github.com/justinas/alice",
 			"revision": "1051eaf52fcafdd87ead59d28b065f1fcb8274ec",
 			"revisionTime": "2016-09-10T10:38:22Z"
+		},
+		{
+			"checksumSHA1": "SEnjvwVyfuU2xBaOfXfwPD5MZqk=",
+			"path": "github.com/mattn/go-colorable",
+			"revision": "efa589957cd060542a26d2dd7832fd6a6c6c3ade",
+			"revisionTime": "2018-03-10T13:32:14Z"
+		},
+		{
+			"checksumSHA1": "GiVgQkx5acnq+JZtYiuHPlhHoso=",
+			"path": "github.com/mattn/go-isatty",
+			"revision": "3fb116b820352b7f0c281308a4d6250c22d94e27",
+			"revisionTime": "2018-08-30T10:17:45Z"
 		},
 		{
 			"checksumSHA1": "hBgLmZ/4mCxmnH88mqFKBkpJFUY=",

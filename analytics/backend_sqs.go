@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/log.go/log"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
@@ -46,7 +46,7 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	jb, err := json.Marshal(&data)
 	if err != nil {
-		log.ErrorR(req, err, nil)
+		log.Event(req.Context(), "error marshaling json", log.Error(err))
 		return
 	}
 
@@ -58,9 +58,9 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	smo, err := b.sendMessage(smr)
 	if err != nil {
-		log.ErrorR(req, err, nil)
+		log.Event(req.Context(), "error sending sqs message", log.Error(err))
 		return
 	}
 
-	log.DebugR(req, "stored analytics data in SQS", log.Data{"message_id": *smo.MessageId})
+	log.Event(req.Context(), "stored analytics data in SQS", log.Data{"message_id": *smo.MessageId})
 }

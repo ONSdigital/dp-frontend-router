@@ -9,7 +9,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/log"
+	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	. "github.com/smartystreets/goconvey/convey"
@@ -85,7 +85,7 @@ a,b,c`)
 		shouldError = false
 		returnBytes = []byte(`a
 a`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirects must have two fields")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'to' URL empty, check logs")
 	})
 
 	Convey("Init should add entries to redirects", t, func() {
@@ -102,13 +102,13 @@ c,d`)
 	Convey("Init should panic if redirect has no from url", t, func() {
 		shouldError = false
 		returnBytes = []byte(`,b`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirect from URL must not be empty")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'from' URL empty, check logs")
 	})
 
 	Convey("Init should panic if redirect has no to url", t, func() {
 		shouldError = false
 		returnBytes = []byte(`a,`)
-		So(func() { Init(asset) }, ShouldPanicWith, "Redirect to URL must not be empty")
+		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'to' URL empty, check logs")
 	})
 
 }
@@ -118,7 +118,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 	}
@@ -136,7 +136,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -160,7 +160,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -184,7 +184,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
@@ -208,7 +208,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 	router := pat.New()
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
-		log.Handler,
+		log.Middleware,
 		//securityHandler,
 		serverError.Handler,
 		Handler,
