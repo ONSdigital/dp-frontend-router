@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
@@ -26,7 +27,7 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 		log.DebugR(rI.req, "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
 		if status == 500 {
-			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+rI.req.URL.Path+"'>refreshing the page or trying again later.</a> </p>")
+			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+url.QueryEscape(rI.req.URL.Path)+"'>refreshing the page or trying again later.</a> </p>")
 		} else if status == 404 {
 			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
 		} else if status == 401 {
