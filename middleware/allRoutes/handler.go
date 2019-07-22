@@ -20,8 +20,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			path := req.URL.Path
 
 			// Populate context here with language
-			ctx := common.SetLocaleCode(req)
-			req = req.WithContext(ctx)
+			req = common.SetLocaleCode(req)
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
