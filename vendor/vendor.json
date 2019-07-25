@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "S0v2OsXtmx5XdsZ6winKRKB5bnk=",
+			"checksumSHA1": "/jves3FaAJdBsJqnjB5ss5AaQAM=",
 			"path": "github.com/ONSdigital/go-ns/common",
-			"revision": "42425bb887bef077be0c0f2d01812516fa146982",
-			"revisionTime": "2019-07-23T09:33:30Z"
+			"revision": "6d8dcc098277c62c1f4109f3c39ab866d7c39952",
+			"revisionTime": "2019-07-24T14:29:48Z"
 		},
 		{
 			"checksumSHA1": "J9OiPnhPHFPhQ+R+dq6LFj+dTxE=",
