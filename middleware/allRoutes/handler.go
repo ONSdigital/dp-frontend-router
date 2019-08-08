@@ -9,6 +9,7 @@ import (
 	"regexp"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/go-ns/common"
 	"github.com/ONSdigital/go-ns/log"
 )
 
@@ -17,6 +18,9 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			path := req.URL.Path
+
+			// Populate context here with language
+			req = common.SetLocaleCode(req)
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
