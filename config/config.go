@@ -29,7 +29,7 @@ var ZebedeeURL = "http://localhost:8082"
 // The URL of the file downloader service
 var DownloaderURL = "http://localhost:23400"
 
-// Whether the template rendering engine is in development mode or not 
+// Whether the template rendering engine is in development mode or not
 var DebugMode = false
 
 // The CDN assets path
