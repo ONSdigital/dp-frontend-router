@@ -18,7 +18,7 @@ var DatasetControllerURL = "http://localhost:20200"
 var FilterDatasetControllerURL = "http://localhost:20001"
 
 // The URL of the Geography controller
-var GeographyControllerURL = "http://localhost:23700" 
+var GeographyControllerURL = "http://localhost:23700"
 
 // Geography feature is enabled
 var GeographyEnabled = false
