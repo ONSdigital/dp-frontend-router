@@ -207,7 +207,6 @@ func main() {
 		"site_domain":              config.SiteDomain,
 		"assets_path":              config.PatternLibraryAssetsPath,
 		"splash_page":              config.SplashPage,
-		"taxonomy_domain":          config.TaxonomyDomain,
 		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
