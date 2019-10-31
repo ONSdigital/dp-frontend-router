@@ -52,7 +52,6 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 			"Language":                 lang.Get(rI.req),
 			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
 			"SiteDomain":               config.SiteDomain,
-			"TaxonomyDomain":           config.TaxonomyDomain,
 			"Error": map[string]interface{}{
 				"Title":       title,
 				"Description": description,
@@ -71,7 +70,6 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 			"title":       title,
 			"description": description,
 		},
-		"taxonomy_domain": config.TaxonomyDomain,
 	}
 
 	b, err := json.Marshal(&data)
