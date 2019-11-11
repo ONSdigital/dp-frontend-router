@@ -101,10 +101,6 @@ func main() {
 		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetRoutesEnabled", "value": os.Getenv("DATASET_ROUTES_ENABLED")}, log.Error(err))
 	}
 
-	if v := os.Getenv("TAXONOMY_DOMAIN"); len(v) > 0 {
-		config.TaxonomyDomain = v
-	}
-
 	log.Namespace = "dp-frontend-router"
 
 	log.Event(nil, "overriding default renderer with service assets")
@@ -211,7 +207,6 @@ func main() {
 		"site_domain":              config.SiteDomain,
 		"assets_path":              config.PatternLibraryAssetsPath,
 		"splash_page":              config.SplashPage,
-		"taxonomy_domain":          config.TaxonomyDomain,
 		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
