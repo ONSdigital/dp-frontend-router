@@ -88,7 +88,7 @@ func templatesErrorTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/error.tmpl", size: 684, mode: os.FileMode(420), modTime: time.Unix(1519374285, 0)}
+	info := bindataFileInfo{name: "templates/error.tmpl", size: 684, mode: os.FileMode(420), modTime: time.Unix(1578059292, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -108,7 +108,7 @@ func templatesMainTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/main.tmpl", size: 3385, mode: os.FileMode(420), modTime: time.Unix(1554396369, 0)}
+	info := bindataFileInfo{name: "templates/main.tmpl", size: 3385, mode: os.FileMode(420), modTime: time.Unix(1578059292, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -128,7 +128,7 @@ func templatesPartialsFooterTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 3865, mode: os.FileMode(420), modTime: time.Unix(1554396369, 0)}
+	info := bindataFileInfo{name: "templates/partials/footer.tmpl", size: 3865, mode: os.FileMode(420), modTime: time.Unix(1577975052, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -148,7 +148,7 @@ func templatesPartialsHeaderTmpl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3874, mode: os.FileMode(420), modTime: time.Unix(1572260934, 0)}
+	info := bindataFileInfo{name: "templates/partials/header.tmpl", size: 3874, mode: os.FileMode(420), modTime: time.Unix(1577975052, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -168,7 +168,7 @@ func redirectsRedirectsCsv() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "redirects/redirects.csv", size: 22147, mode: os.FileMode(420), modTime: time.Unix(1572260958, 0)}
+	info := bindataFileInfo{name: "redirects/redirects.csv", size: 22147, mode: os.FileMode(420), modTime: time.Unix(1573470597, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
