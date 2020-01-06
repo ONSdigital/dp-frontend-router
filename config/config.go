@@ -33,7 +33,7 @@ var DownloaderURL = "http://localhost:23400"
 var DebugMode = false
 
 // The CDN assets path
-var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/6cc1837"
+var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/e42235b"
 
 // The site domain
 var SiteDomain = "ons.gov.uk"
