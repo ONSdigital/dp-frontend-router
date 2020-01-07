@@ -91,6 +91,10 @@ func main() {
 		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DebugMode", "value": os.Getenv("DEBUG")}, log.Error(err))
 	}
 
+	if config.DebugMode {
+		config.PatternLibraryAssetsPath = "http://localhost:9000/dist"
+	}
+
 	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyEnabled", "value": os.Getenv("GEOGRAPHY_ENABLED")}, log.Error(err))
