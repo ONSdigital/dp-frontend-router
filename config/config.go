@@ -38,9 +38,6 @@ var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/e42235b"
 // The site domain
 var SiteDomain = "ons.gov.uk"
 
-// Splash page
-var SplashPage = ""
-
 // Redirect secret
 var RedirectSecret = "secret"
 

@@ -14,8 +14,6 @@ dp-frontend-router
 | ZEBEDEE_URL                   | http://localhost:8082                   | The URL of zebedee
 | PATTERN_LIBRARY_ASSETS_PATH   | https://cdn.ons.gov.uk/sixteens/e42235b | The URL to the sixteens build to use
 | SITE_DOMAIN                   | ons.gov.uk                              | The domain hosting the site
-| SPLASH_PAGE                   |                                         | The splash page template to use
-| DISABLED_PAGE                 |                                         | The disabled page template to use
 | HOMEPAGE_AB_PERCENT           | 0                                       | Percentage of users who get version B
 | DEBUG                         | false                                   | Whether to enable debug mode
 | DOWNLOADER_URL                | http://localhost:23400                  | The URL of dp-file-downloader.
