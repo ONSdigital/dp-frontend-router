@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"math/rand"
 	"net"
 	"net/http"
@@ -20,11 +19,9 @@ import (
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
-	"github.com/ONSdigital/go-ns/render"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	unrolled "github.com/unrolled/render"
 )
 
 func main() {
@@ -69,10 +66,6 @@ func main() {
 		config.SQSAnalyticsURL = v
 	}
 
-	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
-		config.DisabledPage = v
-	}
-
 	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
 		a, err := strconv.Atoi(v)
 		if err == nil {
@@ -81,14 +74,6 @@ func main() {
 	}
 
 	var err error
-	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DebugMode", "value": os.Getenv("DEBUG")}, log.Error(err))
-	}
-
-	if config.DebugMode {
-		config.PatternLibraryAssetsPath = "http://localhost:9000/dist"
-	}
 
 	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
 	if err != nil {
@@ -103,18 +88,6 @@ func main() {
 	log.Namespace = "dp-frontend-router"
 
 	log.Event(nil, "overriding default renderer with service assets")
-
-	render.Renderer = unrolled.New(unrolled.Options{
-		Asset:         assets.Asset,
-		AssetNames:    assets.AssetNames,
-		IsDevelopment: config.DebugMode,
-		Layout:        "main",
-		Funcs: []template.FuncMap{{
-			"safeHTML": func(s string) template.HTML {
-				return template.HTML(s)
-			},
-		}},
-	})
 
 	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
 	if err != nil {
