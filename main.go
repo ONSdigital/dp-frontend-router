@@ -120,8 +120,6 @@ func main() {
 		redirects.Handler,
 	}
 
-
-
 	if config.DatasetRoutesEnabled == true {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
