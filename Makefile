@@ -9,11 +9,11 @@ debug: generate
 
 generate: ${GOPATH}/bin/go-bindata
 	# build the production version
-	cd assets; ${GOPATH}/bin/go-bindata -o templates.go -pkg assets templates/... redirects/...
-	{ echo "// +build production"; cat assets/templates.go; } > assets/templates.go.new
-	mv assets/templates.go.new assets/templates.go
+	cd assets; ${GOPATH}/bin/go-bindata -o redirects.go -pkg assets redirects/...
+	{ echo "// +build production"; cat assets/redirects.go; } > assets/redirects.go.new
+	mv assets/redirects.go.new assets/redirects.go
 	# build the dev version
-	cd assets; ${GOPATH}/bin/go-bindata -debug -o debug.go -pkg assets templates/... redirects/...
+	cd assets; ${GOPATH}/bin/go-bindata -debug -o debug.go -pkg assets redirects/...
 	{ echo "// +build debug"; cat assets/debug.go; } > assets/debug.go.new
 	mv assets/debug.go.new assets/debug.go
 

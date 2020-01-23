@@ -29,23 +29,14 @@ var ZebedeeURL = "http://localhost:8082"
 // The URL of the file downloader service
 var DownloaderURL = "http://localhost:23400"
 
-// Whether the template rendering engine is in development mode or not
-var DebugMode = false
-
 // The CDN assets path
 var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/e42235b"
 
 // The site domain
 var SiteDomain = "ons.gov.uk"
 
-// Splash page
-var SplashPage = ""
-
 // Redirect secret
 var RedirectSecret = "secret"
-
-// Disabled page
-var DisabledPage = ""
 
 // SQS URL for analytics data
 var SQSAnalyticsURL = ""

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"html/template"
 	"math/rand"
 	"net"
 	"net/http"
@@ -15,18 +14,14 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/handlers/splash"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
-	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
 	hc "github.com/ONSdigital/go-ns/healthcheck"
-	"github.com/ONSdigital/go-ns/render"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	unrolled "github.com/unrolled/render"
 )
 
 func main() {
@@ -62,9 +57,6 @@ func main() {
 	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
 		config.SiteDomain = v
 	}
-	if v := os.Getenv("SPLASH_PAGE"); len(v) > 0 {
-		config.SplashPage = v
-	}
 
 	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
 		config.RedirectSecret = v
@@ -72,10 +64,6 @@ func main() {
 
 	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
 		config.SQSAnalyticsURL = v
-	}
-
-	if v := os.Getenv("DISABLED_PAGE"); len(v) > 0 {
-		config.DisabledPage = v
 	}
 
 	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
@@ -86,14 +74,6 @@ func main() {
 	}
 
 	var err error
-	config.DebugMode, err = strconv.ParseBool(os.Getenv("DEBUG"))
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DebugMode", "value": os.Getenv("DEBUG")}, log.Error(err))
-	}
-
-	if config.DebugMode {
-		config.PatternLibraryAssetsPath = "http://localhost:9000/dist"
-	}
 
 	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
 	if err != nil {
@@ -108,18 +88,6 @@ func main() {
 	log.Namespace = "dp-frontend-router"
 
 	log.Event(nil, "overriding default renderer with service assets")
-
-	render.Renderer = unrolled.New(unrolled.Options{
-		Asset:         assets.Asset,
-		AssetNames:    assets.AssetNames,
-		IsDevelopment: config.DebugMode,
-		Layout:        "main",
-		Funcs: []template.FuncMap{{
-			"safeHTML": func(s string) template.HTML {
-				return template.HTML(s)
-			},
-		}},
-	})
 
 	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
 	if err != nil {
@@ -149,14 +117,7 @@ func main() {
 		requestID.Handler(16),
 		log.Middleware,
 		securityHandler,
-		serverError.Handler,
 		redirects.Handler,
-	}
-
-	if len(config.DisabledPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.DisabledPage, false))
-	} else if len(config.SplashPage) > 0 {
-		middleware = append(middleware, splash.Handler(config.SplashPage, true))
 	}
 
 	if config.DatasetRoutesEnabled == true {
@@ -210,7 +171,6 @@ func main() {
 		"renderer_url":             config.RendererURL,
 		"site_domain":              config.SiteDomain,
 		"assets_path":              config.PatternLibraryAssetsPath,
-		"splash_page":              config.SplashPage,
 		"analytics_sqs_url":        config.SQSAnalyticsURL,
 	})
 
