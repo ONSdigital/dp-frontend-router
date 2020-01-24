@@ -14,6 +14,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
+	"github.com/ONSdigital/dp-frontend-router/health"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
@@ -23,6 +24,8 @@ import (
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 )
+
+var BuildTime, GitCommit, Version string
 
 func main() {
 	log.Namespace = "dp-frontend-router"
@@ -145,6 +148,10 @@ func main() {
 		log.Event(nil, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
 	}
+
+	// Healthcheck API
+	health.InitializeHealthCheck(BuildTime, GitCommit, Version)
+	router.HandleFunc("/health", health.Handler)
 
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
