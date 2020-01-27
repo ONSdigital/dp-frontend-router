@@ -3,16 +3,45 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "rjoqh3pX6kZXA6Se3pBJgC/bopw=",
-			"path": "github.com/ONSdigital/dp-healthcheck/healthcheck",
-			"revision": "30744981e46cbafe73eaeecb34abb2d812b927bd",
-			"revisionTime": "2020-01-21T22:05:03Z"
+			"path": "git",
+			"revision": "github.com/ONSdigital/dp-api-clients-go",
+			"version": "github.com/ONSdigital/dp-api-clients-go"
 		},
 		{
-			"checksumSHA1": "/jves3FaAJdBsJqnjB5ss5AaQAM=",
+			"checksumSHA1": "v4yu0ZcB0nvcDzvHWxeuQAiPoQg=",
+			"path": "github.com/ONSdigital/dp-api-clients-go/clientlog",
+			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
+			"revisionTime": "2020-01-21T15:02:40Z"
+		},
+		{
+			"checksumSHA1": "K8vvOzKh6oq+aJ9WNTI4NrTcSmg=",
+			"path": "github.com/ONSdigital/dp-api-clients-go/health",
+			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
+			"revisionTime": "2020-01-21T15:02:40Z"
+		},
+		{
+			"checksumSHA1": "j4mux2KkztY+8Ji/1ZdN4TPWXNA=",
+			"path": "github.com/ONSdigital/dp-api-clients-go/zebedee",
+			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
+			"revisionTime": "2020-01-21T15:02:40Z"
+		},
+		{
+			"checksumSHA1": "n3HuxisI7xJq0qz/JoDrG1T674U=",
+			"path": "github.com/ONSdigital/dp-healthcheck/healthcheck",
+			"revision": "169c38bada895c8b391fdbc3811f84fa66f4ebc8",
+			"revisionTime": "2020-01-24T15:02:51Z"
+		},
+		{
+			"checksumSHA1": "YV8YAET8h0eZuaxGsuKd9TvrqPY=",
+			"path": "github.com/ONSdigital/dp-rchttp",
+			"revision": "463a529590e8fe1b7e3c057f19c1356aa6e57027",
+			"revisionTime": "2020-01-14T09:05:01Z"
+		},
+		{
+			"checksumSHA1": "IV6CmyPxZnOlkVCcXXYVuBwUz+I=",
 			"path": "github.com/ONSdigital/go-ns/common",
-			"revision": "6d8dcc098277c62c1f4109f3c39ab866d7c39952",
-			"revisionTime": "2019-07-24T14:29:48Z"
+			"revision": "f144c4ec2e58b1c191107eb9500ef3093fae4042",
+			"revisionTime": "2019-11-04T12:12:06Z"
 		},
 		{
 			"checksumSHA1": "J9OiPnhPHFPhQ+R+dq6LFj+dTxE=",
@@ -55,6 +84,12 @@
 			"path": "github.com/ONSdigital/go-ns/server",
 			"revision": "c751f1b8254523fa6f18ef042d273750e70c6732",
 			"revisionTime": "2017-08-30T09:50:52Z"
+		},
+		{
+			"checksumSHA1": "Y5RwQB+CFwZ30Rer4bPLWLTv9Ck=",
+			"path": "github.com/ONSdigital/go-ns/zebedee/data",
+			"revision": "f144c4ec2e58b1c191107eb9500ef3093fae4042",
+			"revisionTime": "2019-11-04T12:12:06Z"
 		},
 		{
 			"checksumSHA1": "r2PdGOPVGXt0WTdGQXN5aHfp0RM=",
@@ -331,6 +366,12 @@
 			"path": "golang.org/x/net/context",
 			"revision": "da137c7871d730100384dbcf36e6f8fa493aef5b",
 			"revisionTime": "2019-06-28T18:40:41Z"
+		},
+		{
+			"checksumSHA1": "aFpql3G+Nw8zkzfqLWQJNZC8pu0=",
+			"path": "golang.org/x/net/context/ctxhttp",
+			"revision": "6afb5195e5aab057fda82e27171243402346b0ad",
+			"revisionTime": "2020-01-14T15:53:21Z"
 		}
 	],
 	"rootPath": "github.com/ONSdigital/dp-frontend-router"

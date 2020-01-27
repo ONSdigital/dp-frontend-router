@@ -1,55 +1,34 @@
 package health
 
 import (
-	"encoding/json"
-	"net/http"
-	"strconv"
+	"context"
 	"time"
 
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/log"
 )
 
-var hc *healthcheck.HealthCheck
+var hc healthcheck.HealthCheck
 
 // InitializeHealthCheck initializes the HealthCheck object with startTime now
-func InitializeHealthCheck(BuildTime, GitCommit, Version string) {
+func InitializeHealthCheck(ctx context.Context, buildTime, gitCommit, version string) healthcheck.HealthCheck {
 
-	buildTime, err := strconv.Atoi(BuildTime)
+	versionInfo, err := healthcheck.CreateVersionInfo(buildTime, gitCommit, version)
 	if err != nil {
-		log.Event(nil, "failed to obtain build time", log.Error(err))
-		buildTime = 0
-	}
-	log.Event(nil, "init Healthckeck", log.Data{"BuildTime": BuildTime, "GitCommit": GitCommit, "Version": Version})
-
-	hc = &healthcheck.HealthCheck{
-		Status: healthcheck.StatusOK,
-		Version: healthcheck.CreateVersionInfo(
-			time.Unix(int64(buildTime), 0),
-			GitCommit,
-			Version,
-		),
-		Uptime:    time.Duration(0),
-		StartTime: time.Now().UTC(),
-		Checks:    []*healthcheck.Check{},
-	}
-}
-
-// Handler updates the HealthCheck current uptime, marshalls it, and writes it to the ResponseWriter.
-func Handler(w http.ResponseWriter, req *http.Request) {
-
-	if hc == nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	hc.Uptime = time.Since(hc.StartTime) / time.Millisecond
-
-	marshaled, err := json.Marshal(hc)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		log.Event(ctx, "failed to obtain versionInfo", log.Error(err))
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(marshaled)
+	criticalTimeout := time.Minute
+	interval := 10 * time.Second
+
+	// zc := client.New(config.ZebedeeURL)
+	// zChecker := func(context.Context, *healthcheck.CheckState) error {
+	// 	_, err := zc.Checker(ctx)
+	// 	return err
+	// }
+
+	hc, err = healthcheck.Create(versionInfo, criticalTimeout, interval, nil)
+
+	hc.Start(ctx)
+	return hc
 }

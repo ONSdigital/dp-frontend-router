@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"runtime"
+	"strconv"
 	"time"
 )
 
@@ -37,7 +38,7 @@ type VersionInfo struct {
 // criticalTimeout for how long to wait until an unhealthy dependent propagates its state to make this app unhealthy
 // interval in which to check health of dependencies
 // checkers which implement the checker interface and can run a checkup to determine the health of the app and/or its dependencies
-func Create(version VersionInfo, criticalTimeout, interval time.Duration, checkers ...*Checker) HealthCheck {
+func Create(version VersionInfo, criticalTimeout, interval time.Duration, checkers ...Checker) (HealthCheck, error) {
 
 	var checks []*Check
 
@@ -50,31 +51,39 @@ func Create(version VersionInfo, criticalTimeout, interval time.Duration, checke
 	}
 
 	for _, checker := range checkers {
-		hc.AddCheck(checker)
+		if err := hc.AddCheck(checker); err != nil {
+			return hc, err
+		}
 	}
 
-	return hc
+	return hc, nil
 }
 
 // CreateVersionInfo returns a health check version info object. Caller to provide:
-// buildTime for when the app was built
+// buildTime for when the app was built as a unix time stamp in string form
 // gitCommit the SHA-1 commit hash of the built app
 // version the semantic version of the built app
-func CreateVersionInfo(buildTime time.Time, gitCommit, version string) VersionInfo {
-	return VersionInfo{
-		BuildTime:       buildTime,
+func CreateVersionInfo(buildTime, gitCommit, version string) (VersionInfo, error) {
+	versionInfo := VersionInfo{
+		BuildTime:       time.Unix(0, 0),
 		GitCommit:       gitCommit,
 		Language:        language,
 		LanguageVersion: runtime.Version(),
 		Version:         version,
 	}
+
+	parsedBuildTime, err := strconv.ParseInt(buildTime, 10, 64)
+	if err != nil {
+		return versionInfo, errors.New("failed to parse build time")
+	}
+	versionInfo.BuildTime = time.Unix(parsedBuildTime, 0)
+	return versionInfo, nil
 }
 
 // AddCheck adds a provided checker to the health check
-func (hc *HealthCheck) AddCheck(checker *Checker) (err error) {
+func (hc *HealthCheck) AddCheck(checker Checker) (err error) {
 	if hc.Started {
-		err := errors.New("unable to add new check, health check has already started")
-		return err
+		return errors.New("unable to add new check, health check has already started")
 	}
 
 	check, err := newCheck(checker)

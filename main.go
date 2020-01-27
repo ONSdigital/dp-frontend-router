@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"math/rand"
 	"net"
 	"net/http"
@@ -19,7 +20,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -114,8 +114,6 @@ func main() {
 
 	router := pat.New()
 
-	router.Path("/healthcheck").HandlerFunc(hc.Do)
-
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Middleware,
@@ -150,8 +148,8 @@ func main() {
 	}
 
 	// Healthcheck API
-	health.InitializeHealthCheck(BuildTime, GitCommit, Version)
-	router.HandleFunc("/health", health.Handler)
+	hc := health.InitializeHealthCheck(context.Background(), BuildTime, GitCommit, Version)
+	router.HandleFunc("/health", hc.Handler)
 
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
@@ -191,6 +189,7 @@ func main() {
 
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Event(nil, "error starting server", log.Error(err))
+		hc.Stop()
 		os.Exit(2)
 	}
 }

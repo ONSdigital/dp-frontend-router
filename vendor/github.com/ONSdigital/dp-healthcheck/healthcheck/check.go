@@ -8,8 +8,15 @@ import (
 	"time"
 )
 
+// A list of possible check statuses
+const (
+	StatusOK       = "OK"
+	StatusWarning  = "WARNING"
+	StatusCritical = "CRITICAL"
+)
+
 // Checker represents the interface all checker functions abide to
-type Checker func(context.Context) (*CheckState, error)
+type Checker func(context.Context, *CheckState) error
 
 // CheckState represents the health status returned by a checker
 type CheckState struct {
@@ -24,27 +31,41 @@ type CheckState struct {
 
 // Check represents a check performed by the health check
 type Check struct {
-	State   *CheckState
-	Checker *Checker
+	state   *CheckState
+	checker Checker
 	mutex   *sync.Mutex
+}
+
+// hasRun returns true if the check has been run and has state
+func (c *Check) hasRun() bool {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	if c.state.LastChecked == nil {
+		return false
+	}
+	return true
 }
 
 // newCheck returns a pointer to a new instantiated Check with
 // the provided checker function
-func newCheck(checker *Checker) (*Check, error) {
+func newCheck(checker Checker) (*Check, error) {
 	if checker == nil {
 		return nil, errors.New("expected checker but none provided")
 	}
 
 	return &Check{
-		State:   nil,
-		Checker: checker,
+		state:   &CheckState{},
+		checker: checker,
 		mutex:   &sync.Mutex{},
 	}, nil
 }
 
 func (c *Check) MarshalJSON() ([]byte, error) {
-	b, err := json.Marshal(c.State)
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	b, err := json.Marshal(c.state)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +73,7 @@ func (c *Check) MarshalJSON() ([]byte, error) {
 }
 
 func (c *Check) UnmarshalJSON(b []byte) error {
-	if err := json.Unmarshal(b, &c.State); err != nil {
+	if err := json.Unmarshal(b, &c.state); err != nil {
 		return err
 	}
 	return nil

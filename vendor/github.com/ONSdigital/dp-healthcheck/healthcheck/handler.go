@@ -9,13 +9,6 @@ import (
 	"github.com/ONSdigital/log.go/log"
 )
 
-// A list of possible health statuses
-const (
-	StatusOK       = "OK"
-	StatusCritical = "CRITICAL"
-	StatusWarning  = "WARNING"
-)
-
 // Handler responds to an http request for the current health status
 func (hc HealthCheck) Handler(w http.ResponseWriter, req *http.Request) {
 	now := time.Now().UTC()
@@ -40,7 +33,7 @@ func (hc HealthCheck) Handler(w http.ResponseWriter, req *http.Request) {
 // isAppStartingUp returns false when all clients have completed at least one check
 func (hc HealthCheck) isAppStartingUp() bool {
 	for _, check := range hc.Checks {
-		if check.State == nil {
+		if !check.hasRun() {
 			return true
 		}
 	}
@@ -60,39 +53,35 @@ func (hc HealthCheck) getStatus(ctx context.Context) string {
 func (hc HealthCheck) isAppHealthy() string {
 	status := StatusOK
 	for _, check := range hc.Checks {
-		appHealth := hc.readAppHealth(check)
-		if appHealth == StatusCritical {
+		checkStatus := hc.getCheckStatus(check)
+		if checkStatus == StatusCritical {
 			return StatusCritical
-		} else if appHealth == StatusWarning {
+		} else if checkStatus == StatusWarning {
 			status = StatusWarning
 		}
 	}
 	return status
 }
 
-// readAppHealth locks mutex then reads a check finally it unlocks the mutex.
-func (hc HealthCheck) readAppHealth(check *Check) string {
-	check.mutex.Lock()
-	defer check.mutex.Unlock()
-	return hc.isCheckHealthy(check.State)
-}
+// getCheckStatus returns a string for the status on if an individual check
+func (hc HealthCheck) getCheckStatus(c *Check) string {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 
-// isCheckHealthy returns a string for the status on if an individual dependent apps health
-func (hc HealthCheck) isCheckHealthy(c *CheckState) string {
-	now := time.Now().UTC()
-	switch c.Status {
-	case StatusWarning:
-		return StatusWarning
+	switch c.state.Status {
 	case StatusOK:
 		return StatusOK
+	case StatusWarning:
+		return StatusWarning
 	default:
+		now := time.Now().UTC()
 		status := StatusWarning
 		criticalTimeThreshold := hc.TimeOfFirstCriticalError.Add(hc.CriticalErrorTimeout)
-		if c.LastSuccess.Before(hc.TimeOfFirstCriticalError) && now.After(criticalTimeThreshold) {
+		if c.state.LastSuccess.Before(hc.TimeOfFirstCriticalError) && now.After(criticalTimeThreshold) {
 			status = StatusCritical
 		}
 		// Set timestamp of first critical error to now
-		if c.LastSuccess.After(hc.TimeOfFirstCriticalError) {
+		if c.state.LastSuccess.After(hc.TimeOfFirstCriticalError) {
 			hc.TimeOfFirstCriticalError = now
 		}
 		return status
