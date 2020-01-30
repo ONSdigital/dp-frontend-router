@@ -10,26 +10,30 @@
 		{
 			"checksumSHA1": "v4yu0ZcB0nvcDzvHWxeuQAiPoQg=",
 			"path": "github.com/ONSdigital/dp-api-clients-go/clientlog",
-			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
-			"revisionTime": "2020-01-21T15:02:40Z"
+			"revision": "b2172ac048b6dfaef26ed195684ce6ea5490b08d",
+			"revisionTime": "2020-01-28T16:03:02Z"
 		},
 		{
-			"checksumSHA1": "K8vvOzKh6oq+aJ9WNTI4NrTcSmg=",
+			"checksumSHA1": "LcWY0Tua634iXnffQLILdUklQis=",
 			"path": "github.com/ONSdigital/dp-api-clients-go/health",
-			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
-			"revisionTime": "2020-01-21T15:02:40Z"
+			"revision": "b2172ac048b6dfaef26ed195684ce6ea5490b08d",
+			"revisionTime": "2020-01-28T16:03:02Z"
 		},
 		{
-			"checksumSHA1": "j4mux2KkztY+8Ji/1ZdN4TPWXNA=",
+			"checksumSHA1": "FCWfjIZVaXfCHgt5LWJyh44GCB4=",
 			"path": "github.com/ONSdigital/dp-api-clients-go/zebedee",
-			"revision": "a62e4e04431ddc763092953f0cd6a5021f017143",
-			"revisionTime": "2020-01-21T15:02:40Z"
+			"revision": "b2172ac048b6dfaef26ed195684ce6ea5490b08d",
+			"revisionTime": "2020-01-28T16:03:02Z"
 		},
 		{
-			"checksumSHA1": "n3HuxisI7xJq0qz/JoDrG1T674U=",
+			"path": "github.com/ONSdigital/dp-api-clients-go/zedebee",
+			"revision": ""
+		},
+		{
+			"checksumSHA1": "EXppwQxejsSo92jl3WFQoofWsak=",
 			"path": "github.com/ONSdigital/dp-healthcheck/healthcheck",
-			"revision": "169c38bada895c8b391fdbc3811f84fa66f4ebc8",
-			"revisionTime": "2020-01-24T15:02:51Z"
+			"revision": "0d9da490ddc370e2200960f6ea864d495a5e4543",
+			"revisionTime": "2020-01-28T11:52:42Z"
 		},
 		{
 			"checksumSHA1": "YV8YAET8h0eZuaxGsuKd9TvrqPY=",

@@ -2,6 +2,7 @@ package health
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -32,20 +33,15 @@ type ErrInvalidAppResponse struct {
 // Client represents an app client
 type Client struct {
 	Client rchttp.Clienter
-	Check  *health.Check
-	Name   string
 	URL    string
+	name   string
 }
 
 // NewClient creates a new instance of Client with a given app url
-func NewClient(name, url string) *Client {
+func NewClient(url string) *Client {
 	c := &Client{
 		Client: rchttp.NewClient(),
-		Name:   name,
 		URL:    url,
-		Check: &health.Check{
-			Name: name,
-		},
 	}
 
 	// healthcheck client should not retry when calling a healthcheck endpoint,
@@ -55,6 +51,12 @@ func NewClient(name, url string) *Client {
 	c.Client.SetPathsWithNoRetries(paths)
 
 	return c
+}
+
+// CreateCheck creates a new check state object
+func CreateCheck(service string) (check health.CheckState) {
+	check.Name = service
+	return check
 }
 
 // Error should be called by the user to print out the stringified version of the error
@@ -67,9 +69,13 @@ func (e ErrInvalidAppResponse) Error() string {
 }
 
 // Checker calls an app health endpoint and returns a check object to the caller
-func (c *Client) Checker(ctx context.Context) (*health.Check, error) {
+func (c *Client) Checker(ctx context.Context, state *health.CheckState) error {
+	if state.Name == "" {
+		return errors.New("missing service name in state")
+	}
+	c.name = state.Name
 	logData := log.Data{
-		"service": c.Name,
+		"service": state.Name,
 	}
 
 	code, err := c.get(ctx, "/health")
@@ -83,33 +89,33 @@ func (c *Client) Checker(ctx context.Context) (*health.Check, error) {
 	}
 
 	currentTime := time.Now().UTC()
-	c.Check.StatusCode = code
-	c.Check.LastChecked = &currentTime
+	state.StatusCode = code
+	state.LastChecked = &currentTime
 
 	switch code {
 	case 0: // When there is a problem with the client return error in message
-		c.Check.Message = err.Error()
-		c.Check.Status = health.StatusCritical
-		c.Check.LastFailure = &currentTime
+		state.Message = err.Error()
+		state.Status = health.StatusCritical
+		state.LastFailure = &currentTime
 	case 200:
-		c.Check.Message = StatusMessage[health.StatusOK]
-		c.Check.Status = health.StatusOK
-		c.Check.LastSuccess = &currentTime
+		state.Message = StatusMessage[health.StatusOK]
+		state.Status = health.StatusOK
+		state.LastSuccess = &currentTime
 	case 429:
-		c.Check.Message = StatusMessage[health.StatusWarning]
-		c.Check.Status = health.StatusWarning
-		c.Check.LastFailure = &currentTime
+		state.Message = StatusMessage[health.StatusWarning]
+		state.Status = health.StatusWarning
+		state.LastFailure = &currentTime
 	default:
-		c.Check.Message = StatusMessage[health.StatusCritical]
-		c.Check.Status = health.StatusCritical
-		c.Check.LastFailure = &currentTime
+		state.Message = StatusMessage[health.StatusCritical]
+		state.Status = health.StatusCritical
+		state.LastFailure = &currentTime
 	}
 
-	return c.Check, nil
+	return nil
 }
 
 func (c *Client) get(ctx context.Context, path string) (int, error) {
-	clientlog.Do(ctx, "retrieving dataset", c.Name, c.URL)
+	clientlog.Do(ctx, "retrieving dataset", c.name, c.URL)
 
 	req, err := http.NewRequest("GET", c.URL+path, nil)
 	if err != nil {

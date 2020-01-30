@@ -4,31 +4,27 @@ import (
 	"context"
 	"time"
 
+	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/log.go/log"
 )
 
+const criticalTimeout = time.Minute
+const interval = 10 * time.Second
+
 var hc healthcheck.HealthCheck
 
-// InitializeHealthCheck initializes the HealthCheck object with startTime now
-func InitializeHealthCheck(ctx context.Context, buildTime, gitCommit, version string) healthcheck.HealthCheck {
+// StartHealthCheck instantiates and starts HealthCheck
+func StartHealthCheck(ctx context.Context, buildTime, gitCommit, version string, zc *client.Client) healthcheck.HealthCheck {
 
+	// Create VersionInfo
 	versionInfo, err := healthcheck.CreateVersionInfo(buildTime, gitCommit, version)
 	if err != nil {
 		log.Event(ctx, "failed to obtain versionInfo", log.Error(err))
 	}
 
-	criticalTimeout := time.Minute
-	interval := 10 * time.Second
-
-	// zc := client.New(config.ZebedeeURL)
-	// zChecker := func(context.Context, *healthcheck.CheckState) error {
-	// 	_, err := zc.Checker(ctx)
-	// 	return err
-	// }
-
-	hc, err = healthcheck.Create(versionInfo, criticalTimeout, interval, nil)
-
+	// Instantiate and start Healthcheck
+	hc, err = healthcheck.Create(versionInfo, criticalTimeout, interval, zc.Checker)
 	hc.Start(ctx)
 	return hc
 }

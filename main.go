@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
@@ -121,10 +122,12 @@ func main() {
 		redirects.Handler,
 	}
 
+	zebedeeClient := client.New(config.ZebedeeURL)
+
 	if config.DatasetRoutesEnabled == true {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}))
+		}, zebedeeClient))
 	}
 
 	alice := alice.New(middleware...).Then(router)
@@ -148,7 +151,7 @@ func main() {
 	}
 
 	// Healthcheck API
-	hc := health.InitializeHealthCheck(context.Background(), BuildTime, GitCommit, Version)
+	hc := health.StartHealthCheck(context.Background(), BuildTime, GitCommit, Version, zebedeeClient)
 	router.HandleFunc("/health", hc.Handler)
 
 	reverseProxy := createReverseProxy("babbage", babbageURL)
