@@ -14,7 +14,6 @@ require (
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/pat v1.0.1
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
-	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/justinas/alice v1.2.0
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4
