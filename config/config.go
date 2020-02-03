@@ -1,5 +1,7 @@
 package config
 
+import "time"
+
 var BindAddr = ":20000"
 
 // The URL of the babbage instance to use.
@@ -43,3 +45,9 @@ var SQSAnalyticsURL = ""
 
 // ContentTypeByteLimit respresents the response size at which we stop checking content-type to avoid oom errors
 var ContentTypeByteLimit = 5000000 // 5mb
+
+// HealthckeckCriticalTimeout is the timeout until we consider a failing healthcheck to be critical
+var HealthckeckCriticalTimeout = time.Duration(time.Minute)
+
+// HealthckeckInterval is the period of time between checks
+var HealthckeckInterval = time.Duration(10 * time.Second)
