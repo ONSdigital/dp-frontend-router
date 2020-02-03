@@ -16,7 +16,7 @@ debug:
 	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
 test:
+	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
 	go test -race -cover -tags 'production' ./...
-
 
 .PHONY: build debug

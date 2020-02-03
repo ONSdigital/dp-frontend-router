@@ -3,5 +3,5 @@
 export GOMODPATH=$(pwd)
 
 pushd $GOMODPATH/dp-frontend-router
-  make generate-build test
+  make test
 popd
