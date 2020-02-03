@@ -171,6 +171,9 @@ func main() {
 		log.Event(ctx, "initialising healthcheck without versionInfo", log.Error(err))
 	}
 	hc := healthcheck.New(versionInfo, config.HealthckeckCriticalTimeout, config.HealthckeckInterval)
+	if err = hc.AddCheck("Zebedee", zebedeeClient.Checker); err != nil {
+		log.Event(ctx, "Failed to add Zebedee checker to healthcheck", log.Error(err))
+	}
 	router.HandleFunc("/health", hc.Handler)
 
 	reverseProxy := createReverseProxy("babbage", babbageURL)
