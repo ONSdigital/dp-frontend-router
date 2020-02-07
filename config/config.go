@@ -17,6 +17,9 @@ var DatasetControllerURL = "http://localhost:20200"
 // The URL of the filter dataset controller
 var FilterDatasetControllerURL = "http://localhost:20001"
 
+// The URL of the cookies controller
+var CookiesControllerURL = "http://localhost:23800"
+
 // The URL of the Geography controller
 var GeographyControllerURL = "http://localhost:23700"
 

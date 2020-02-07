@@ -107,6 +107,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	cookiesControllerURL, err := url.Parse(config.CookiesControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "CookiesControllerURL", "value": config.CookiesControllerURL}, log.Error(err))
+	}
+
 	redirects.Init(assets.Asset)
 
 	router := pat.New()
@@ -149,6 +154,7 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
+	router.Handle("/cookies", createReverseProxy("cookies", cookiesControllerURL))
 
 	if config.DatasetRoutesEnabled == true {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
@@ -165,6 +171,7 @@ func main() {
 	log.Event(nil, "Starting server", log.Data{
 		"bind_addr":                config.BindAddr,
 		"babbage_url":              config.BabbageURL,
+		"cookies_controller_url":   config.CookiesControllerURL,
 		"dataset_controller_url":   config.DatasetControllerURL,
 		"geography_controller_url": config.GeographyControllerURL,
 		"downloader_url":           config.DownloaderURL,
