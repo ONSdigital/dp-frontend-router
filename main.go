@@ -154,7 +154,7 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
-	router.Handle("/cookies", createReverseProxy("cookies", cookiesControllerURL))
+	router.Handle("/cookie/{uri:.*}", createReverseProxy("cookie", cookiesControllerURL))
 
 	if config.DatasetRoutesEnabled == true {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
