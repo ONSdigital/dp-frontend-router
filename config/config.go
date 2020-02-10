@@ -33,7 +33,7 @@ var ZebedeeURL = "http://localhost:8082"
 var DownloaderURL = "http://localhost:23400"
 
 // The CDN assets path
-var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/e42235b"
+var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/f816ac8"
 
 // The site domain
 var SiteDomain = "ons.gov.uk"
