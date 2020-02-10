@@ -12,7 +12,11 @@ import (
 	"github.com/ONSdigital/log.go/log"
 )
 
-//Handler ...
+// HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
+const HeaderOnsPageType = "ONS-Page-Type"
+
+//Handler implements the middleware for dp-frontend-router. It sets the locale code, obtains the necessary cookies for the request path and access_token,
+// authenticates with Zebedee if required,  and obtains the "ONS-Page-Type" header to use the handler for the page type, if present.
 func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -84,7 +88,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 
 			log.Event(req.Context(), "zebedee response", log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
 
-			pageType := headers.Get("ONS-Page-Type")
+			pageType := headers.Get(HeaderOnsPageType)
 
 			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
 				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)

@@ -26,7 +26,14 @@ import (
 	"github.com/justinas/alice"
 )
 
-var BuildTime, GitCommit, Version string
+var (
+	// BuildTime represents the time in which the service was built
+	BuildTime string
+	// GitCommit represents the commit (SHA-1) hash of the service that is running
+	GitCommit string
+	// Version represents the version of the service that is running
+	Version string
+)
 
 func main() {
 	log.Namespace = "dp-frontend-router"
@@ -168,11 +175,13 @@ func main() {
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
-		log.Event(ctx, "initialising healthcheck without versionInfo", log.Error(err))
+		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.Error(err))
+		os.Exit(1)
 	}
 	hc := healthcheck.New(versionInfo, config.HealthckeckCriticalTimeout, config.HealthckeckInterval)
 	if err = hc.AddCheck("Zebedee", zebedeeClient.Checker); err != nil {
 		log.Event(ctx, "Failed to add Zebedee checker to healthcheck", log.Error(err))
+		os.Exit(1)
 	}
 	router.HandleFunc("/health", hc.Handler)
 
