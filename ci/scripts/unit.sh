@@ -1,7 +1,7 @@
 #!/bin/bash -eux
 
-export GOMODPATH=$(pwd)
+export cwd=$(pwd)
 
-pushd $GOMODPATH/dp-frontend-router
+pushd $cwd/dp-frontend-router
   make test
 popd

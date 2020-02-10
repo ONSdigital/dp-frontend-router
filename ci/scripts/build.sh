@@ -1,9 +1,9 @@
 #!/bin/bash -eux
 
 export BINPATH=$(pwd)/build
-export GOMODPATH=$(pwd)
+export cwd=$(pwd)
 
-pushd $GOMODPATH/dp-frontend-router
+pushd $cwd/dp-frontend-router
   BINPATH=$BINPATH make build
   cp Dockerfile.concourse $BINPATH
 popd
