@@ -10,9 +10,8 @@ import (
 type httpRedirector func(w http.ResponseWriter, r *http.Request, urlStr string, code int)
 
 type searchHandler struct {
-	service        analytics.Service
-	redirector     httpRedirector
-	redirectSecret string
+	service    analytics.Service
+	redirector httpRedirector
 }
 
 // NewSearchHandler creates a new search handler
@@ -28,9 +27,8 @@ func NewSearchHandler(SQSanalyticsURL, RedirectSecret string) (http.Handler, err
 	}
 
 	sh := &searchHandler{
-		service:        analytics.NewServiceImpl(b),
-		redirector:     http.Redirect,
-		redirectSecret: RedirectSecret,
+		service:    analytics.NewServiceImpl(b, RedirectSecret),
+		redirector: http.Redirect,
 	}
 	return sh, nil
 }
@@ -39,7 +37,7 @@ func NewSearchHandler(SQSanalyticsURL, RedirectSecret string) (http.Handler, err
 // the user to the requested resource.
 func (sh searchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	log.Event(r.Context(), "capturing search analytics data")
-	redirectURL, err := sh.service.CaptureAnalyticsData(r, sh.redirectSecret)
+	redirectURL, err := sh.service.CaptureAnalyticsData(r)
 
 	if err != nil {
 		log.Event(r.Context(), "error capturing analytics data", log.Error(err))

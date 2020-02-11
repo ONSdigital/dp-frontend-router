@@ -1,9 +1,10 @@
 package analytics
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/pkg/errors"
 
 	"github.com/ONSdigital/log.go/log"
 	jwt "github.com/dgrijalva/jwt-go"
@@ -21,7 +22,7 @@ const gIDParam = "gid"
 
 // Service - defines a Stats Service Interface
 type Service interface {
-	CaptureAnalyticsData(r *http.Request, redirectSecret string) (string, error)
+	CaptureAnalyticsData(r *http.Request) (string, error)
 }
 
 // ServiceBackend is used to store data output by the analytics service
@@ -31,28 +32,30 @@ type ServiceBackend interface {
 
 // ServiceImpl - Implementation of the Analytics Service interface.
 type ServiceImpl struct {
-	backend ServiceBackend
+	backend        ServiceBackend
+	redirectSecret string
 }
 
 // NewServiceImpl - Creates a new Analytics ServiceImpl.
-func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
-	return &ServiceImpl{backend}
+func NewServiceImpl(backend ServiceBackend, redirectSecret string) *ServiceImpl {
+	return &ServiceImpl{backend, redirectSecret}
 }
 
 // CaptureAnalyticsData - captures the analytics values
-func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request, redirectSecret string) (string, error) {
+func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	data := r.URL.Query().Get(":data")
+	fmt.Println("data", data)
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(redirectSecret), nil
+		return []byte(s.redirectSecret), nil
 	})
 
 	if err != nil {
-		return "", errors.New("Invalid redirect data")
+		return "", errors.Wrap(err, "Invalid redirect data")
 	}
 
 	log.Event(r.Context(), "jwt token", log.Data{"token": token})

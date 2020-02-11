@@ -18,7 +18,7 @@ type mockAnalyticsService struct {
 	mockBehaviour func(r *http.Request, m *mockAnalyticsService) (string, error)
 }
 
-func (m *mockAnalyticsService) CaptureAnalyticsData(r *http.Request, redirectSecret string) (string, error) {
+func (m *mockAnalyticsService) CaptureAnalyticsData(r *http.Request) (string, error) {
 	m.args = append(m.args, r.URL.Query())
 	return m.mockBehaviour(r, m)
 }
