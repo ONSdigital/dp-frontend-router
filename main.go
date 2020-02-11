@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
@@ -29,13 +28,12 @@ func main() {
 	log.Namespace = "dp-frontend-router"
 
 	cfg, err := config.Get()
-	ctx := context.Background()
 	if err != nil {
-		log.Event(ctx, "unable to retrieve service configuration", log.Error(err))
+		log.Event(nil, "unable to retrieve service configuration", log.Error(err))
 		os.Exit(1)
 	}
 
-	fmt.Println("dataset", cfg.DatasetRoutesEnabled)
+	ctx := context.Background()
 
 	log.Event(ctx, "got service configuration", log.Data{"config": cfg})
 
@@ -82,7 +80,7 @@ func main() {
 		redirects.Handler,
 	}
 
-	if cfg.DatasetRoutesEnabled == true {
+	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
 		}))
@@ -90,7 +88,7 @@ func main() {
 
 	alice := alice.New(middleware...).Then(router)
 
-	searchHandler, err := analytics.NewSearchHandler()
+	searchHandler, err := analytics.NewSearchHandler(cfg.SQSAnalyticsURL)
 	if err != nil {
 		log.Event(nil, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
@@ -100,29 +98,19 @@ func main() {
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 
-	if cfg.DatasetRoutesEnabled == true {
+	if cfg.DatasetRoutesEnabled {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
 		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
 		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	}
 	// remove geo from prod
-	if cfg.GeographyEnabled == true {
+	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Event(nil, "Starting server", log.Data{
-		"bind_addr":                cfg.BindAddr,
-		"babbage_url":              cfg.BabbageURL,
-		"dataset_controller_url":   cfg.DatasetControllerURL,
-		"geography_controller_url": cfg.GeographyControllerURL,
-		"downloader_url":           cfg.DownloaderURL,
-		"renderer_url":             cfg.RendererURL,
-		"site_domain":              cfg.SiteDomain,
-		"assets_path":              cfg.PatternLibraryAssetsPath,
-		"analytics_sqs_url":        cfg.SQSAnalyticsURL,
-	})
+	log.Event(nil, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
 		Addr:         cfg.BindAddr,

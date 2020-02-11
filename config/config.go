@@ -18,7 +18,7 @@ type Config struct {
 	DownloaderURL              string `envconfig:"DOWNLOADER_URL"`
 	PatternLibraryAssetsPath   string `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	SiteDomain                 string `envconfig:"SITE_DOMAIN"`
-	RedirectSecret             string `envconfig:"REDIRECT_SECRET"`
+	RedirectSecret             string `envconfig:"REDIRECT_SECRET" 					json:"-"`
 	SQSAnalyticsURL            string `envconfig:"SQS_ANALYTICS_URL"`
 	ContentTypeByteLimit       int    `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 }
