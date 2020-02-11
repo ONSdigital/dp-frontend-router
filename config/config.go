@@ -9,6 +9,7 @@ type Config struct {
 	BindAddr                   string `envconfig:"BIND_ADDR"`
 	BabbageURL                 string `envconfig:"BABBAGE_URL"`
 	RendererURL                string `envconfig:"RENDERER_URL"`
+	CookiesControllerURL       string `envconfig:"COOKIES_CONTROLLER_URL"`
 	DatasetRoutesEnabled       bool   `envconfig:"DATASET_ROUTES_ENABLED"`
 	DatasetControllerURL       string `envconfig:"DATASET_CONTROLLER_URL"`
 	FilterDatasetControllerURL string `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
@@ -35,6 +36,7 @@ func Get() (*Config, error) {
 		BindAddr:                   ":20000",
 		BabbageURL:                 "http://localhost:8080",
 		RendererURL:                "http://localhost:20010",
+		CookiesControllerURL:       "http://localhost:23800",
 		DatasetRoutesEnabled:       false,
 		DatasetControllerURL:       "http://localhost:20200",
 		FilterDatasetControllerURL: "http://localhost:20001",
