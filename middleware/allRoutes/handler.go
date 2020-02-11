@@ -17,6 +17,8 @@ import (
 func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			cfg, err := config.Get()
+
 			path := req.URL.Path
 
 			// Populate context here with language
@@ -36,7 +38,7 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 				return
 			}
 
-			contentURL := config.ZebedeeURL + "/data"
+			contentURL := cfg.ZebedeeURL + "/data"
 
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentURL += "/" + c.Value + "?uri=" + path
@@ -77,12 +79,12 @@ func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Ha
 			}
 
 			// Use a limited reader so we dont oom the router checking for content-type
-			limitReader := io.LimitReader(res.Body, int64(config.ContentTypeByteLimit+1))
+			limitReader := io.LimitReader(res.Body, int64(cfg.ContentTypeByteLimit+1))
 			defer io.Copy(ioutil.Discard, res.Body)
 			b, err := ioutil.ReadAll(limitReader)
 			res.Body.Close()
 
-			if len(b) == config.ContentTypeByteLimit+1 {
+			if len(b) == cfg.ContentTypeByteLimit+1 {
 				log.Info("Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", nil)
 				h.ServeHTTP(w, req)
 				return

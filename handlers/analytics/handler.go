@@ -17,11 +17,12 @@ type searchHandler struct {
 
 // NewSearchHandler creates a new search handler
 func NewSearchHandler() (http.Handler, error) {
-	var b analytics.ServiceBackend
-	var err error
+	cfg, err := config.Get()
 
-	if len(config.SQSAnalyticsURL) > 0 {
-		b, err = analytics.NewSQSBackend(config.SQSAnalyticsURL)
+	var b analytics.ServiceBackend
+
+	if len(cfg.SQSAnalyticsURL) > 0 {
+		b, err = analytics.NewSQSBackend(cfg.SQSAnalyticsURL)
 		if err != nil {
 			return nil, err
 		}

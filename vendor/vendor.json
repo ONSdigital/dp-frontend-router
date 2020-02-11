@@ -243,16 +243,22 @@
 			"revisionTime": "2018-02-06T20:15:40Z"
 		},
 		{
-			"checksumSHA1": "tewA7jXVGCw1zb5mA0BDecWi4iQ=",
+			"checksumSHA1": "cIiyvAduLLFvu+tg1Qr5Jw3jeWo=",
 			"path": "github.com/jtolds/gls",
-			"revision": "8ddce2a84170772b95dd5d576c48d517b22cac63",
-			"revisionTime": "2016-01-05T22:08:40Z"
+			"revision": "b4936e06046bbecbb94cae9c18127ebe510a2cb9",
+			"revisionTime": "2018-11-10T20:28:10Z"
 		},
 		{
 			"checksumSHA1": "OBvAHqWjdI4NQVAqTkcQAdTuCFY=",
 			"path": "github.com/justinas/alice",
 			"revision": "1051eaf52fcafdd87ead59d28b065f1fcb8274ec",
 			"revisionTime": "2016-09-10T10:38:22Z"
+		},
+		{
+			"checksumSHA1": "i1+Ef2OakJK8UC7zk9N7a0w+9J4=",
+			"path": "github.com/kelseyhightower/envconfig",
+			"revision": "0b417c4ec4a8a82eecc22a1459a504aa55163d61",
+			"revisionTime": "2019-05-24T18:54:01Z"
 		},
 		{
 			"checksumSHA1": "SEnjvwVyfuU2xBaOfXfwPD5MZqk=",

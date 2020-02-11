@@ -42,6 +42,8 @@ func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
 
 // CaptureAnalyticsData - captures the analytics values
 func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
+	cfg, err := config.Get()
+
 	data := r.URL.Query().Get(":data")
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
@@ -49,7 +51,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(config.RedirectSecret), nil
+		return []byte(cfg.RedirectSecret), nil
 	})
 
 	if err != nil {

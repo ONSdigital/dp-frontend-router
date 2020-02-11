@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -27,89 +28,45 @@ import (
 func main() {
 	log.Namespace = "dp-frontend-router"
 
-	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
-		config.BindAddr = v
-	}
-	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
-		config.BabbageURL = v
-	}
-	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
-		config.RendererURL = v
-	}
-	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.DatasetControllerURL = v
-	}
-	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.FilterDatasetControllerURL = v
-	}
-	if v := os.Getenv("GEOGRAPHY_CONTROLLER_URL"); len(v) > 0 {
-		config.GeographyControllerURL = v
-	}
-	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
-		config.ZebedeeURL = v
-	}
-	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
-		config.DownloaderURL = v
-	}
-	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
-		config.PatternLibraryAssetsPath = v
-	}
-	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
-		config.SiteDomain = v
-	}
-
-	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
-		config.RedirectSecret = v
-	}
-
-	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
-		config.SQSAnalyticsURL = v
-	}
-
-	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
-		a, err := strconv.Atoi(v)
-		if err == nil {
-			config.ContentTypeByteLimit = int(a)
-		}
-	}
-
-	var err error
-
-	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
+	cfg, err := config.Get()
+	ctx := context.Background()
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyEnabled", "value": os.Getenv("GEOGRAPHY_ENABLED")}, log.Error(err))
-	}
-
-	config.DatasetRoutesEnabled, err = strconv.ParseBool(os.Getenv("DATASET_ROUTES_ENABLED"))
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetRoutesEnabled", "value": os.Getenv("DATASET_ROUTES_ENABLED")}, log.Error(err))
-	}
-
-	log.Namespace = "dp-frontend-router"
-
-	log.Event(nil, "overriding default renderer with service assets")
-
-	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": config.DatasetControllerURL}, log.Error(err))
+		log.Event(ctx, "unable to retrieve service configuration", log.Error(err))
 		os.Exit(1)
 	}
 
-	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	fmt.Println("dataset", cfg.DatasetRoutesEnabled)
+
+	log.Event(ctx, "got service configuration", log.Data{"config": cfg})
+
+	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": config.FilterDatasetControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
-	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
+	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": config.GeographyControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
-	cookiesControllerURL, err := url.Parse(config.CookiesControllerURL)
+	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "CookiesControllerURL", "value": config.CookiesControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	babbageURL, err := url.Parse(cfg.BabbageURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	downloaderURL, err := url.Parse(cfg.DownloaderURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL}, log.Error(err))
+		os.Exit(1)
 	}
 
 	redirects.Init(assets.Asset)
@@ -125,25 +82,13 @@ func main() {
 		redirects.Handler,
 	}
 
-	if config.DatasetRoutesEnabled == true {
+	if cfg.DatasetRoutesEnabled == true {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
 		}))
 	}
 
 	alice := alice.New(middleware...).Then(router)
-
-	babbageURL, err := url.Parse(config.BabbageURL)
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": config.BabbageURL}, log.Error(err))
-		os.Exit(1)
-	}
-
-	downloaderURL, err := url.Parse(config.DownloaderURL)
-	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": config.DownloaderURL}, log.Error(err))
-		os.Exit(1)
-	}
 
 	searchHandler, err := analytics.NewSearchHandler()
 	if err != nil {
@@ -154,35 +99,33 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
-	router.Handle("/cookie/{uri:.*}", createReverseProxy("cookie", cookiesControllerURL))
 
-	if config.DatasetRoutesEnabled == true {
+	if cfg.DatasetRoutesEnabled == true {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
 		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
 		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	}
 	// remove geo from prod
-	if config.GeographyEnabled == true {
+	if cfg.GeographyEnabled == true {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.Data{
-		"bind_addr":                config.BindAddr,
-		"babbage_url":              config.BabbageURL,
-		"cookies_controller_url":   config.CookiesControllerURL,
-		"dataset_controller_url":   config.DatasetControllerURL,
-		"geography_controller_url": config.GeographyControllerURL,
-		"downloader_url":           config.DownloaderURL,
-		"renderer_url":             config.RendererURL,
-		"site_domain":              config.SiteDomain,
-		"assets_path":              config.PatternLibraryAssetsPath,
-		"analytics_sqs_url":        config.SQSAnalyticsURL,
+		"bind_addr":                cfg.BindAddr,
+		"babbage_url":              cfg.BabbageURL,
+		"dataset_controller_url":   cfg.DatasetControllerURL,
+		"geography_controller_url": cfg.GeographyControllerURL,
+		"downloader_url":           cfg.DownloaderURL,
+		"renderer_url":             cfg.RendererURL,
+		"site_domain":              cfg.SiteDomain,
+		"assets_path":              cfg.PatternLibraryAssetsPath,
+		"analytics_sqs_url":        cfg.SQSAnalyticsURL,
 	})
 
 	s := &http.Server{
-		Addr:         config.BindAddr,
+		Addr:         cfg.BindAddr,
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
