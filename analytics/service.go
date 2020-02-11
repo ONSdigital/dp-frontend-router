@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/log.go/log"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -22,7 +21,7 @@ const gIDParam = "gid"
 
 // Service - defines a Stats Service Interface
 type Service interface {
-	CaptureAnalyticsData(r *http.Request) (string, error)
+	CaptureAnalyticsData(r *http.Request, redirectSecret string) (string, error)
 }
 
 // ServiceBackend is used to store data output by the analytics service
@@ -41,9 +40,7 @@ func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
 }
 
 // CaptureAnalyticsData - captures the analytics values
-func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
-	cfg, err := config.Get()
-
+func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request, redirectSecret string) (string, error) {
 	data := r.URL.Query().Get(":data")
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
@@ -51,7 +48,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(cfg.RedirectSecret), nil
+		return []byte(redirectSecret), nil
 	})
 
 	if err != nil {
