@@ -83,7 +83,7 @@ func main() {
 	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}))
+		}, cfg))
 	}
 
 	alice := alice.New(middleware...).Then(router)

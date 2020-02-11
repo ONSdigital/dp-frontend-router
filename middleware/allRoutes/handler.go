@@ -14,11 +14,9 @@ import (
 )
 
 //Handler ...
-func Handler(routesHandler map[string]http.Handler) func(h http.Handler) http.Handler {
+func Handler(routesHandler map[string]http.Handler, cfg *config.Config) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			cfg, err := config.Get()
-
 			path := req.URL.Path
 
 			// Populate context here with language
