@@ -16,6 +16,8 @@ require (
 	github.com/jmespath/go-jmespath v0.0.0-20180206201540-c2b33e8439af // indirect
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/justinas/alice v1.2.0
+	github.com/kelseyhightower/envconfig v1.4.0
+	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/stretchr/testify v1.2.2 // indirect

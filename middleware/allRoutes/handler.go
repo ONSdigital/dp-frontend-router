@@ -17,7 +17,7 @@ const HeaderOnsPageType = "ONS-Page-Type"
 
 //Handler implements the middleware for dp-frontend-router. It sets the locale code, obtains the necessary cookies for the request path and access_token,
 // authenticates with Zebedee if required,  and obtains the "ONS-Page-Type" header to use the handler for the page type, if present.
-func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client) func(h http.Handler) http.Handler {
+func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client, cfg *config.Config) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			path := req.URL.Path
@@ -70,7 +70,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			if len(b) == config.ContentTypeByteLimit+1 {
+			if len(b) == cfg.ContentTypeByteLimit+1 {
 				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling")
 				h.ServeHTTP(w, req)
 				return

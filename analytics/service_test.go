@@ -8,7 +8,9 @@ import (
 )
 
 func Test_extractIntParam(t *testing.T) {
-	s := &ServiceImpl{}
+	s := &ServiceImpl{
+		redirectSecret: "secret",
+	}
 	Convey("Given a valid redirect URL", t, func() {
 		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
 		So(r, ShouldNotBeNil)

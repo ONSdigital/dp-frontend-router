@@ -8,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 
@@ -38,98 +37,49 @@ var (
 func main() {
 	log.Namespace = "dp-frontend-router"
 
-	if v := os.Getenv("BIND_ADDR"); len(v) > 0 {
-		config.BindAddr = v
-	}
-	if v := os.Getenv("BABBAGE_URL"); len(v) > 0 {
-		config.BabbageURL = v
-	}
-	if v := os.Getenv("RENDERER_URL"); len(v) > 0 {
-		config.RendererURL = v
-	}
-	if v := os.Getenv("DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.DatasetControllerURL = v
-	}
-	if v := os.Getenv("FILTER_DATASET_CONTROLLER_URL"); len(v) > 0 {
-		config.FilterDatasetControllerURL = v
-	}
-	if v := os.Getenv("GEOGRAPHY_CONTROLLER_URL"); len(v) > 0 {
-		config.GeographyControllerURL = v
-	}
-	if v := os.Getenv("ZEBEDEE_URL"); len(v) > 0 {
-		config.ZebedeeURL = v
-	}
-	if v := os.Getenv("DOWNLOADER_URL"); len(v) > 0 {
-		config.DownloaderURL = v
-	}
-	if v := os.Getenv("PATTERN_LIBRARY_ASSETS_PATH"); len(v) > 0 {
-		config.PatternLibraryAssetsPath = v
-	}
-	if v := os.Getenv("SITE_DOMAIN"); len(v) > 0 {
-		config.SiteDomain = v
+	cfg, err := config.Get()
+	if err != nil {
+		log.Event(nil, "unable to retrieve service configuration", log.Error(err))
+		os.Exit(1)
 	}
 
-	if v := os.Getenv("REDIRECT_SECRET"); len(v) > 0 {
-		config.RedirectSecret = v
-	}
-
-	if v := os.Getenv("ANALYTICS_SQS_URL"); len(v) > 0 {
-		config.SQSAnalyticsURL = v
-	}
-
-	if v := os.Getenv("CONTENT_TYPE_BYTE_LIMIT"); len(v) > 0 {
-		a, err := strconv.Atoi(v)
-		if err == nil {
-			config.ContentTypeByteLimit = int(a)
-		}
-	}
-
-	if v := os.Getenv("HEALTHCHECK_CRITICAL_TIMEOUT"); len(v) > 0 {
-		d, err := time.ParseDuration(v)
-		if err == nil {
-			config.HealthckeckCriticalTimeout = d
-		}
-	}
-
-	if v := os.Getenv("HEALTHCHECK_INTERVAL"); len(v) > 0 {
-		d, err := time.ParseDuration(v)
-		if err == nil {
-			config.HealthckeckInterval = d
-		}
-	}
-
-	var err error
 	ctx := context.Background()
 
-	config.GeographyEnabled, err = strconv.ParseBool(os.Getenv("GEOGRAPHY_ENABLED"))
+	log.Event(ctx, "got service configuration", log.Data{"config": cfg})
+
+	cookiesControllerURL, err := url.Parse(cfg.CookiesControllerURL)
 	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "GeographyEnabled", "value": os.Getenv("GEOGRAPHY_ENABLED")}, log.Error(err))
-	}
-
-	config.DatasetRoutesEnabled, err = strconv.ParseBool(os.Getenv("DATASET_ROUTES_ENABLED"))
-	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "DatasetRoutesEnabled", "value": os.Getenv("DATASET_ROUTES_ENABLED")}, log.Error(err))
-	}
-
-	log.Namespace = "dp-frontend-router"
-
-	log.Event(nil, "overriding default renderer with service assets")
-
-	datasetControllerURL, err := url.Parse(config.DatasetControllerURL)
-	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": config.DatasetControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
-	filterDatasetControllerURL, err := url.Parse(config.FilterDatasetControllerURL)
+	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": config.FilterDatasetControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
-	geographyControllerURL, err := url.Parse(config.GeographyControllerURL)
+	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": config.GeographyControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	babbageURL, err := url.Parse(cfg.BabbageURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	downloaderURL, err := url.Parse(cfg.DownloaderURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL}, log.Error(err))
 		os.Exit(1)
 	}
 
@@ -144,29 +94,17 @@ func main() {
 		redirects.Handler,
 	}
 
-	zebedeeClient := client.New(config.ZebedeeURL)
+	zebedeeClient := client.New(cfg.ZebedeeURL)
 
-	if config.DatasetRoutesEnabled == true {
+	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}, zebedeeClient))
+		}, zebedeeClient, cfg))
 	}
 
 	alice := alice.New(middleware...).Then(router)
 
-	babbageURL, err := url.Parse(config.BabbageURL)
-	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "BabbageURL", "value": config.BabbageURL}, log.Error(err))
-		os.Exit(1)
-	}
-
-	downloaderURL, err := url.Parse(config.DownloaderURL)
-	if err != nil {
-		log.Event(ctx, "configuration value is invalid", log.Data{"config_name": "DownloaderURL", "value": config.DownloaderURL}, log.Error(err))
-		os.Exit(1)
-	}
-
-	searchHandler, err := analytics.NewSearchHandler()
+	searchHandler, err := analytics.NewSearchHandler(cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
 		log.Event(ctx, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
@@ -178,7 +116,7 @@ func main() {
 		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.Error(err))
 		os.Exit(1)
 	}
-	hc := healthcheck.New(versionInfo, config.HealthckeckCriticalTimeout, config.HealthckeckInterval)
+	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
 	if err = hc.AddCheck("Zebedee", zebedeeClient.Checker); err != nil {
 		log.Event(ctx, "Failed to add Zebedee checker to healthcheck", log.Error(err))
 		os.Exit(1)
@@ -189,32 +127,26 @@ func main() {
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 
-	if config.DatasetRoutesEnabled == true {
+	if cfg.CookiesRoutesEnabled {
+		router.Handle("/cookies/{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
+	}
+
+	if cfg.DatasetRoutesEnabled {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
 		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
 		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	}
 	// remove geo from prod
-	if config.GeographyEnabled == true {
+	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 	router.Handle("/{uri:.*}", reverseProxy)
 
-	log.Event(ctx, "Starting server", log.Data{
-		"bind_addr":                config.BindAddr,
-		"babbage_url":              config.BabbageURL,
-		"dataset_controller_url":   config.DatasetControllerURL,
-		"geography_controller_url": config.GeographyControllerURL,
-		"downloader_url":           config.DownloaderURL,
-		"renderer_url":             config.RendererURL,
-		"site_domain":              config.SiteDomain,
-		"assets_path":              config.PatternLibraryAssetsPath,
-		"analytics_sqs_url":        config.SQSAnalyticsURL,
-	})
+	log.Event(nil, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
-		Addr:         config.BindAddr,
+		Addr:         cfg.BindAddr,
 		Handler:      alice,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,

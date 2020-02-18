@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/analytics"
-	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/log.go/log"
 )
 
@@ -16,19 +15,19 @@ type searchHandler struct {
 }
 
 // NewSearchHandler creates a new search handler
-func NewSearchHandler() (http.Handler, error) {
+func NewSearchHandler(SQSanalyticsURL, RedirectSecret string) (http.Handler, error) {
 	var b analytics.ServiceBackend
 	var err error
 
-	if len(config.SQSAnalyticsURL) > 0 {
-		b, err = analytics.NewSQSBackend(config.SQSAnalyticsURL)
+	if len(SQSanalyticsURL) > 0 {
+		b, err = analytics.NewSQSBackend(SQSanalyticsURL)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	sh := &searchHandler{
-		service:    analytics.NewServiceImpl(b),
+		service:    analytics.NewServiceImpl(b, RedirectSecret),
 		redirector: http.Redirect,
 	}
 	return sh, nil

@@ -1,53 +1,63 @@
 package config
 
-import "time"
+import (
+	"time"
 
-var BindAddr = ":20000"
+	"github.com/kelseyhightower/envconfig"
+)
 
-// The URL of the babbage instance to use.
-var BabbageURL = "http://localhost:8080"
+// Config represents service configuration for dp-frontend-router
+type Config struct {
+	BindAddr                   string        `envconfig:"BIND_ADDR"`
+	BabbageURL                 string        `envconfig:"BABBAGE_URL"`
+	RendererURL                string        `envconfig:"RENDERER_URL"`
+	CookiesControllerURL       string        `envconfig:"COOKIES_CONTROLLER_URL"`
+	CookiesRoutesEnabled       bool          `envconfig:"COOKIES_ROUTES_ENABLED"`
+	DatasetRoutesEnabled       bool          `envconfig:"DATASET_ROUTES_ENABLED"`
+	DatasetControllerURL       string        `envconfig:"DATASET_CONTROLLER_URL"`
+	FilterDatasetControllerURL string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
+	GeographyControllerURL     string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
+	GeographyEnabled           bool          `envconfig:"GEOGRAPHY_ENABLED"`
+	ZebedeeURL                 string        `envconfig:"ZEBEDEE_URL"`
+	DownloaderURL              string        `envconfig:"DOWNLOADER_URL"`
+	PatternLibraryAssetsPath   string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	SiteDomain                 string        `envconfig:"SITE_DOMAIN"`
+	RedirectSecret             string        `envconfig:"REDIRECT_SECRET" json:"-"`
+	SQSAnalyticsURL            string        `envconfig:"SQS_ANALYTICS_URL"`
+	ContentTypeByteLimit       int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
+	HealthckeckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
+	HealthckeckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
+}
 
-// The URL of the content renderer
-var RendererURL = "http://localhost:20010"
+var cfg *Config
 
-// Dataset routes enabled
-var DatasetRoutesEnabled = false
+// Get returns the default config with any modifications made through environment variables
+func Get() (*Config, error) {
+	if cfg != nil {
+		return cfg, nil
+	}
 
-// The URL of the dataset controller
-var DatasetControllerURL = "http://localhost:20200"
+	cfg := &Config{
+		BindAddr:                   ":20000",
+		BabbageURL:                 "http://localhost:8080",
+		RendererURL:                "http://localhost:20010",
+		CookiesControllerURL:       "http://localhost:23800",
+		CookiesRoutesEnabled:       false,
+		DatasetRoutesEnabled:       false,
+		DatasetControllerURL:       "http://localhost:20200",
+		FilterDatasetControllerURL: "http://localhost:20001",
+		GeographyControllerURL:     "http://localhost:23700",
+		GeographyEnabled:           false,
+		ZebedeeURL:                 "http://localhost:8082",
+		DownloaderURL:              "http://localhost:23400",
+		PatternLibraryAssetsPath:   "https://cdn.ons.gov.uk/sixteens/f816ac8",
+		SiteDomain:                 "ons.gov.uk",
+		RedirectSecret:             "secret",
+		SQSAnalyticsURL:            "",
+		ContentTypeByteLimit:       5000000,
+		HealthckeckCriticalTimeout: time.Minute,
+		HealthckeckInterval:        time.Second * 10,
+	}
 
-// The URL of the filter dataset controller
-var FilterDatasetControllerURL = "http://localhost:20001"
-
-// The URL of the Geography controller
-var GeographyControllerURL = "http://localhost:23700"
-
-// Geography feature is enabled
-var GeographyEnabled = false
-
-// The URL of Zebedee API
-var ZebedeeURL = "http://localhost:8082"
-
-// The URL of the file downloader service
-var DownloaderURL = "http://localhost:23400"
-
-// The CDN assets path
-var PatternLibraryAssetsPath = "https://cdn.ons.gov.uk/sixteens/e42235b"
-
-// The site domain
-var SiteDomain = "ons.gov.uk"
-
-// Redirect secret
-var RedirectSecret = "secret"
-
-// SQS URL for analytics data
-var SQSAnalyticsURL = ""
-
-// ContentTypeByteLimit respresents the response size at which we stop checking content-type to avoid oom errors
-var ContentTypeByteLimit = 5000000 // 5mb
-
-// HealthckeckCriticalTimeout is the timeout until we consider a failing healthcheck to be critical
-var HealthckeckCriticalTimeout = time.Duration(time.Minute)
-
-// HealthckeckInterval is the period of time between checks
-var HealthckeckInterval = time.Duration(10 * time.Second)
+	return cfg, envconfig.Process("", cfg)
+}
