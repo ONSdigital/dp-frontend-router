@@ -105,7 +105,7 @@ func main() {
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 
 	if cfg.CookiesRoutesEnabled {
-		router.Handle("/cookies/{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
+		router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 	}
 
 	if cfg.DatasetRoutesEnabled {
