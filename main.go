@@ -37,6 +37,12 @@ func main() {
 
 	log.Event(ctx, "got service configuration", log.Data{"config": cfg})
 
+	cookiesControllerURL, err := url.Parse(cfg.CookiesControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
 	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL}, log.Error(err))
@@ -97,6 +103,10 @@ func main() {
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
+
+	if cfg.CookiesRoutesEnabled {
+		router.Handle("/cookies/{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
+	}
 
 	if cfg.DatasetRoutesEnabled {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
