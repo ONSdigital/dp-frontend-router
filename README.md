@@ -21,6 +21,10 @@ dp-frontend-router
 | AWS_SECRET_ACCESS_KEY         |                                         | Your AWS secret access key
 | AWS_REGION                    |                                         | AWS region (normally eu-west-1)
 | REDIRECT_SECRET               | secret                                  | Pre-shared key for signing/encrypting redirect data
+| CONTENT_TYPE_BYTE_LIMIT       | 5000000 (5MB)                           | Response size at which we stop checking content-type to avoid oom errors
+| HEALTHCHECK_INTERVAL          | 60s                                     | The period of time between health checks
+| HEALTHCHECK_CRITICAL_TIMEOUT  | 5s                                      | The period of time after which failing checks 
+
 
 ### Licence
 

@@ -11,17 +11,27 @@ import (
 	"strings"
 	"time"
 
+	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
+	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	hc "github.com/ONSdigital/go-ns/healthcheck"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
+)
+
+var (
+	// BuildTime represents the time in which the service was built
+	BuildTime string
+	// GitCommit represents the commit (SHA-1) hash of the service that is running
+	GitCommit string
+	// Version represents the version of the service that is running
+	Version string
 )
 
 func main() {
@@ -77,8 +87,6 @@ func main() {
 
 	router := pat.New()
 
-	router.Path("/healthcheck").HandlerFunc(hc.Do)
-
 	middleware := []alice.Constructor{
 		requestID.Handler(16),
 		log.Middleware,
@@ -86,19 +94,34 @@ func main() {
 		redirects.Handler,
 	}
 
+	zebedeeClient := client.New(cfg.ZebedeeURL)
+
 	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}, cfg))
+		}, zebedeeClient, cfg))
 	}
 
 	alice := alice.New(middleware...).Then(router)
 
 	searchHandler, err := analytics.NewSearchHandler(cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
-		log.Event(nil, "error creating search analytics handler", log.Error(err))
+		log.Event(ctx, "error creating search analytics handler", log.Error(err))
 		os.Exit(1)
 	}
+
+	// Healthcheck API
+	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
+	if err != nil {
+		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.Error(err))
+		os.Exit(1)
+	}
+	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
+	if err = hc.AddCheck("Zebedee", zebedeeClient.Checker); err != nil {
+		log.Event(ctx, "Failed to add Zebedee checker to healthcheck", log.Error(err))
+		os.Exit(1)
+	}
+	router.HandleFunc("/health", hc.Handler)
 
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
@@ -130,8 +153,13 @@ func main() {
 		IdleTimeout:  120 * time.Second,
 	}
 
+	// Start healthcheck
+	hc.Start(ctx)
+
+	// Start server
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Event(nil, "error starting server", log.Error(err))
+		log.Event(ctx, "error starting server", log.Error(err))
+		hc.Stop()
 		os.Exit(2)
 	}
 }
@@ -177,7 +205,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 				cookieValue = "B"
 			}
 
-			log.Event(nil, "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
+			log.Event(req.Context(), "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
 
 			expiration := time.Now().Add(365 * 24 * time.Hour)
 			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
@@ -187,13 +215,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Use cookie value to direct to a or b handler
 		switch cookie.Value {
 		case "A":
-			log.Event(nil, "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
+			log.Event(req.Context(), "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
 			a.ServeHTTP(w, req)
 		case "B":
-			log.Event(nil, "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
+			log.Event(req.Context(), "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
 			b.ServeHTTP(w, req)
 		default:
-			log.Event(nil, "abHandler invalid cookie value, reselecting")
+			log.Event(req.Context(), "abHandler invalid cookie value, reselecting")
 			cookie = nil
 			goto RETRY
 		}

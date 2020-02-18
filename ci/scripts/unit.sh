@@ -1,7 +1,7 @@
 #!/bin/bash -eux
 
-export GOPATH=$(pwd)/go
+export cwd=$(pwd)
 
-pushd $GOPATH/src/github.com/ONSdigital/dp-frontend-router
-  make generate test
+pushd $cwd/dp-frontend-router
+  make test
 popd
