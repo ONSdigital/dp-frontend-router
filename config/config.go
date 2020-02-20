@@ -41,7 +41,7 @@ func Get() (*Config, error) {
 		BindAddr:                   ":20000",
 		BabbageURL:                 "http://localhost:8080",
 		RendererURL:                "http://localhost:20010",
-		CookiesControllerURL:       "http://localhost:23800",
+		CookiesControllerURL:       "http://localhost:24100",
 		CookiesRoutesEnabled:       false,
 		DatasetRoutesEnabled:       false,
 		DatasetControllerURL:       "http://localhost:20200",
