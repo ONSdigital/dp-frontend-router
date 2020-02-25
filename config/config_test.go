@@ -20,7 +20,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.BindAddr, ShouldEqual, ":20000")
 				So(cfg.BabbageURL, ShouldEqual, "http://localhost:8080")
 				So(cfg.RendererURL, ShouldEqual, "http://localhost:20010")
-				So(cfg.CookiesControllerURL, ShouldEqual, "http://localhost:23800")
+				So(cfg.CookiesControllerURL, ShouldEqual, "http://localhost:24100")
 				So(cfg.DatasetRoutesEnabled, ShouldEqual, false)
 				So(cfg.DatasetControllerURL, ShouldEqual, "http://localhost:20200")
 				So(cfg.FilterDatasetControllerURL, ShouldEqual, "http://localhost:20001")
