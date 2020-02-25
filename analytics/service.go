@@ -58,7 +58,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		return "", errors.Wrap(err, "Invalid redirect data")
 	}
 
-	log.Event(r.Context(), "jwt token", log.Data{"token": token})
+	log.Event(r.Context(), "jwt token", log.INFO, log.Data{"token": token})
 
 	var url, term, listType, gaID, gID string
 	var pageIndex, linkIndex, pageSize float64
@@ -103,7 +103,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	// FIXME do we want to log as well as store in backend?
-	log.Event(r.Context(), "search analytics data", log.Data{
+	log.Event(r.Context(), "search analytics data", log.INFO, log.Data{
 		urlParam:        url,
 		termParam:       term,
 		searchTypeParam: listType,

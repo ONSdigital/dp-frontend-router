@@ -27,14 +27,15 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
-				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.Data{"url": path})
+				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.INFO, log.Data{"url": path})
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			// We can skip handling based on content type where the url points to a known/expected file extension
 			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
-				log.Event(req.Context(), "Skipping content specific handling as it's a request to download a known file extension.", log.Data{"url": req.URL.String()})
+				log.Event(req.Context(), "Skipping content specific handling as it's a request to download a known file extension.",
+					log.INFO, log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -46,7 +47,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			} else {
 				contentPath += "?uri=" + path
 			}
-			log.Event(req.Context(), "generated from 'collection' cookie", log.Data{"contentPath": contentPath})
+			log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
 
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
@@ -56,22 +57,22 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			userAccessToken := ""
 			c, err := req.Cookie(`access_token`)
 			if err != nil {
-				log.Event(req.Context(), "Cookie error", log.Error(err))
+				log.Event(req.Context(), "Cookie error", log.WARN, log.Error(err))
 			} else if len(c.Value) > 0 {
 				userAccessToken = c.Value
-				log.Event(req.Context(), "Obtained access_token Cookie", log.Data{"value": c.Value})
+				log.Event(req.Context(), "Obtained access_token Cookie", log.INFO, log.Data{"value": c.Value})
 			}
 
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
-				log.Event(req.Context(), "Zebedee GET error", log.Error(err))
+				log.Event(req.Context(), "Zebedee GET error", log.ERROR, log.Error(err))
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			if len(b) == cfg.ContentTypeByteLimit+1 {
-				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling")
+				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", log.WARN)
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -81,12 +82,12 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				DatasetID string `json:"apiDatasetId"`
 			}{}
 			if err := json.Unmarshal(b, &zebResp); err != nil {
-				log.Event(req.Context(), "json unmarshal error", log.Error(err))
+				log.Event(req.Context(), "json unmarshal error", log.ERROR, log.Error(err))
 				h.ServeHTTP(w, req)
 				return
 			}
 
-			log.Event(req.Context(), "zebedee response", log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
+			log.Event(req.Context(), "zebedee response", log.INFO, log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
 
 			pageType := headers.Get(HeaderOnsPageType)
 
@@ -96,7 +97,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			}
 
 			if h, ok := routesHandler[pageType]; ok {
-				log.Event(req.Context(), "Using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
+				log.Event(req.Context(), "Using handler for page type", log.INFO, log.Data{"pageType": pageType, "path": contentPath})
 				h.ServeHTTP(w, req)
 				return
 			}

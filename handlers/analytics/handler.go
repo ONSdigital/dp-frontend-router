@@ -36,11 +36,11 @@ func NewSearchHandler(SQSanalyticsURL, RedirectSecret string) (http.Handler, err
 // HandleSearch - http Handler func for dealing with Babbage Search requests. Captures search analytics data and redirects
 // the user to the requested resource.
 func (sh searchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Event(r.Context(), "capturing search analytics data")
+	log.Event(r.Context(), "capturing search analytics data", log.INFO)
 	redirectURL, err := sh.service.CaptureAnalyticsData(r)
 
 	if err != nil {
-		log.Event(r.Context(), "error capturing analytics data", log.Error(err))
+		log.Event(r.Context(), "error capturing analytics data", log.ERROR, log.Error(err))
 		w.WriteHeader(400)
 		// FIXME probably want to display a better error page than this
 		w.Write([]byte(err.Error()))
