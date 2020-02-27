@@ -46,7 +46,7 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	jb, err := json.Marshal(&data)
 	if err != nil {
-		log.Event(req.Context(), "error marshaling json", log.Error(err))
+		log.Event(req.Context(), "error marshaling json", log.ERROR, log.Error(err))
 		return
 	}
 
@@ -58,9 +58,9 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	smo, err := b.sendMessage(smr)
 	if err != nil {
-		log.Event(req.Context(), "error sending sqs message", log.Error(err))
+		log.Event(req.Context(), "error sending sqs message", log.ERROR, log.Error(err))
 		return
 	}
 
-	log.Event(req.Context(), "stored analytics data in SQS", log.Data{"message_id": *smo.MessageId})
+	log.Event(req.Context(), "stored analytics data in SQS", log.INFO, log.Data{"message_id": *smo.MessageId})
 }
