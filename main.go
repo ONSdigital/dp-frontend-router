@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"math/rand"
 	"net"
 	"net/http"
@@ -23,6 +24,7 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
+
 )
 
 var (
@@ -91,6 +93,7 @@ func main() {
 		requestID.Handler(16),
 		log.Middleware,
 		securityHandler,
+		serverError.Handler,
 		redirects.Handler,
 	}
 
