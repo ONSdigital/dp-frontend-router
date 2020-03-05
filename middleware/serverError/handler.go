@@ -5,11 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/log.go/log"
-	"io/ioutil"
-	"net/http"
 )
 
 type responseInterceptor struct {
@@ -25,10 +27,10 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 		log.Event(rI.req.Context(), "Intercepted error response", log.Data{"status": status}, log.INFO)
 		rI.intercepted = true
 		if status == 404 {
-			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
+			rI.renderErrorPage(rI.req, 404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
 			return
 		} else if status == 401 {
-			rI.renderErrorPage(401, "401 - You do not have permission to view this web page", `<p>This page may exist, but you do not currently have permission to view it. If you believe this to be incorrect please contact a system administrator.</p>`)
+			rI.renderErrorPage(rI.req, 401, "401 - You do not have permission to view this web page", `<p>This page may exist, but you do not currently have permission to view it. If you believe this to be incorrect please contact a system administrator.</p>`)
 			return
 		}
 	}
@@ -36,7 +38,7 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 	rI.ResponseWriter.WriteHeader(status)
 }
 
-func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
+func (rI *responseInterceptor) renderErrorPage(req *http.Request, code int, title, description string) {
 	// Attempt to render an error page
 	if err := rI.callRenderer(code, title, description); err != nil {
 		// Calling the renderer failed, render the disaster page
@@ -54,11 +56,14 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 	if err != nil {
 		return err
 	}
+	preferencesCookie := mapCookiePreferences(rI.req)
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
 			"description": description,
 		},
+		"cookies_preferences_set": preferencesCookie.IsPreferenceSet,
+		"cookies_policy":          preferencesCookie.Policy,
 	}
 
 	b, err := json.Marshal(&data)
@@ -138,4 +143,8 @@ func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		h.ServeHTTP(&responseInterceptor{w, req, false, false, make(http.Header)}, req)
 	})
+}
+
+func mapCookiePreferences(req *http.Request) cookies.PreferencesResponse {
+	return cookies.GetCookiePreferences(req)
 }
