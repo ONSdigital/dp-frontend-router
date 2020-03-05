@@ -56,7 +56,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 	if err != nil {
 		return err
 	}
-	preferencesCookie := mapCookiePreferences(rI.req)
+	preferencesCookie := cookies.GetCookiePreferences(rI.req)
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
@@ -143,8 +143,4 @@ func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		h.ServeHTTP(&responseInterceptor{w, req, false, false, make(http.Header)}, req)
 	})
-}
-
-func mapCookiePreferences(req *http.Request) cookies.PreferencesResponse {
-	return cookies.GetCookiePreferences(req)
 }
