@@ -5,11 +5,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+
+	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
 	"github.com/ONSdigital/log.go/log"
-	"io/ioutil"
-	"net/http"
 )
 
 type responseInterceptor struct {
@@ -54,11 +56,14 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 	if err != nil {
 		return err
 	}
+	preferencesCookie := cookies.GetCookiePreferences(rI.req)
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
 			"description": description,
 		},
+		"cookies_preferences_set": preferencesCookie.IsPreferenceSet,
+		"cookies_policy":          preferencesCookie.Policy,
 	}
 
 	b, err := json.Marshal(&data)
