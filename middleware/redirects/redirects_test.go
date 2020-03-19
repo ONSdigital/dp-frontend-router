@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/requestID"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
@@ -120,7 +119,6 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 		requestID.Handler(16),
 		log.Middleware,
 		//securityHandler,
-		serverError.Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
@@ -138,7 +136,6 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 		requestID.Handler(16),
 		log.Middleware,
 		//securityHandler,
-		serverError.Handler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -162,7 +159,6 @@ func BenchmarkWith100Redirects(b *testing.B) {
 		requestID.Handler(16),
 		log.Middleware,
 		//securityHandler,
-		serverError.Handler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -186,7 +182,6 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 		requestID.Handler(16),
 		log.Middleware,
 		//securityHandler,
-		serverError.Handler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -210,7 +205,6 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 		requestID.Handler(16),
 		log.Middleware,
 		//securityHandler,
-		serverError.Handler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)

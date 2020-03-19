@@ -1,16 +1,16 @@
 package serverError
 
+// This whole package and process needs a refactor. Re-added file - take very little responsibility for anything in here
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 
+	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
-	"github.com/ONSdigital/go-ns/render"
 	"github.com/ONSdigital/log.go/log"
 )
 
@@ -24,18 +24,15 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 	if status >= 400 {
-		log.Event(rI.req.Context(), "Intercepted error response", log.Data{"status": status})
+		log.Event(rI.req.Context(), "Intercepted error response", log.Data{"status": status}, log.INFO)
 		rI.intercepted = true
-		if status == 500 {
-			rI.renderErrorPage(500, "Internal server error", "<p>We're currently experiencing some technical difficulties. You could try <a href='"+rI.req.Host+url.QueryEscape(rI.req.URL.Path)+"'>refreshing the page or trying again later.</a> </p>")
-		} else if status == 404 {
+		if status == 404 {
 			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the search, or return to the <a href="/" title="Our homepage" target="_self">homepage</a> and use the sitemap.</p>`)
+			return
 		} else if status == 401 {
 			rI.renderErrorPage(401, "401 - You do not have permission to view this web page", `<p>This page may exist, but you do not currently have permission to view it. If you believe this to be incorrect please contact a system administrator.</p>`)
-		} else {
-			rI.renderErrorPage(503, "Service temporarily unavailable", `<p>The service is temporarily unavailable, please check our <a href="https://twitter.com/onsdigital">twitter</a> feed for updates.</p>`)
+			return
 		}
-		return
 	}
 	rI.writeHeaders()
 	rI.ResponseWriter.WriteHeader(status)
@@ -44,32 +41,29 @@ func (rI *responseInterceptor) WriteHeader(status int) {
 func (rI *responseInterceptor) renderErrorPage(code int, title, description string) {
 	// Attempt to render an error page
 	if err := rI.callRenderer(code, title, description); err != nil {
-		log.Event(rI.req.Context(), "rendering disaster page", log.Error(err))
-
 		// Calling the renderer failed, render the disaster page
-		err = render.HTML(rI.ResponseWriter, code, "error", map[string]interface{}{
-			"URI":                      rI.req.URL.Path,
-			"Language":                 lang.Get(rI.req),
-			"PatternLibraryAssetsPath": config.PatternLibraryAssetsPath,
-			"SiteDomain":               config.SiteDomain,
-			"Error": map[string]interface{}{
-				"Title":       title,
-				"Description": description,
-			},
-		})
 		if err != nil {
-			log.Event(rI.req.Context(), "error calling renderer", log.Error(err))
+			rI.writeHeaders()
+			rI.ResponseWriter.WriteHeader(http.StatusInternalServerError)
+			log.Event(rI.req.Context(), "error calling renderer", log.Error(err), log.ERROR)
 			return
 		}
 	}
 }
 
 func (rI *responseInterceptor) callRenderer(code int, title, description string) error {
+	cfg, err := config.Get()
+	if err != nil {
+		return err
+	}
+	preferencesCookie := cookies.GetCookiePreferences(rI.req)
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
 			"description": description,
 		},
+		"cookies_preferences_set": preferencesCookie.IsPreferenceSet,
+		"cookies_policy":          preferencesCookie.Policy,
 	}
 
 	b, err := json.Marshal(&data)
@@ -77,7 +71,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		return fmt.Errorf("error marshaling data: %s", err)
 	}
 
-	rendererReq, err := http.NewRequest("POST", config.RendererURL+"/error", bytes.NewReader(b))
+	rendererReq, err := http.NewRequest("POST", cfg.RendererURL+"/error", bytes.NewReader(b))
 	if err != nil {
 		err = fmt.Errorf("error creating request: %s", err)
 		return err
@@ -109,7 +103,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		}
 	}
 
-	log.Event(rI.req.Context(), "returning error page")
+	log.Event(rI.req.Context(), "returning error page", log.INFO)
 	rI.ResponseWriter.WriteHeader(code)
 	rI.ResponseWriter.Write(b)
 

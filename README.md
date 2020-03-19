@@ -14,16 +14,17 @@ dp-frontend-router
 | ZEBEDEE_URL                   | http://localhost:8082                   | The URL of zebedee
 | PATTERN_LIBRARY_ASSETS_PATH   | https://cdn.ons.gov.uk/sixteens/e42235b | The URL to the sixteens build to use
 | SITE_DOMAIN                   | ons.gov.uk                              | The domain hosting the site
-| SPLASH_PAGE                   |                                         | The splash page template to use
-| DISABLED_PAGE                 |                                         | The disabled page template to use
 | HOMEPAGE_AB_PERCENT           | 0                                       | Percentage of users who get version B
-| DEBUG                         | false                                   | Whether to enable debug mode
 | DOWNLOADER_URL                | http://localhost:23400                  | The URL of dp-file-downloader.
 | ANALYTICS_SQS_URL             |                                         | SQS URL for search analytics; leave blank to disable
 | AWS_ACCESS_KEY_ID             |                                         | Your AWS access key ID (required for SQS)
 | AWS_SECRET_ACCESS_KEY         |                                         | Your AWS secret access key
 | AWS_REGION                    |                                         | AWS region (normally eu-west-1)
 | REDIRECT_SECRET               | secret                                  | Pre-shared key for signing/encrypting redirect data
+| CONTENT_TYPE_BYTE_LIMIT       | 5000000 (5MB)                           | Response size at which we stop checking content-type to avoid oom errors
+| HEALTHCHECK_INTERVAL          | 60s                                     | The period of time between health checks
+| HEALTHCHECK_CRITICAL_TIMEOUT  | 5s                                      | The period of time after which failing checks 
+
 
 ### Licence
 

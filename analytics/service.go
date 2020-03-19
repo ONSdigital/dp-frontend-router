@@ -1,11 +1,11 @@
 package analytics
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 
-	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/pkg/errors"
+
 	"github.com/ONSdigital/log.go/log"
 	jwt "github.com/dgrijalva/jwt-go"
 )
@@ -32,31 +32,33 @@ type ServiceBackend interface {
 
 // ServiceImpl - Implementation of the Analytics Service interface.
 type ServiceImpl struct {
-	backend ServiceBackend
+	backend        ServiceBackend
+	redirectSecret string
 }
 
 // NewServiceImpl - Creates a new Analytics ServiceImpl.
-func NewServiceImpl(backend ServiceBackend) *ServiceImpl {
-	return &ServiceImpl{backend}
+func NewServiceImpl(backend ServiceBackend, redirectSecret string) *ServiceImpl {
+	return &ServiceImpl{backend, redirectSecret}
 }
 
 // CaptureAnalyticsData - captures the analytics values
 func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	data := r.URL.Query().Get(":data")
+	fmt.Println("data", data)
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return []byte(config.RedirectSecret), nil
+		return []byte(s.redirectSecret), nil
 	})
 
 	if err != nil {
-		return "", errors.New("Invalid redirect data")
+		return "", errors.Wrap(err, "Invalid redirect data")
 	}
 
-	log.Event(r.Context(), "jwt token", log.Data{"token": token})
+	log.Event(r.Context(), "jwt token", log.INFO, log.Data{"token": token})
 
 	var url, term, listType, gaID, gID string
 	var pageIndex, linkIndex, pageSize float64
@@ -101,7 +103,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	// FIXME do we want to log as well as store in backend?
-	log.Event(r.Context(), "search analytics data", log.Data{
+	log.Event(r.Context(), "search analytics data", log.INFO, log.Data{
 		urlParam:        url,
 		termParam:       term,
 		searchTypeParam: listType,
