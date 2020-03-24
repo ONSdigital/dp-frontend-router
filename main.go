@@ -75,7 +75,7 @@ func main() {
 
 	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL}, log.Error(err))
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
