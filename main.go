@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"math/rand"
 	"net"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -24,7 +25,6 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-
 )
 
 var (
@@ -70,6 +70,12 @@ func main() {
 	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
@@ -144,6 +150,11 @@ func main() {
 	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
+
+	if cfg.NewHomepageEnabled {
+		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
+	}
+
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
