@@ -1,0 +1,15 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: onsdigital/dp-concourse-tools-nancy
+    tag: latest
+
+inputs:
+  - name: dp-frontend-router
+    path: dp-frontend-router
+
+run:
+  path: dp-frontend-router/ci/scripts/audit.sh
