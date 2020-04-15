@@ -11,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
+
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -71,6 +73,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL}, log.Error(err))
@@ -91,6 +99,7 @@ func main() {
 		requestID.Handler(16),
 		log.Middleware,
 		securityHandler,
+		serverError.Handler,
 		redirects.Handler,
 	}
 
@@ -128,7 +137,7 @@ func main() {
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 
 	if cfg.CookiesRoutesEnabled {
-		router.Handle("/cookies/{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
+		router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 	}
 
 	if cfg.DatasetRoutesEnabled {
@@ -141,6 +150,11 @@ func main() {
 	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
+
+	if cfg.NewHomepageEnabled {
+		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
+	}
+
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
