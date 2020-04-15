@@ -55,8 +55,8 @@ func Get() (*Config, error) {
 		RedirectSecret:             "secret",
 		SQSAnalyticsURL:            "",
 		ContentTypeByteLimit:       5000000,
-		HealthckeckCriticalTimeout: time.Minute,
-		HealthckeckInterval:        time.Second * 10,
+		HealthckeckCriticalTimeout: 90 * time.Second,
+		HealthckeckInterval:        30 * time.Second,
 	}
 
 	return cfg, envconfig.Process("", cfg)
