@@ -2,6 +2,7 @@ package config
 
 import (
 	"testing"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -33,6 +34,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.RedirectSecret, ShouldEqual, "secret")
 				So(cfg.SQSAnalyticsURL, ShouldEqual, "")
 				So(cfg.ContentTypeByteLimit, ShouldEqual, 5000000)
+				So(cfg.HealthckeckInterval, ShouldEqual, 30*time.Second)
+				So(cfg.HealthckeckCriticalTimeout, ShouldEqual, 90*time.Second)
 			})
 		})
 	})
