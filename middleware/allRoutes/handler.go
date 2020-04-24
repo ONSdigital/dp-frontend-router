@@ -71,7 +71,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			if len(b) == cfg.ContentTypeByteLimit+1 {
+			if len(b) > cfg.ContentTypeByteLimit {
 				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", log.WARN)
 				h.ServeHTTP(w, req)
 				return
