@@ -1,0 +1,1585 @@
+make debug
+cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -debug -o redirects.go -pkg assets redirects/...
+go build -tags 'debug' -o build/dp-frontend-router -ldflags="-X 'main.BuildTime=1587810698' -X 'main.GitCommit=7563a88b3ce332bc70a90a41d1eb18612f15e364' -X 'main.Version='"
+HUMAN_LOG=1 DEBUG=1 build/dp-frontend-router
+{
+  "created_at": "2020-04-25T10:31:40.313243774Z",
+  "data": {
+    "config": {
+      "BabbageURL": "http://localhost:8080",
+      "BindAddr": ":20000",
+      "ContentTypeByteLimit": 5000000,
+      "CookiesControllerURL": "http://localhost:24100",
+      "CookiesRoutesEnabled": false,
+      "DatasetControllerURL": "http://localhost:20200",
+      "DatasetRoutesEnabled": false,
+      "DownloaderURL": "http://localhost:23400",
+      "FilterDatasetControllerURL": "http://localhost:20001",
+      "GeographyControllerURL": "http://localhost:23700",
+      "GeographyEnabled": false,
+      "HealthckeckCriticalTimeout": 90000000000,
+      "HealthckeckInterval": 30000000000,
+      "HomepageControllerURL": "http://localhost:24400",
+      "NewHomepageEnabled": false,
+      "PatternLibraryAssetsPath": "https://cdn.ons.gov.uk/sixteens/f816ac8",
+      "RendererURL": "http://localhost:20010",
+      "SQSAnalyticsURL": "",
+      "SiteDomain": "ons.gov.uk",
+      "ZebedeeURL": "http://localhost:8082"
+    }
+  },
+  "event": "got service configuration",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313630149Z",
+  "data": {
+    "from": "/economy/grossdomesticproductgdp/qmis/grossdomesticproductgdpqmi",
+    "to": "/economy/grossdomesticproductgdp/methodologies/grossdomesticproductgdpqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313669829Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/housing/qmis/housepricestatisticsforsmallareasqmi",
+    "to": "/peoplepopulationandcommunity/housing/methodologies/housepricestatisticsforsmallareasqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313700601Z",
+  "data": {
+    "from": "/economy/nationalaccounts/uksectoraccounts/qmis/indexofservicesqmi",
+    "to": "/economy/nationalaccounts/uksectoraccounts/methodologies/indexofservicesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313734886Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/labourproductivity/qmis/labourproductivityqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/labourproductivity/methodologies/labourproductivityqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313764912Z",
+  "data": {
+    "from": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/qmis/publicsectorfinancesandgovernmentdeficitanddebtunderthemaastrichttreatyqmi",
+    "to": "/economy/governmentpublicsectorandtaxes/publicsectorfinance/methodologies/publicsectorfinancesandgovernmentdeficitanddebtunderthemaastrichttreatyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313800895Z",
+  "data": {
+    "from": "/economy/inflationandpriceindices/qmis/producerpriceindicesqmi",
+    "to": "/economy/inflationandpriceindices/methodologies/producerpriceindicesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313837319Z",
+  "data": {
+    "from": "/businessindustryandtrade/retailindustry/qmis/retailsalesindexqmi",
+    "to": "/businessindustryandtrade/retailindustry/methodologies/retailsalesindexrsiqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313868884Z",
+  "data": {
+    "from": "/economy/inflationandpriceindices/qmis/housepriceindexhpiqmi",
+    "to": "/economy/inflationandpriceindices/methodologies/ukhousepriceindexhpiqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313901787Z",
+  "data": {
+    "from": "/economy/nationalaccounts/uksectoraccounts/qmis/indexofproductionqmi",
+    "to": "/economy/nationalaccounts/uksectoraccounts/methodologies/ukindexofproductionqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313930981Z",
+  "data": {
+    "from": "/economy/nationalaccounts/balanceofpayments/qmis/uktradeqmi",
+    "to": "/economy/nationalaccounts/balanceofpayments/methodologies/uktradeqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313961606Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/populationestimates/qmis/2011censusstatisticsforenglandandwalesmarch2011qmi",
+    "to": "/peoplepopulationandcommunity/populationandmigration/populationestimates/methodologies/2011censusstatisticsforenglandandwalesmarch2011qmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.313994986Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/qmis/alcoholrelateddeathsintheukqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/methodologies/alcoholrelateddeathsintheukqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314027447Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/businessservices/qmis/annualbusinesssurveyqmi",
+    "to": "/businessindustryandtrade/business/businessservices/methodologies/annualbusinesssurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314065153Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/populationestimates/qmis/annualmidyearpopulationestimatesqmi",
+    "to": "/peoplepopulationandcommunity/populationandmigration/populationestimates/methodologies/annualmidyearpopulationestimatesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314097316Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/annualpopulationsurveyapsqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/annualpopulationsurveyapsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314132101Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/qmis/avoidablemortalityinenglandandwalesqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/methodologies/avoidablemortalityinenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314161457Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/birthcohorttablesforinfantdeathsqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/birthcohorttablesforinfantdeathsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31419469Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/activitysizeandlocation/qmis/businessdemographyqmi",
+    "to": "/businessindustryandtrade/business/activitysizeandlocation/methodologies/businessdemographyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314231255Z",
+  "data": {
+    "from": "/economy/investmentspensionsandtrusts/qmis/businessinvestmentqmi",
+    "to": "/economy/investmentspensionsandtrusts/methodologies/businessinvestmentqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314257657Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/businessregisteremploymentsurveybresqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/businessregisteremploymentsurveybresqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314290031Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/qmis/cancerregistrationstatisticsqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/methodologies/cancerregistrationstatisticsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314330047Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/qmis/cancersurvivalstatisticalbulletinsqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases/methodologies/cancersurvivalstatisticalbulletinsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314361988Z",
+  "data": {
+    "from": "/economy/nationalaccounts/uksectoraccounts/qmis/capitalstocksandcapitalconsumptionqmi",
+    "to": "/economy/nationalaccounts/uksectoraccounts/methodologies/capitalstocksandcapitalconsumptionqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314389378Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/childmortalitystatisticsqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/childmortalitystatisticsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314424531Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/qmis/civilservicestatisticsqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/methodologies/civilservicestatisticsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314458547Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/claimantcountqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/claimantcountqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314491295Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/qmis/conceptionstatisticsqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/conceptionandfertilityrates/methodologies/conceptionstatisticsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314525033Z",
+  "data": {
+    "from": "/economy/nationalaccounts/satelliteaccounts/qmis/consumertrendsqmi",
+    "to": "/economy/nationalaccounts/satelliteaccounts/methodologies/consumertrendsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314554294Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/deathsinvolvingclostridiumdifficilewalesqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/deathsinvolvingclostridiumdifficilewalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314626097Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/deathsinvolvingmrsawalesqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/deathsinvolvingmrsawalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314658815Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/deathsrelatedtodrugpoisoninginenglandandwalesqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/deathsrelatedtodrugpoisoninginenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314693613Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/qmis/divorcesinenglandandwalesqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/divorce/methodologies/divorcesinenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314725132Z",
+  "data": {
+    "from": "/businessindustryandtrade/itandinternetindustry/qmis/ecommerceqmi",
+    "to": "/businessindustryandtrade/itandinternetindustry/methodologies/ecommerceqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314751979Z",
+  "data": {
+    "from": "/economy/environmentalaccounts/qmis/environmentalaccountsonairemissionsqmi",
+    "to": "/economy/environmentalaccounts/methodologies/environmentalaccountsonairemissionsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314787888Z",
+  "data": {
+    "from": "/economy/environmentalaccounts/qmis/environmentalaccountsonenergyqmi",
+    "to": "/economy/environmentalaccounts/methodologies/environmentalaccountsonenergyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314817578Z",
+  "data": {
+    "from": "/economy/environmentalaccounts/qmis/environmentalaccountsonenvironmentaltaxesqmi",
+    "to": "/economy/environmentalaccounts/methodologies/environmentalaccountsonenvironmentaltaxesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314852761Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/qmis/excesswintermortalityinenglandandwalesqmi",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/excesswintermortalityinenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314887243Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/businessinnovation/qmis/foreigndirectinvestmentfdiqmi",
+    "to": "/businessindustryandtrade/business/businessinnovation/methodologies/foreigndirectinvestmentfdiqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314916962Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/qmis/gestationspecificinfantmortalityqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/causesofdeath/methodologies/gestationspecificinfantmortalityinenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314951729Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/qmis/indexoflabourcostsperhourqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/earningsandworkinghours/methodologies/indexoflabourcostsperhourqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.314980586Z",
+  "data": {
+    "from": "/economy/inflationandpriceindices/qmis/indexofprivatehousingrentalpricesqmi",
+    "to": "/economy/inflationandpriceindices/methodologies/indexofprivatehousingrentalpricesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315019597Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/housing/qmis/integratedhouseholdsurveyihsqmi",
+    "to": "/peoplepopulationandcommunity/housing/methodologies/integratedhouseholdsurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315046225Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/qmis/internalmigrationestimatesqmi",
+    "to": "/peoplepopulationandcommunity/populationandmigration/migrationwithintheuk/methodologies/internalmigrationestimatesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315078052Z",
+  "data": {
+    "from": "/economy/economicoutputandproductivity/productivitymeasures/qmis/internationalcomparisonsofproductivityqmi",
+    "to": "/economy/economicoutputandproductivity/productivitymeasures/methodologies/internationalcomparisonsofproductivityqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315107742Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/leisureandtourism/qmis/internationalpassengersurveyipsqmi",
+    "to": "/peoplepopulationandcommunity/leisureandtourism/methodologies/internationalpassengersurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315143619Z",
+  "data": {
+    "from": "/businessindustryandtrade/internationaltrade/qmis/internationaltradeinservicesqmi",
+    "to": "/businessindustryandtrade/internationaltrade/methodologies/internationaltradeinservicesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315174136Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/qmis/internetaccesshouseholdsandindividualsqmi",
+    "to": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/methodologies/internetaccesshouseholdsandindividualsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315206471Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/qmis/labourdisputessurveyqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/workplacedisputesandworkingconditions/methodologies/labourdisputessurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315242939Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/labourforcesurveylfsqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/labourforcesurveylfsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315275661Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/labourmarketqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/labourmarketqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315311388Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/disability/qmis/lifeopportunitiessurveyqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/disability/methodologies/lifeopportunitiessurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315343576Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/qmis/livingcostsandfoodsurveyqmi",
+    "to": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/methodologies/livingcostsandfoodsurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315377046Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/populationprojections/qmis/maritalstatuspopulationprojections",
+    "to": "/peoplepopulationandcommunity/populationandmigration/populationprojections/methodologies/maritalstatuspopulationprojectionsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315416015Z",
+  "data": {
+    "from": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/qmis/mergersandacquisitionsmaqmi",
+    "to": "/businessindustryandtrade/changestobusiness/mergersandacquisitions/methodologies/mergersandacquisitionsmaqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315448467Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/businessservices/qmis/monthlybusinesssurveyqmi",
+    "to": "/businessindustryandtrade/business/businessservices/methodologies/monthlybusinesssurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315481135Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/workforcejobsqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/workforcejobsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315513518Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/qmis/shortterminternationalmigrationestimatesforlocalauthoritiesqmi",
+    "to": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/methodologies/shortterminternationalmigrationestimatesforenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.3155487Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/qmis/shortterminternationalmigrationestimatesforenglandandwalesqmi",
+    "to": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/methodologies/shortterminternationalmigrationestimatesforenglandandwalesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31558365Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/qmis/publicsectoremploymentqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/publicsectorpersonnel/methodologies/publicsectoremploymentqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315617875Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/healthandlifeexpectancies/qmis/opinionsandlifestylesurveyqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/healthandlifeexpectancies/methodologies/opinionsandlifestylesurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315651231Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/healthandsocialcare/healthcaresystem/qmis/nationalbereavementsurveyvoicesqmi",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/healthcaresystem/methodologies/nationalbereavementsurveyvoicesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315685632Z",
+  "data": {
+    "from": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/qmis/vacancysurveyqmi",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/methodologies/vacancysurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315716665Z",
+  "data": {
+    "from": "/economy/economicoutputandproductivity/publicservicesproductivity/qmis/publicserviceproductivityestimateseducationqmi",
+    "to": "/economy/economicoutputandproductivity/publicservicesproductivity/methodologies/publicserviceproductivityestimateseducationqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315748295Z",
+  "data": {
+    "from": "/economy/inflationandpriceindices/qmis/servicesproducerpriceindicesqmi",
+    "to": "/economy/inflationandpriceindices/methodologies/servicesproducerpriceinflationqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315787953Z",
+  "data": {
+    "from": "/economy/economicoutputandproductivity/publicservicesproductivity/qmis/publicserviceproductivityestimatestotalpublicservicesqmi",
+    "to": "/economy/economicoutputandproductivity/publicservicesproductivity/methodologies/publicserviceproductivityestimatestotalpublicservicesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315823259Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/qmis/theeffectsoftaxesandbenefitsonhouseholdincomeqmi",
+    "to": "/peoplepopulationandcommunity/personalandhouseholdfinances/incomeandwealth/methodologies/theeffectsoftaxesandbenefitsonukhouseholdincome"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315857776Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/elections/electoralregistration/qmis/ukelectoralstatisticsqmi",
+    "to": "/peoplepopulationandcommunity/elections/electoralregistration/methodologies/ukelectoralstatisticsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315887508Z",
+  "data": {
+    "from": "/economy/investmentspensionsandtrusts/qmis/mq5investmentbyinsurancecompaniespensionsfundsandtrustsqmi",
+    "to": "/economy/investmentspensionsandtrusts/methodologies/mq5investmentbyinsurancecompaniespensionsfundsandtrustsqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315920534Z",
+  "data": {
+    "from": "/economy/regionalaccounts/grossdisposablehouseholdincome/qmis/regionalgrossdisposablehouseholdincomeqmi",
+    "to": "/economy/regionalaccounts/grossdisposablehouseholdincome/methodologies/regionalgrossdisposablehouseholdincomeqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315952927Z",
+  "data": {
+    "from": "/economy/investmentspensionsandtrusts/qmis/ownershipofukquotedsharesqmi",
+    "to": "/economy/investmentspensionsandtrusts/methodologies/ownershipofukquotedsharesqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.315985235Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/activitysizeandlocation/qmis/ukbusinessqmi",
+    "to": "/businessindustryandtrade/business/activitysizeandlocation/methodologies/ukbusinessactivitysizeandlocationqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31602127Z",
+  "data": {
+    "from": "/businessindustryandtrade/business/businessinnovation/qmis/ukgrossdomesticexpenditureonresearchanddevelopmentqmi",
+    "to": "/businessindustryandtrade/business/businessinnovation/methodologies/ukgrossdomesticexpenditureonresearchanddevelopmentqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316052331Z",
+  "data": {
+    "from": "/economy/grossvalueaddedgva/qmis/regionalgrossvalueaddedproductionapproachqmi",
+    "to": "/economy/grossvalueaddedgva/methodologies/regionalgrossvalueaddedproductionapproachqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316083018Z",
+  "data": {
+    "from": "/economy/grossdomesticproductgdp/qmis/quarterlyacquisitionsanddisposalsofcapitalassetssurveyqmi",
+    "to": "/economy/grossdomesticproductgdp/methodologies/quarterlyacquisitionsanddisposalsofcapitalassetssurveyqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316112471Z",
+  "data": {
+    "from": "/surveys/get-started",
+    "to": "https://surveys.ons.gov.uk"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31614635Z",
+  "data": {
+    "from": "/visualisations/nesscontent/dev3/ONS_SOC_occupation_coding_tool.html",
+    "to": "https://onsdigital.github.io/dp-classification-tools/standard-occupational-classification/ONS_SOC_occupation_coding_tool.html"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316178727Z",
+  "data": {
+    "from": "/visualisations/nesscontent/dev3/ONS_NSSEC_discovery_tool.html",
+    "to": "https://onsdigital.github.io/dp-classification-tools/standard-occupational-classification/ONS_NSSEC_discovery_tool.html"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316213689Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/userguidetomortalitystatistics",
+    "to": "/peoplepopulationandcommunity/birthsdeathsandmarriages/deaths/methodologies/userguidetomortalitystatisticsjuly2017"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316245867Z",
+  "data": {
+    "from": "/visualisations/nesscontent/SIC/ONS_SIC_hierarchy_view.html",
+    "to": "https://onsdigital.github.io/dp-classification-tools/standard-industrial-classification/ONS_SIC_hierarchy_view.html"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31627788Z",
+  "data": {
+    "from": "/releases/monthlyfiguresondeathsregisteredbyareaofusualresidenceenglandandwales2015annual",
+    "to": "/releases/monthlyfiguresondeathsregisteredbyareaofusualresidenceenglandandwalesjune2016provisional"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316307988Z",
+  "data": {
+    "from": "/census/help/termsandconditions",
+    "to": "/census/censustransformationprogramme/termsandconditions"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316337742Z",
+  "data": {
+    "from": "/census/help/cookiesandprivacy",
+    "to": "/census/censustransformationprogramme/privacystatement"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316373549Z",
+  "data": {
+    "from": "/census/help",
+    "to": "/census/censustransformationprogramme/2017censustest"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316411335Z",
+  "data": {
+    "from": "/economicconf",
+    "to": "/aboutus/whatwedo/events/economicconference"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316439479Z",
+  "data": {
+    "from": "/nshw",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/nationalstudyofhealthandwellbeingchildrenandyoungpeople/nationalstudyofhealthandwellbeingchildrenandyoungpeople"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316473425Z",
+  "data": {
+    "from": "/nshwhr",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/nationalstudyofhealthandwellbeingchildrenandyoungpeople/nationalstudyforhealthandwellbeinginformationforyoungpeoplelivinginhallsofresidence"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316508344Z",
+  "data": {
+    "from": "/ons/rel/migration1/migration-statistics-quarterly-report/february-2016/stb-msqr-february-2016.html",
+    "to": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreport/february2016"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31654695Z",
+  "data": {
+    "from": "/ons/rel/migration1/migration-statistics-quarterly-report/february-2016/index.html",
+    "to": "/peoplepopulationandcommunity/populationandmigration/internationalmigration/bulletins/migrationstatisticsquarterlyreport/february2016"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316574503Z",
+  "data": {
+    "from": "/ons/rel/lms/young-people-not-in-education--employment-or-training--neets-/february-2016/stb.html",
+    "to": "/employmentandlabourmarket/peoplenotinwork/unemployment/bulletins/youngpeoplenotineducationemploymentortrainingneet/february2016"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316605732Z",
+  "data": {
+    "from": "/ons/rel/naa2/second-estimate-of-gdp/q4-2015/stb-2nd-est-gdp-q4-2015.html",
+    "to": "/economy/grossdomesticproductgdp/bulletins/secondestimateofgdp/quarter4octtodec2015"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31663663Z",
+  "data": {
+    "from": "/ons/rel/bus-invest/business-investment/q4-2015-provisional-results/index.html",
+    "to": "/economy/grossdomesticproductgdp/bulletins/businessinvestment/quarter4octtodec2015provisionalresults"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316688632Z",
+  "data": {
+    "from": "/ons/rel/lms/labour-market-statistics/february-2016/index.html",
+    "to": "/employmentandlabourmarket/peopleinwork/employmentandemployeetypes/bulletins/uklabourmarket/february2016"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316720367Z",
+  "data": {
+    "from": "/ons/apiservice/web/apiservice/home",
+    "to": "/help/localstatistics"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316750688Z",
+  "data": {
+    "from": "/ons/index.html",
+    "to": "/"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316778609Z",
+  "data": {
+    "from": "/economy/inflationandpriceindices/qmis/consumerpriceinflationqmi",
+    "to": "/economy/inflationandpriceindices/methodologies/consumerpriceinflationincludesall3indicescpihcpiandrpiqmi"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316813464Z",
+  "data": {
+    "from": "/economictraining",
+    "to": "/aboutus/whatwedo/programmesandprojects/economicstatisticstransformation/engagingwitheconomicstatistics/events/economicstatisticstraining"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316846626Z",
+  "data": {
+    "from": "/economicengagement",
+    "to": "/aboutus/whatwedo/programmesandprojects/economicstatisticstransformation/engagingwitheconomicstatistics/economicstatisticsevents"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316875788Z",
+  "data": {
+    "from": "/economicevents",
+    "to": "/aboutus/whatwedo/programmesandprojects/economicstatisticstransformation/engagingwitheconomicstatistics/economicstatisticsevents"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316908117Z",
+  "data": {
+    "from": "/lifestyle",
+    "to": "/aboutus/whatwedo/programmesandprojects/onlineopinionsandlifestylestudy"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316940809Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/labourforcesurveylfs",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/labourforcesurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.316970719Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/internationalpassengersurveyips",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/internationalpassengersurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317003375Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/livingcostsandfoodsurveylcf",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/livingcostsandfoodsurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317033663Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/householdassetssurveyhas",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/householdassetssurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317064875Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/familyresourcessurveyfrs",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/familyresourcessurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317096642Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/opinionsandlifestylesurveyopn",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/opinionsandlifestylesurvey"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317140043Z",
+  "data": {
+    "from": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/crimesurveyforenglandwales/crimesurveyforenglandandwalesfaqs",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/crimesurveyforenglandandwales"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317179995Z",
+  "data": {
+    "from": "/mystudy",
+    "to": "/aboutus/whatwedo/programmesandprojects/mystudy"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317206958Z",
+  "data": {
+    "from": "/takepart",
+    "to": "/aboutus/whatwedo/programmesandprojects/onlinehouseholdstudy"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317235652Z",
+  "data": {
+    "from": "/equalities",
+    "to": "/aboutus/whatwedo/programmesandprojects/centreforequalitiesandinclusion"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317264136Z",
+  "data": {
+    "from": "/ashe",
+    "to": "/surveys/informationforbusinesses/businesssurveys/annualsurveyofhoursandearningsashe"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317296761Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/dataprotection/privacyinformationforhealthandlifeeventsdivision",
+    "to": "/aboutus/transparencyandgovernance/dataprotection/privacyinformationforourstakeholders"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317327908Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317359321Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/howwecollectdata",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317391977Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/howwekeepdatasecure",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.3174231Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/howweusedata",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317458833Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/howwepublishstatistics",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317488722Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/howwepermitaccesstodataforresearch",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317520784Z",
+  "data": {
+    "from": "/aboutus/transparencyandgovernance/onsdatapolicies/legislationondata",
+    "to": "/aboutus/transparencyandgovernance/lookingafterandusingdataforpublicbenefit/policies"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317548331Z",
+  "data": {
+    "from": "/BingSiteAuth.xml",
+    "to": "https://cdn.ons.gov.uk/assets/validation/BingSiteAuth.xml"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317576219Z",
+  "data": {
+    "from": "/fsps",
+    "to": "/surveys/informationforbusinesses/businesssurveys/financialsurveyofpensionschemes"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317603559Z",
+  "data": {
+    "from": "/idt",
+    "to": "/aboutus/whatwedo/programmesandprojects/internationaldevelopmentteam"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317635274Z",
+  "data": {
+    "from": "/becounted",
+    "to": "/aboutus/whatwedo/programmesandprojects/becounted"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317668221Z",
+  "data": {
+    "from": "/renaissanceprize",
+    "to": "/aboutus/whatwedo/programmesandprojects/economicstatisticstransformation/theonsrenaissanceprize"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31770124Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2017censustest",
+    "to": "/census/censustransformationprogramme/testingthecensus/2017test"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317732795Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2017censustest/2017censustestreport",
+    "to": "/census/censustransformationprogramme/testingthecensus/2017test/2017censustestreport"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317773437Z",
+  "data": {
+    "from": "/file?uri=/census/censustransformationprogramme/2017censustest/2017censustestreport/rrlsoa2017censustestcpt16.xls",
+    "to": "/file?uri=/census/censustransformationprogramme/testingthecensus/2017test/2017censustestreport/rrlsoa2017censustestcpt16.xls"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317811938Z",
+  "data": {
+    "from": "/file?uri=/census/censustransformationprogramme/2017censustest/2017censustestreport/summaryofareasselectedforcensus2017test.pdf",
+    "to": "/file?uri=/census/censustransformationprogramme/testingthecensus/2017test/2017censustestreport/summaryofareasselectedforcensus2017test.pdf"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317844214Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317876148Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/aboutthe2016censustest",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317910626Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/aboutthe2016censustest/aboutthecensus",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317941247Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/aboutthe2016censustest/whyisthetestonlineonly",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.317978274Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/aboutthe2016censustest/whytestintelfordandthewrekin",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318012145Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/confidentialityandsecurity",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318044106Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/gethelp",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318077839Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/gethelp/accessibilitylanguage",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31811577Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/gethelp/addressissues",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318149193Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/gethelp/technicalhelp",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.31817891Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/gethelp/typeofproperty",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318213278Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/mediaenquiries",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318246711Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/takingpart",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318275323Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/takingpart/doihavetodothetest",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318311713Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/takingpart/helpingotherstotakepart",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318351059Z",
+  "data": {
+    "from": "/census/censustransformationprogramme/2016censustestintelfordandthewrekin/takingpart/whatdoineedtotakepart",
+    "to": "/census/censustransformationprogramme/testingthecensus/2016censustestintelfordandthewrekin"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318386484Z",
+  "data": {
+    "from": "/playmypart",
+    "to": "/aboutus/whatwedo/programmesandprojects/playmypart"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318416235Z",
+  "data": {
+    "from": "/coronavirus",
+    "to": "/peoplepopulationandcommunity/healthandsocialcare/conditionsanddiseases"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318448375Z",
+  "data": {
+    "from": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/bulletins/internetaccesshouseholdsandindividualsgreatbritain/2019",
+    "to": "/peoplepopulationandcommunity/householdcharacteristics/homeinternetandsocialmediausage/bulletins/internetaccesshouseholdsandindividuals/2019"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318484938Z",
+  "data": {
+    "from": "/dataprotection",
+    "to": "/aboutus/transparencyandgovernance/dataprotection"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318517673Z",
+  "data": {
+    "from": "/esas",
+    "to": "/methodology/classificationsandstandards/economicstatisticsclassifications/onseconomicstatisticsandanalysisstrategyfinancialyearending2019"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318550384Z",
+  "data": {
+    "from": "/engagement",
+    "to": "/aboutus/whatwedo/programmesandprojects/economicstatisticstransformation/engagingwitheconomicstatistics/economicstatisticsevents"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318584849Z",
+  "data": {
+    "from": "/studycontact",
+    "to": "/aboutus/whatwedo/programmesandprojects/studycontact"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318632326Z",
+  "data": {
+    "from": "/cis",
+    "to": "/surveys/informationforhouseholdsandindividuals/householdandindividualsurveys/covid19infectionsurveycis"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318660612Z",
+  "data": {
+    "from": "/aboutus/whatwedo/programmesandprojects/centreforequalitiesandinclusion",
+    "to": "/aboutus/whatwedo/programmesandprojects/onscentres/centreforequalitiesandinclusion"
+  },
+  "event": "adding redirect",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+{
+  "created_at": "2020-04-25T10:31:40.318766859Z",
+  "data": {
+    "config": {
+      "BabbageURL": "http://localhost:8080",
+      "BindAddr": ":20000",
+      "ContentTypeByteLimit": 5000000,
+      "CookiesControllerURL": "http://localhost:24100",
+      "CookiesRoutesEnabled": false,
+      "DatasetControllerURL": "http://localhost:20200",
+      "DatasetRoutesEnabled": false,
+      "DownloaderURL": "http://localhost:23400",
+      "FilterDatasetControllerURL": "http://localhost:20001",
+      "GeographyControllerURL": "http://localhost:23700",
+      "GeographyEnabled": false,
+      "HealthckeckCriticalTimeout": 90000000000,
+      "HealthckeckInterval": 30000000000,
+      "HomepageControllerURL": "http://localhost:24400",
+      "NewHomepageEnabled": false,
+      "PatternLibraryAssetsPath": "https://cdn.ons.gov.uk/sixteens/f816ac8",
+      "RendererURL": "http://localhost:20010",
+      "SQSAnalyticsURL": "",
+      "SiteDomain": "ons.gov.uk",
+      "ZebedeeURL": "http://localhost:8082"
+    }
+  },
+  "event": "Starting server",
+  "namespace": "dp-frontend-router",
+  "severity": 3
+}
+

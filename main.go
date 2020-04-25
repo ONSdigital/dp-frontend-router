@@ -29,11 +29,11 @@ import (
 
 var (
 	// BuildTime represents the time in which the service was built
-	BuildTime string
+	BuildTime string = "1587727818"
 	// GitCommit represents the commit (SHA-1) hash of the service that is running
-	GitCommit string
+	GitCommit string = "6584b786caac36b6214ffe04bf62f058d4021538"
 	// Version represents the version of the service that is running
-	Version string
+	Version string = "v1.14.0"
 )
 
 func main() {

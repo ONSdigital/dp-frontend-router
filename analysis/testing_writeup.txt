@@ -1,0 +1,119 @@
+dp-frontend-router crash
+------------------------
+
+Some tests, observations, possibly oversimplified analysis, suggestions:
+========================================================================
+
+Tests carried out on Ubuntu 18.04LTS, 6core/12thread, SSD, 64GB RAM
+
+Test set up:
+
+(NOTE: no other services - like Zebedee ure running, which will no doubt contribute to observations seen)
+
+1. Adjust dp-front-end-router/main.go to have it run in Visual Studio Code under debug:
+
+var (
+	// BuildTime represents the time in which the service was built
+	BuildTime string = "1587727818"
+	// GitCommit represents the commit (SHA-1) hash of the service that is running
+	GitCommit string = "6584b786caac36b6214ffe04bf62f058d4021538"
+	// Version represents the version of the service that is running
+	Version string = "v1.14.0"
+)
+
+2. Run it in Debug mode
+
+3. In another terminal, run autocannon.go with line:
+
+	go run autocannon.go --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+	==> autocannon-go came from: https://github.com/GlenTiki/autocannon-go
+
+Test 1:
+=======
+
+Do the "Test set up" as above.
+
+Observation:
+dp-frontend-router gets hit with ~6500 Req/sec and Memory use does not grow.
+
+Test 2:
+=======
+
+Do the "Test set up" as above - AND
+
+Step # 4:
+
+4. whilst step 3 is running, in its terminal press cursor up and press Enter to line up the next HTTP load test.
+
+Do step 4 rapidly 30 times to line up a long stream of HTTP requests.
+
+Observation:
+dp-frontend-router gets hit with ~6500 Req/sec and Memory use grows by 6 G Bytes as visual studio code caches
+all of the log() outputs, as it attempts to output them in its DEBUG CONSOLE.
+Once the 'autocannon' HTTP Load tests have finished, it takes a LONG time for visual studio code to finish print / scrolling
+the Log() outputs from dp-frontend-router to its DEBUG CONSOLE ... and as it does this, the memory used is free'd.
+Thus NO memory Leaks.
+
+Test 3:
+=======
+
+Repeat Test 2, BUT do not run dp-frontend-router with visual studio code in debug mode, instead run it from a new terminal as follows:
+
+	go run main.go > /dev/null 2>&1
+
+Also, when it is running, open a 2nd terminal for autocannon and repeat step 4 from Test 3 for two instances of autocannon
+in their respective terminals.
+
+Observation:
+dp-frontend-router gets hit with ~11,500 Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage wen up to about 70% on all cores.
+
+
+Analysis:
+=========
+
+From the observed behaviour in the above tests, one might surmise the following:
+
+When dp-frontend-router is running in its container on AWS, (i'm guessing the next bit) its log() output is being captured by some AWS utility and sent off to AWS log stash.
+I suspect this AWS utility is doing some sort of bandwidth limiting and in so doing building up its own cache of the Log() output from dp-frontend-router before sending to AWS log stash ... and thus memory use grows to the point of Docker container failure.
+
+However if all of the other services like Zebedee were running and being talked to by dp-frontend-router there may be much different observations.
+
+Conclusion:
+===========
+
+The tests above would indicate that dp-frontend-router is NOT leaking memory.
+
+However, to be more confident of that one would need to have the full suite of Apps running and talking to one another and then perform a 'pprof' run of dp-frontend-router with pprof set up to analyse memory usage over a period of ~60 seconds, etc and exercise it with two instances of autocannon again.
+
+
+Suggestions:
+============
+
+  (I'm sure some of these have been considered, but for completness ...)
+
+1. Increase the memory available to the environment the dp-frontend-router container is running on.
+
+2. Consider using "github.com/rs/zerolog/log" to reduce log traffic and much better performance.
+
+3. In dp-frontend-router, Add another Middleware layer before all other layers that does "HTTP requests rate limiting", by crafting ones own, such as:
+	https://pauladamsmith.com/blog/2016/04/max-clients-go-net-http.html
+   OR a library, such as:
+	https://github.com/ulule/limiter
+
+4. Run up an instance of the whole ONS website on a different 'test' domain name that is not advertised.
+   Adjust the performance logging tools that are gathering stats for memory usage, CPU usage and network usage for the dp-frontend-router such that these particular statistics are being logged every 50ms - and also configured to send this log data every 50ms (that is don't cache and write one a minute, or whatever).
+   Then hammer this new website from say 5 different computers at ONS at the same time with them using autocannon (or something similar) in the manner described in step 4 above.
+   This last step, you ay want to build it up with regards the number of Load testing apps running at a time, just start with 1 to start with and build up ...
+   Also for this test, have Cloudfare disabled.
+   With any luck this 'test' site will crash and you will have performance log files to analyse and gain a fuller understanding of the real-time dynamic under load.
+
+-=-=-
+
+Obviously having Cloudflare running is the best thing to do.
+
+
+Hope this helps,
+
+Rhys
