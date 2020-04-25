@@ -1,10 +1,15 @@
 dp-frontend-router crash
 ------------------------
 
+( during week ending Friday 24th April 2020 )
+
+
 Some tests, observations, possibly oversimplified analysis, suggestions:
 ========================================================================
 
-Tests carried out on Ubuntu 18.04LTS, 6core/12thread, SSD, 64GB RAM
+Tests carried out on:
+** Ubuntu 18.04LTS, 6core/12thread, SSD, 64GB RAM
+** go version go1.14 linux/amd64
 
 Test set up:
 
@@ -67,7 +72,44 @@ in their respective terminals.
 
 Observation:
 dp-frontend-router gets hit with ~11,500 Req/sec between both instances of autocannon and Memory use does NOT grow.
-CPU usage wen up to about 70% on all cores.
+CPU usage went up to about 75% on all cores.
+
+Test 4:
+=======
+
+First edit the log.go file that dp-frontend-router has been built against on your machine, [mine is at: ~/gobook/pkg/mod/github/!o!n!sdigital/log.go@v1.0.0/log/log.go]
+and comment out on line, at ~line 70 as such:
+
+func Event(ctx context.Context, event string, opts ...option) {
+	//!!!	eventFuncInst.f(ctx, event, opts...)
+}
+
+this stops the very expensive CPU processing and output to terminal window that is also expensive of CPU cycles to render and scroll.
+
+Then, Repeat Test 3
+
+Observation:
+dp-frontend-router gets hit with ~68,000+ Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage went up to about 82% on all cores.
+
+Test 5:
+=======
+
+First build main.go for dp-frontend-router, and build autocannon.go
+
+then run the files as:
+
+./main in one terminal
+
+and run two instances of autocannon in seperate terminals, as:
+
+./autocannon --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+and do as step 4 of Test 2 for both instances of autocannon
+
+Observation:
+dp-frontend-router gets hit with ~70,800 Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage went up to about 82% on all cores.
 
 
 Analysis:
@@ -83,7 +125,9 @@ However if all of the other services like Zebedee were running and being talked 
 Conclusion:
 ===========
 
-The tests above would indicate that dp-frontend-router is NOT leaking memory.
+1. The jump in the amount of Requests/sec from Test 3 to Test 4 is significant and demonstrates Logging is taking a sizeable amount of CPU time ... a jump from ~11,500 to ~68,000+ Requests is quite something.
+
+2. The tests above would indicate that dp-frontend-router is NOT leaking memory.
 
 However, to be more confident of that one would need to have the full suite of Apps running and talking to one another and then perform a 'pprof' run of dp-frontend-router with pprof set up to analyse memory usage over a period of ~60 seconds, etc and exercise it with two instances of autocannon again.
 
@@ -109,7 +153,90 @@ Suggestions:
    Also for this test, have Cloudfare disabled.
    With any luck this 'test' site will crash and you will have performance log files to analyse and gain a fuller understanding of the real-time dynamic under load.
 
+5. Increase the RAM and CPU cores used to deploy dp-frontend-router:
+	RAM	  : increase by x4 to x8
+	CPU cores : increase by x4 to x8
+
 -=-=-
+
+
+APPENDIX 1:
+===========
+
+For each HTTP request made with autocannon, the following is being logged (~742 bytes):
+
+{
+  "created_at": "2020-04-25T19:19:57.26100652Z",
+  "event": "http request received",
+  "http": {
+    "method": "GET",
+    "path": "/embed/visualisations/",
+    "started_at": "2020-04-25T19:19:57.261005003Z",
+    "status_code": 0
+  },
+  "namespace": "dp-frontend-router",
+  "trace_id": "UXJcGYhgUQmtPqXT"
+}
+{
+  "created_at": "2020-04-25T19:19:57.261833223Z",
+  "event": "http request completed",
+  "http": {
+    "duration": 3423764,
+    "ended_at": "2020-04-25T19:19:57.261829164Z",
+    "method": "GET",
+    "path": "/embed/visualisations/",
+    "query": "%3Auri=embed%2Fvisualisations%2F",
+    "started_at": "2020-04-25T19:19:57.2584054Z",
+    "status_code": 502
+  },
+  "namespace": "dp-frontend-router",
+  "trace_id": "JlKnSSAQxcVCzZhr"
+}
+
+At say 8,000 requests per second, thats 742*8000 = 5,936,000 bytes / second [plus any other stuff] dumping to AWS log stash ... hmmm.
+
+-=-=-
+
+There are other frequent entries in the log due to not having any other services running ... which may be making these particular tests much worse.
+BUT these other entries ONLY occure when dp-frontend-router is receiving the HTTP requests.
+
+There are also the regular healthcheck log outputs at 30 second intervals, etc.
+
+
+APPENDIX 2:
+===========
+
+The output from autocannon for Test 5, typically looks like:
+
+running 10s test @ http://localhost:20000/embed/visualisations/
+10 connections with 12 pipelining factor.
+
+
++---------+------+------+-------+------+---------+---------+------+
+|  STAT   | 2.5% | 50%  | 97.5% | 99%  |   AVG   |  STDEV  | MAX  |
++---------+------+------+-------+------+---------+---------+------+
+| Latency | 0 ms | 0 ms | 0 ms  | 0 ms | 0.00 ms | 0.00 ms | 0 ms |
++---------+------+------+-------+------+---------+---------+------+
+
+
++-----------+--------+--------+--------+--------+----------+---------+--------+
+|   STAT    |   1%   |  2.5%  |  50%   | 97.5%  |   AVG    |  STDEV  |  MIN   |
++-----------+--------+--------+--------+--------+----------+---------+--------+
+| Req/Sec   |  33743 |  33743 |  34378 |  41720 | 35673.30 | 2802.76 |  33743 |
+| Bytes/Sec | 4.9 MB | 4.9 MB | 5.0 MB | 6.1 MB | 5.2 MB   | 409 kB  | 4.9 MB |
++-----------+--------+--------+--------+--------+----------+---------+--------+
+
+Req/Bytes counts sampled once per second.
+
+
+0 2xx responses, 356733 non 2xx responses.
+357k total requests in 10 seconds, 52 MB read.
+Done!
+
+
+
+-=-=-=-=-=-=-=
+
 
 Obviously having Cloudflare running is the best thing to do.
 
