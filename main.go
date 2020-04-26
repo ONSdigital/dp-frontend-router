@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
@@ -242,6 +244,14 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
+var (
+	tMutex sync.Mutex
+
+	total_time     int64
+	total_requests int64
+	average_time   int64
+)
+
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
@@ -257,10 +267,22 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
-			"destination": proxyURL,
-			"proxy_name":  proxyName,
-		})
+		{
+			start := time.Now()
+			log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
+				"destination": proxyURL,
+				"proxy_name":  proxyName,
+			})
+			duration := time.Since(start)
+			fmt.Printf("took : %s\n", duration)
+			tMutex.Lock()
+			total_requests++
+			total_time += duration.Nanoseconds()
+			//total_time += duration.Microseconds()
+			average_time = total_time / total_requests
+			tMutex.Unlock()
+			fmt.Printf("average : %v\n", average_time)
+		}
 		director(req)
 	}
 	return proxy
