@@ -444,6 +444,15 @@ In this Appendix's test *** :
 
 [ that is if i have not made any mistake(s) in gathering the data presented ]
 
+Please note the above comparison number(s) should be taken "for indication and painting a picture ONLY",
+                                                           ============================================  
+ because i do not know the performance of the machine used when generating the performance timing for zerolog
+ and the others
+ AND
+ The test covered in this appendix will not be a direct comparison to the ones done on the other libraries,
+
+    BUT  probably close enough.
+
 -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 
