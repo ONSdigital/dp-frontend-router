@@ -158,6 +158,8 @@ period of ~60 seconds, etc and exercise it with two instances of autocannon agai
 NOTE: See SECTION 8.6 - Concurrent Web Crawler (in The GO Programming Language 2016 edition)
       ... AND in PARTICULAR Page 241, 2nd paragraph ... starting with the sentence "The program is TOO parallel." ...
 
+4. As per point number 3, but if the "file descriptor limit" is not reached, and as more and more socket connections
+are opened and remain open because other services are taking a while to respond ... then this process could fill memory.
 
 Suggestions:
 ============
