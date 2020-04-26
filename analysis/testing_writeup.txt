@@ -136,11 +136,27 @@ Conclusion:
 1. The jump in the amount of Requests/sec from Test 3 to Test 4 is significant and demonstrates Logging is taking
 a sizeable amount of CPU time ... a jump from ~11,500 to ~68,000+ Requests is quite something.
 
-2. The tests above would indicate that dp-frontend-router is NOT leaking memory.
+2. The tests above would indicate that dp-frontend-router is NOT leaking memory, per se.
 
 However, to be more confident of that one would need to have the full suite of Apps running and talking to one
 another and then perform a 'pprof' run of dp-frontend-router with pprof set up to analyse memory usage over a
 period of ~60 seconds, etc and exercise it with two instances of autocannon again.
+
+3. One possibility (just speculation) could be that if all other services were running during the tests detailed here ...
+ As each socket connection is made and the request trickles out from dp-frontend-router to the other Applications ...
+  It takes a while for each request to complete such that more and more socket connections are opened ...
+   *** Due to the "Unbounded Parallelism" of dp-frontend-router code (hmmm) ... ***
+    And remain open ...
+     Each socket connection is handled with a "file descriptor" ...
+      The "file descriptor limit" is reached ...
+       The App stops with a fatal error (or something similar) ...
+        The App has PID number 1 ...
+         When PID 1 stops the container STOPs
+
+          ... and the Container management system restarts the Container ...
+
+NOTE: See SECTION 8.6 - Concurrent Web Crawler (in The GO Programming Language 2016 edition)
+      ... AND in PARTICULAR Page 241, 2nd paragraph ... starting with the sentence "The program is TOO parallel." ...
 
 
 Suggestions:
@@ -188,6 +204,9 @@ by crafting ones own, such as:
 5. Increase the RAM and CPU cores used to deploy dp-frontend-router:
 	RAM	  : increase by x4 to x8
 	CPU cores : increase by x4 to x8
+
+6. So ... How what is the "file descriptor limit" for the dp-frontend-router Application Container ???
+   Implement some sort of test that stresses the current limit, increase if need be and retest, loop this until happy.
 
 -=-=-
 
