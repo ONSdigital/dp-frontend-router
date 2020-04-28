@@ -1,0 +1,55 @@
+An easy and CHEAP optimisation:
+
+In reading up on zerolog, one of the things i've noticed being done is to shorten the event descriptor ...
+
+and in the case of ONS ...
+
+one could do:
+
+--------------
+"created_at":"2020-04-27T15:50:32.729286447Z",
+
+becomes:
+"t": <numeric number in format as user in zerolog> ... expressed as ASCII characters ... which is much shorter
+ than ONS current time format
+
+==> i believe, in zerolog, one sets its time format, for example: zerolog.TimeFieldFormat = time.RFC3339Nano
+   OR zerolog.TimeFieldFormat = TimeFormatUnixMicro
+
+--------------
+"namespace":"dp-frontend-router",
+
+becomes:
+"n":"dp-frontend-router",
+
+--------------
+"event":"third party logs",
+
+becomes
+"ev":"third party logs",
+
+--------------
+"data":{"raw":"http: proxy error: dial tcp 127.0.0.1:8080: connect: connection refused"}}
+
+becomes
+
+"d":{"raw":"http: proxy error: dial tcp 127.0.0.1:8080: connect: connection refused"}}
+
+--------------
+"trace_id":"UKAvvPVnhQcJcYEO",
+
+becomes:
+"id":"UKAvvPVnhQcJcYEO",
+
+
+That's 29 characters saved PLUS ~11 in the time format, saving ~40 bytes for almost every event log
+
+And the log file i'm looking at has 352732 log lines * 40 bytes = 14,109,280 bytes
+
+ saved out of 102,958,793 bytes in logfile gives a reduction of 13.7%
+
+-=-=-
+
+That would translate into financial savings on the amount of data logged and be a simple thing to implement and
+a simple thing to improve the performance of the web site a little.
+
