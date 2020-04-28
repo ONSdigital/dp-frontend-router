@@ -1,0 +1,217 @@
+pprof analysis
+==============
+
+To achieve pprof analysis ...
+
+Test prerequisite's:
+
+(Read test descriptions in document: testing_writeup.txt  to familiarise yourself with the test tools)
+
+The main.go function for dp-frontend-router needs the following code added such that the line:
+
+	router := pat.New()
+
+becomes:
+
+	router := pat.New()
+
+	router.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+	router.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+	router.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+	router.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+	router.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+
+and, a new import needs to be added thus:
+
+	_ "net/http/pprof"
+
+NOTE: The underscore at the start of the above line is needed.
+
+Then build main.go
+
+-=-=-
+
+Then some more commands in a terminal to enable pprof to flame graphs later on:
+
+	go get github.com/uber/go-torch
+	cd $GOPATH/src/github.com/uber/go-torch
+	git clone https://github.com/brendangregg/FlameGraph.git
+	cd FlameGraph
+	sudo cp flamegraph.pl /usr/local/bin
+
+-=-=-
+
+1. Big picture
+==============
+
+Step 1:
+-------
+In one terminal run:
+
+	export HUMAN_LOG=0
+
+	./main >l.txt 2>&1
+
+Step 2:
+-------
+In 2nd terminal in the autocannon folder, line up the following command, but do not press enter:
+
+	./autocannon --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+Step 3:
+-------
+In 3rd terminal in analysis folder, line up the following command, but do not press enter:
+
+	go tool pprof --seconds=9 localhost:20000/debug/pprof/profile
+
+Step 4:
+-------
+Press Enter in the 3rd Terminal followed as quickly as possibly by pressing Enter in the 2nd Terminal.
+
+Step 5:
+-------
+Wait for about 17 seconds until the prompt '(pprof)' appears in 3rd terminal.
+
+Step 6:
+-------
+Enter:
+	top
+
+The output from this does not reveal much insite, so ...
+
+Step 7:
+-------
+Enter:
+	web
+
+(On Ubuntu) An .svg file named: 'pprof001.svg' is opened in chrome.
+
+In the file i have saved in analysis folder, it shows that "log.Event()" is taking 26.3% of the time.
+
+You can zoom in and pan around to see how the breakdown of different functions consume their percentage of time.
+
+-=-=-
+
+The results of autocannon for the above run is (7243 Requests/second):
+
+running 10s test @ http://localhost:20000/embed/visualisations/
+10 connections with 12 pipelining factor.
+
+
++---------+------+------+-------+------+---------+---------+------+
+|  STAT   | 2.5% | 50%  | 97.5% | 99%  |   AVG   |  STDEV  | MAX  |
++---------+------+------+-------+------+---------+---------+------+
+| Latency | 0 ms | 0 ms | 0 ms  | 0 ms | 0.00 ms | 0.00 ms | 0 ms |
++---------+------+------+-------+------+---------+---------+------+
+
+
++-----------+--------+--------+--------+--------+---------+--------+--------+
+|   STAT    |   1%   |  2.5%  |  50%   | 97.5%  |   AVG   | STDEV  |  MIN   |
++-----------+--------+--------+--------+--------+---------+--------+--------+
+| Req/Sec   |   6769 |   6769 |   6987 |   7243 | 7013.70 | 115.73 |   6769 |
+| Bytes/Sec | 988 kB | 988 kB | 1.0 MB | 1.1 MB | 1.0 MB  | 17 kB  | 988 kB |
++-----------+--------+--------+--------+--------+---------+--------+--------+
+
+Req/Bytes counts sampled once per second.
+
+
+0 2xx responses, 70137 non 2xx responses.
+70k total requests in 10 seconds, 10 MB read.
+Done!
+
+
+
+//////////////////////////////////////////////////////
+
+2. Flame Graph : CPU
+====================
+In one terminal run:
+
+	export HUMAN_LOG=1
+
+	./main >l.txt 2>&1
+
+Step 2:
+-------
+In 2nd terminal in the autocannon folder, line up the following command, but do not press enter:
+
+	./autocannon --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+Step 3:
+-------
+In 3rd terminal in analysis folder, line up the following command, but do not press enter:
+
+	go-torch -u http://localhost:20000 --seconds 9
+
+Step 4:
+-------
+Press Enter in the 3rd Terminal followed as quickly as possibly by pressing Enter in the 2nd Terminal.
+
+Step 5:
+-------
+Wait for about 17 seconds and if all goe well you should get:
+	Writing svg to torch.svg
+
+Rename this file to 'torch-cpu.svg'
+
+Step 6:
+-------
+Open 'torch-cpu.svg' in chrome.
+
+Hover mouse over the 7th coloured row up from the bottom named: "github.com/ONSdigital/log.go/log.Middleware.func1"
+to see that this accounts for 51.1% of the time (in this run).
+
+
+3. Memory Allocation
+====================
+
+Adjust previous modifications to dp-frontend-router main.go to:
+
+	router := pat.New()
+
+	router.PathPrefix("/debug/").Handler(http.DefaultServeMux)
+
+Build and run.
+
+Then kick off the 'autocannon'
+
+Then within 3 to 4 seconds in another terminal:
+
+	go tool pprof http://127.0.0.1:20000/debug/pprof/heap
+
+and, then enter:
+
+	exit
+
+After doing above:
+
+do:
+	ls -alt /home/rhys/pprof	[OR whatever the path of your 'pprof' folder is]
+
+and put the latest *pb.gz file name into end of line as:
+
+go tool pprof -http 127.0.0.1:20001 -edgefraction 0 -nodefraction 0 -nodecount 100000 /home/rhys/pprof/pprof.__debug_bin.alloc_objects.alloc_space.inuse_objects.inuse_space.006.pb.gz
+
+(a copy is in the analysis folder)
+
+this should open chrome, and if you use CTRL-and-Mouse_wheel, you can zoom 'the page' to see a drop down
+ menu in chrome that will allow the viewing of all sorts of things.
+If you click on the image and zoom without holding the CTRL key down, then 'the image' should zoom.
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+See also:
+
+https://blog.detectify.com/2019/09/05/how-we-tracked-down-a-memory-leak-in-one-of-our-go-microservices/
+
+[
+Towards the end of the article (the potential pot of GOLD at the end of the rainbow - or rocky path) ...
+Do a text search in the web page for "GODEBUG=madvdontneed=1"
+I think in order for the dp-frontend-router team to evaluate this, they would need to follow along what the
+ person in the article did.
+I think it looks most interesting ...
+]
+
+

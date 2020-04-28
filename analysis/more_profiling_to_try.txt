@@ -1,0 +1,27 @@
+See also:
+
+https://blog.detectify.com/2019/09/05/how-we-tracked-down-a-memory-leak-in-one-of-our-go-microservices/
+
+[
+Towards the end of the article (the potential pot of GOLD at the end of the rainbow - or rocky path) ...
+Do a text search in the web page for "GODEBUG=madvdontneed=1"
+I think in order for the dp-frontend-router team to evaluate this, they would need to follow along what the person in the article did.
+I think it looks most interesting ...
+]
+
+=====
+
+work thru:
+
+https://www.freecodecamp.org/news/how-i-investigated-memory-leaks-in-go-using-pprof-on-a-large-codebase-4bec4325e192/
+
+
+and implement here / document results ...
+
+and read:
+
+https://bruinsslot.jp/post/profiling-golang-docker/
+
+https://blog.detectify.com/2019/09/05/how-we-tracked-down-a-memory-leak-in-one-of-our-go-microservices/
+
+

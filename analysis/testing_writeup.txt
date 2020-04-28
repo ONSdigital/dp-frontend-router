@@ -7,6 +7,10 @@ dp-frontend-router crash
 Some tests, observations, possibly oversimplified analysis, suggestions:
 ========================================================================
 
+Please note, these tests were run with 'HUMAN_LOG=1' which may have doubled the amount of time spent
+ in log.Event() in the results presented.
+[see profile_testing_writeup.txt where tests run with flag on and flag off to see difference].
+
 Tests carried out on:
 ** Ubuntu 18.04LTS, 6core/12thread, SSD, 64GB RAM
 ** go version go1.14 linux/amd64
