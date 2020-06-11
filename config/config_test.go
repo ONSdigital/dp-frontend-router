@@ -36,6 +36,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.ContentTypeByteLimit, ShouldEqual, 5000000)
 				So(cfg.HealthckeckInterval, ShouldEqual, 30*time.Second)
 				So(cfg.HealthckeckCriticalTimeout, ShouldEqual, 90*time.Second)
+				So(cfg.EnableProfiler, ShouldEqual, false)
 			})
 		})
 	})

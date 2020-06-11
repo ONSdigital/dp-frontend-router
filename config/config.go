@@ -29,6 +29,8 @@ type Config struct {
 	ContentTypeByteLimit       int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 	HealthckeckCriticalTimeout time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 	HealthckeckInterval        time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
+	EnableProfiler             bool          `envconfig:"ENABLE_PROFILER"`
+	PprofToken                 string        `envconfig:"PPROF_TOKEN" json:"-"`
 }
 
 var cfg *Config
@@ -61,6 +63,7 @@ func Get() (*Config, error) {
 		ContentTypeByteLimit:       5000000,
 		HealthckeckCriticalTimeout: 90 * time.Second,
 		HealthckeckInterval:        30 * time.Second,
+		EnableProfiler:             false,
 	}
 
 	return cfg, envconfig.Process("", cfg)
