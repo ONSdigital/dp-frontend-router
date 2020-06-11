@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/ONSdigital/dp-frontend-router/middleware/profiler"
 	"math/rand"
 	"net"
 	"net/http"
@@ -25,6 +26,8 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
+
+	_ "net/http/pprof"
 )
 
 var (
@@ -111,7 +114,7 @@ func main() {
 		}, zebedeeClient, cfg))
 	}
 
-	alice := alice.New(middleware...).Then(router)
+	aliceChain := alice.New(middleware...).Then(router)
 
 	searchHandler, err := analytics.NewSearchHandler(cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
@@ -155,13 +158,18 @@ func main() {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 	}
 
+	if cfg.EnableProfiler {
+		profilerChain := alice.New(profiler.Middleware(cfg.PprofToken)).Then(http.DefaultServeMux)
+		router.PathPrefix("/debug").Handler(profilerChain)
+	}
+
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
 
 	s := &http.Server{
 		Addr:         cfg.BindAddr,
-		Handler:      alice,
+		Handler:      aliceChain,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
