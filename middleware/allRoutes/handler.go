@@ -44,10 +44,10 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			contentPath := "/data"
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentPath += "/" + c.Value + "?uri=" + path
+				log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
 			} else {
 				contentPath += "?uri=" + path
 			}
-			log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
 
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
