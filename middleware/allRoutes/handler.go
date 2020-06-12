@@ -56,9 +56,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// Obtain access_token from cookie
 			userAccessToken := ""
 			c, err := req.Cookie(`access_token`)
-			if err != nil {
-				log.Event(req.Context(), "Cookie error", log.WARN, log.Error(err))
-			} else if len(c.Value) > 0 {
+			if err == nil && len(c.Value) > 0 {
 				userAccessToken = c.Value
 				log.Event(req.Context(), "Obtained access_token Cookie", log.INFO, log.Data{"value": c.Value})
 			}
