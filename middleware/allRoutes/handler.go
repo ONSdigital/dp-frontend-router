@@ -9,6 +9,7 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"net/http"
 	"regexp"
+	"strings"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -39,7 +40,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			if ok, err := regexp.MatchString(`\/latest$`, req.URL.String()); ok && err == nil {
+			if strings.HasSuffix(req.URL.String(), "/latest") {
 				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
 					log.INFO, log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
