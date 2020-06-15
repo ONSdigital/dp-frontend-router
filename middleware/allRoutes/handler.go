@@ -25,6 +25,13 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// Populate context here with language
 			req = common.SetLocaleCode(req)
 
+			if strings.HasSuffix(path, "/latest") {
+				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
+					log.INFO, log.Data{"url": req.URL.String()})
+				h.ServeHTTP(w, req)
+				return
+			}
+
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
 				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.INFO, log.Data{"url": path})
@@ -35,13 +42,6 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// We can skip handling based on content type where the url points to a known/expected file extension
 			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
 				log.Event(req.Context(), "Skipping content specific handling as it's a request to download a known file extension.",
-					log.INFO, log.Data{"url": req.URL.String()})
-				h.ServeHTTP(w, req)
-				return
-			}
-
-			if strings.HasSuffix(req.URL.String(), "/latest") {
-				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
 					log.INFO, log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return
