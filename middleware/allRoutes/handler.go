@@ -70,7 +70,8 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
-				log.Event(req.Context(), "Zebedee GET error", log.ERROR, log.Error(err))
+				// intentionally log as info with the error in log.data to prevent the full stack trace being logged as zebedee 404's are common
+				log.Event(req.Context(), "Zebedee GET failed", log.INFO, log.Data{"error": err.Error(), "path": path})
 				h.ServeHTTP(w, req)
 				return
 			}
