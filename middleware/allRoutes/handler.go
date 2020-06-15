@@ -3,13 +3,12 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"regexp"
-
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/common"
 	"github.com/ONSdigital/log.go/log"
+	"net/http"
+	"regexp"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -40,7 +39,14 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			// Construct contentPath with any colletion if present in cookie
+			if ok, err := regexp.MatchString(`\/latest$`, req.URL.String()); ok && err == nil {
+				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
+					log.INFO, log.Data{"url": req.URL.String()})
+				h.ServeHTTP(w, req)
+				return
+			}
+
+			// Construct contentPath with any collection if present in cookie
 			contentPath := "/data"
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentPath += "/" + c.Value + "?uri=" + path
