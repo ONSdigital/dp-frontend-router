@@ -3,13 +3,13 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"regexp"
-
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/go-ns/common"
 	"github.com/ONSdigital/log.go/log"
+	"net/http"
+	"regexp"
+	"strings"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -24,6 +24,13 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 
 			// Populate context here with language
 			req = common.SetLocaleCode(req)
+
+			if strings.HasSuffix(path, "/latest") {
+				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
+					log.INFO, log.Data{"url": req.URL.String()})
+				h.ServeHTTP(w, req)
+				return
+			}
 
 			// No point calling zebedee for these paths so skip middleware
 			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
@@ -40,14 +47,14 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			// Construct contentPath with any colletion if present in cookie
+			// Construct contentPath with any collection if present in cookie
 			contentPath := "/data"
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentPath += "/" + c.Value + "?uri=" + path
+				log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
 			} else {
 				contentPath += "?uri=" + path
 			}
-			log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
 
 			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
@@ -56,9 +63,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// Obtain access_token from cookie
 			userAccessToken := ""
 			c, err := req.Cookie(`access_token`)
-			if err != nil {
-				log.Event(req.Context(), "Cookie error", log.WARN, log.Error(err))
-			} else if len(c.Value) > 0 {
+			if err == nil && len(c.Value) > 0 {
 				userAccessToken = c.Value
 				log.Event(req.Context(), "Obtained access_token Cookie", log.INFO, log.Data{"value": c.Value})
 			}
@@ -66,7 +71,8 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
-				log.Event(req.Context(), "Zebedee GET error", log.ERROR, log.Error(err))
+				// intentionally log as info with the error in log.data to prevent the full stack trace being logged as zebedee 404's are common
+				log.Event(req.Context(), "Zebedee GET failed", log.INFO, log.Data{"error": err.Error(), "path": path})
 				h.ServeHTTP(w, req)
 				return
 			}
