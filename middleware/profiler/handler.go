@@ -14,8 +14,8 @@ func Middleware(token string) func(http.Handler) http.Handler {
 
 			pprofToken := req.Header.Get("Authorization")
 			if pprofToken == "Bearer " || pprofToken != "Bearer "+token {
-				log.Event(ctx, "invalid auth token", log.ERROR, log.Error(errors.New("invalid auth token")))
-				w.WriteHeader(404)
+				log.Event(ctx, "invalid pprof auth token", log.ERROR, log.Error(errors.New("invalid pprof auth token")))
+				w.WriteHeader(403)
 				return
 			}
 
