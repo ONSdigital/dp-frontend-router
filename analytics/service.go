@@ -44,7 +44,6 @@ func NewServiceImpl(backend ServiceBackend, redirectSecret string) *ServiceImpl 
 // CaptureAnalyticsData - captures the analytics values
 func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	data := r.URL.Query().Get(":data")
-	fmt.Println("data", data)
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
