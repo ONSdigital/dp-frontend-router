@@ -57,6 +57,10 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		return err
 	}
 	preferencesCookie := cookies.GetCookiePreferences(rI.req)
+	language, err := cookies.GetLang(rI.req)
+	if err != nil {
+		language = "en"
+	}
 	data := map[string]interface{}{
 		"error": map[string]interface{}{
 			"title":       title,
@@ -64,6 +68,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		},
 		"cookies_preferences_set": preferencesCookie.IsPreferenceSet,
 		"cookies_policy":          preferencesCookie.Policy,
+		"language":                language,
 	}
 
 	b, err := json.Marshal(&data)
