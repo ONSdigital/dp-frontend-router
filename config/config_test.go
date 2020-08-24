@@ -27,6 +27,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.FilterDatasetControllerURL, ShouldEqual, "http://localhost:20001")
 				So(cfg.GeographyControllerURL, ShouldEqual, "http://localhost:23700")
 				So(cfg.GeographyEnabled, ShouldEqual, false)
+				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
+				So(cfg.NewSearchEnabled, ShouldEqual, false)
 				So(cfg.ZebedeeURL, ShouldEqual, "http://localhost:8082")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
 				So(cfg.PatternLibraryAssetsPath, ShouldEqual, "https://cdn.ons.gov.uk/sixteens/f816ac8")
