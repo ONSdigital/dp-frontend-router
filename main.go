@@ -91,6 +91,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	feedbackControllerURL, err := url.Parse(cfg.FeedbackControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "FeedbackControllerURL", "value": cfg.FeedbackControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
 	redirects.Init(assets.Asset)
 
 	router := pat.New()
@@ -153,6 +159,10 @@ func main() {
 
 	if cfg.NewHomepageEnabled {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
+	}
+
+	if cfg.FeedbackEnabled {
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
 	}
 
 	router.Handle("/{uri:.*}", reverseProxy)
