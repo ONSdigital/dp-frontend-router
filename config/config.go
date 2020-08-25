@@ -20,6 +20,8 @@ type Config struct {
 	FilterDatasetControllerURL string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
 	GeographyControllerURL     string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
 	GeographyEnabled           bool          `envconfig:"GEOGRAPHY_ENABLED"`
+	SearchControllerURL        string        `envconfig:"SEARCH_CONTROLLER_URL"`
+	SearchRoutesEnabled        bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	ZebedeeURL                 string        `envconfig:"ZEBEDEE_URL"`
 	DownloaderURL              string        `envconfig:"DOWNLOADER_URL"`
 	PatternLibraryAssetsPath   string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
@@ -52,6 +54,8 @@ func Get() (*Config, error) {
 		FilterDatasetControllerURL: "http://localhost:20001",
 		GeographyControllerURL:     "http://localhost:23700",
 		GeographyEnabled:           false,
+		SearchControllerURL:        "http://localhost:25000",
+		SearchRoutesEnabled:        false,
 		ZebedeeURL:                 "http://localhost:8082",
 		DownloaderURL:              "http://localhost:23400",
 		PatternLibraryAssetsPath:   "https://cdn.ons.gov.uk/sixteens/f816ac8",
