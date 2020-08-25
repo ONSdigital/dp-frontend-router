@@ -26,6 +26,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.DatasetControllerURL, ShouldEqual, "http://localhost:20200")
 				So(cfg.FilterDatasetControllerURL, ShouldEqual, "http://localhost:20001")
 				So(cfg.GeographyControllerURL, ShouldEqual, "http://localhost:23700")
+				So(cfg.FeedbackControllerURL, ShouldEqual, "http://localhost:25200")
+				So(cfg.FeedbackEnabled, ShouldEqual, false)
 				So(cfg.GeographyEnabled, ShouldEqual, false)
 				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
 				So(cfg.SearchRoutesEnabled, ShouldEqual, false)
