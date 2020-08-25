@@ -161,7 +161,7 @@ func main() {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 	}
 
-	if cfg.NewSearchEnabled {
+	if cfg.SearchRoutesEnabled {
 		router.Handle("/search", createReverseProxy("search", searchControllerURL))
 	}
 
