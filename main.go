@@ -154,6 +154,7 @@ func main() {
 
 	if cfg.DatasetRoutesEnabled {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
 		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	}
@@ -164,10 +165,6 @@ func main() {
 
 	if cfg.NewHomepageEnabled {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
-	}
-
-	if cfg.FeedbackEnabled {
-		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
 	}
 
 	if cfg.SearchRoutesEnabled {
