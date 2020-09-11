@@ -29,6 +29,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.FeedbackControllerURL, ShouldEqual, "http://localhost:25200")
 				So(cfg.FeedbackEnabled, ShouldEqual, false)
 				So(cfg.GeographyEnabled, ShouldEqual, false)
+				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
+				So(cfg.SearchRoutesEnabled, ShouldEqual, false)
 				So(cfg.ZebedeeURL, ShouldEqual, "http://localhost:8082")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
 				So(cfg.PatternLibraryAssetsPath, ShouldEqual, "https://cdn.ons.gov.uk/sixteens/f816ac8")
