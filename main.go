@@ -166,12 +166,12 @@ func main() {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 	}
 
-	if cfg.SearchRoutesEnabled {
-		router.Handle("/search", createReverseProxy("search", searchControllerURL))
-	}
-
 	if cfg.FeedbackEnabled {
 		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
+	}
+
+	if cfg.SearchRoutesEnabled {
+		router.Handle("/search", createReverseProxy("search", searchControllerURL))
 	}
 
 	router.Handle("/{uri:.*}", reverseProxy)
