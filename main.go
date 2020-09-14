@@ -151,7 +151,6 @@ func main() {
 	}
 
 	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-
 	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 
