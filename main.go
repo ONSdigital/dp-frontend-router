@@ -117,11 +117,9 @@ func main() {
 
 	zebedeeClient := client.New(cfg.ZebedeeURL)
 
-	if cfg.DatasetRoutesEnabled {
-		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
-			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-		}, zebedeeClient, cfg))
-	}
+	middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
+		"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+	}, zebedeeClient, cfg))
 
 	alice := alice.New(middleware...).Then(router)
 
@@ -152,12 +150,11 @@ func main() {
 		router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 	}
 
-	if cfg.DatasetRoutesEnabled {
-		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
-		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
-		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
-	}
+	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
+	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
+	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
+
 	// remove geo from prod
 	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
