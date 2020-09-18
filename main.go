@@ -79,6 +79,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	searchControllerURL, err := url.Parse(cfg.SearchControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "SearchControllerURL", "value": cfg.SearchControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL}, log.Error(err))
@@ -88,6 +94,12 @@ func main() {
 	downloaderURL, err := url.Parse(cfg.DownloaderURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL}, log.Error(err))
+		os.Exit(1)
+	}
+
+	feedbackControllerURL, err := url.Parse(cfg.FeedbackControllerURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "FeedbackControllerURL", "value": cfg.FeedbackControllerURL}, log.Error(err))
 		os.Exit(1)
 	}
 
@@ -153,6 +165,14 @@ func main() {
 
 	if cfg.NewHomepageEnabled {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
+	}
+
+	if cfg.FeedbackEnabled {
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
+	}
+
+	if cfg.SearchRoutesEnabled {
+		router.Handle("/search", createReverseProxy("search", searchControllerURL))
 	}
 
 	router.Handle("/{uri:.*}", reverseProxy)
