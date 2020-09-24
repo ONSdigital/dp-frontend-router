@@ -12,7 +12,6 @@ type Config struct {
 	BabbageURL                 string        `envconfig:"BABBAGE_URL"`
 	RendererURL                string        `envconfig:"RENDERER_URL"`
 	CookiesControllerURL       string        `envconfig:"COOKIES_CONTROLLER_URL"`
-	CookiesRoutesEnabled       bool          `envconfig:"COOKIES_ROUTES_ENABLED"`
 	NewHomepageEnabled         bool          `envconfig:"NEW_HOMEPAGE_ENABLED"`
 	HomepageControllerURL      string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	DatasetRoutesEnabled       bool          `envconfig:"DATASET_ROUTES_ENABLED"`
@@ -48,7 +47,6 @@ func Get() (*Config, error) {
 		BabbageURL:                 "http://localhost:8080",
 		RendererURL:                "http://localhost:20010",
 		CookiesControllerURL:       "http://localhost:24100",
-		CookiesRoutesEnabled:       false,
 		NewHomepageEnabled:         false,
 		HomepageControllerURL:      "http://localhost:24400",
 		DatasetRoutesEnabled:       false,
