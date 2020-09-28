@@ -20,8 +20,8 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
+	"github.com/ONSdigital/dp-net/handlers/reverseproxy"
+	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -108,7 +108,7 @@ func main() {
 	router := pat.New()
 
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		securityHandler,
 		serverError.Handler,
@@ -119,7 +119,7 @@ func main() {
 
 	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
-			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+			"dataset_landing_page": reverseproxy.Create(datasetControllerURL, nil),
 		}, zebedeeClient, cfg))
 	}
 

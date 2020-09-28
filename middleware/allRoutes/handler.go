@@ -3,13 +3,14 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
-	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
-	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/go-ns/common"
-	"github.com/ONSdigital/log.go/log"
 	"net/http"
 	"regexp"
 	"strings"
+
+	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
+	"github.com/ONSdigital/dp-frontend-router/config"
+	dprequest "github.com/ONSdigital/dp-net/request"
+	"github.com/ONSdigital/log.go/log"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -23,7 +24,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 			path := req.URL.Path
 
 			// Populate context here with language
-			req = common.SetLocaleCode(req)
+			req = dprequest.SetLocaleCode(req)
 
 			if strings.HasSuffix(path, "/latest") {
 				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
