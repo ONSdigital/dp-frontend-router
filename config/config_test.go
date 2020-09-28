@@ -31,7 +31,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.GeographyEnabled, ShouldEqual, false)
 				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
 				So(cfg.SearchRoutesEnabled, ShouldEqual, false)
-				So(cfg.ZebedeeURL, ShouldEqual, "http://localhost:8082")
+				So(cfg.APIRouterURL, ShouldEqual, "http://localhost:23200/v1")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
 				So(cfg.PatternLibraryAssetsPath, ShouldEqual, "https://cdn.ons.gov.uk/sixteens/f816ac8")
 				So(cfg.SiteDomain, ShouldEqual, "ons.gov.uk")
