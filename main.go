@@ -153,11 +153,12 @@ func main() {
 	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
 	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
-	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
 
+	feedbackURL := datasetControllerURL
 	if cfg.FeedbackEnabled {
-		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
+		feedbackURL = feedbackControllerURL
 	}
+	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackURL))
 
 	// remove geo from prod
 	if cfg.GeographyEnabled {
