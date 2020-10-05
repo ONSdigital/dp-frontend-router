@@ -13,7 +13,6 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	"github.com/aws/aws-sdk-go/aws/client"
 
 	"github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -131,8 +130,6 @@ func main() {
 		serverError.Handler,
 		redirects.Handler,
 	}
-
-	zebedeeClient := client.New(cfg.ZebedeeURL)
 
 	middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
 		"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
