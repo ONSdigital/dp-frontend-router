@@ -12,8 +12,6 @@ import (
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
-	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
-	"github.com/aws/aws-sdk-go/aws/client"
 
 	"github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
@@ -22,6 +20,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
+	"github.com/ONSdigital/dp-net/handlers/reverseproxy"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
@@ -132,11 +131,11 @@ func main() {
 		redirects.Handler,
 	}
 
-	zebedeeClient := client.New(cfg.ZebedeeURL)
-
-	middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
-		"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-	}, zebedeeClient, cfg))
+	if cfg.DatasetRoutesEnabled {
+		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
+			"dataset_landing_page": reverseproxy.Create(datasetControllerURL, nil),
+		}, zebedeeClient, cfg))
+	}
 
 	alice := alice.New(middleware...).Then(router)
 
@@ -152,16 +151,12 @@ func main() {
 
 	router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 
-	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
-	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
-
-	feedbackURL := datasetControllerURL
-	if cfg.FeedbackEnabled {
-		feedbackURL = feedbackControllerURL
+	if cfg.DatasetRoutesEnabled {
+		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", datasetControllerURL))
+		router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
+		router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 	}
-	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackURL))
-
 	// remove geo from prod
 	if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
@@ -169,6 +164,10 @@ func main() {
 
 	if cfg.NewHomepageEnabled {
 		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
+	}
+
+	if cfg.FeedbackEnabled {
+		router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
 	}
 
 	if cfg.SearchRoutesEnabled {

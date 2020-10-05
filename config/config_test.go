@@ -22,6 +22,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.BabbageURL, ShouldEqual, "http://localhost:8080")
 				So(cfg.RendererURL, ShouldEqual, "http://localhost:20010")
 				So(cfg.CookiesControllerURL, ShouldEqual, "http://localhost:24100")
+				So(cfg.DatasetRoutesEnabled, ShouldEqual, false)
 				So(cfg.DatasetControllerURL, ShouldEqual, "http://localhost:20200")
 				So(cfg.FilterDatasetControllerURL, ShouldEqual, "http://localhost:20001")
 				So(cfg.GeographyControllerURL, ShouldEqual, "http://localhost:23700")
