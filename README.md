@@ -26,6 +26,7 @@ dp-frontend-router
 | HEALTHCHECK_CRITICAL_TIMEOUT  | 90s                                     | The period of time after which failing checks will result in critical global check 
 
 
+
 ### Licence
 
 Copyright ©‎ 2016 - 2017, Office for National Statistics (https://www.ons.gov.uk)
