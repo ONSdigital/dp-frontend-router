@@ -12,7 +12,6 @@ type Config struct {
 	BabbageURL                 string        `envconfig:"BABBAGE_URL"`
 	RendererURL                string        `envconfig:"RENDERER_URL"`
 	CookiesControllerURL       string        `envconfig:"COOKIES_CONTROLLER_URL"`
-	CookiesRoutesEnabled       bool          `envconfig:"COOKIES_ROUTES_ENABLED"`
 	NewHomepageEnabled         bool          `envconfig:"NEW_HOMEPAGE_ENABLED"`
 	HomepageControllerURL      string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	DatasetRoutesEnabled       bool          `envconfig:"DATASET_ROUTES_ENABLED"`
@@ -24,7 +23,7 @@ type Config struct {
 	FeedbackEnabled            bool          `envconfig:"FEEDBACK_ENABLED"`
 	SearchControllerURL        string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	SearchRoutesEnabled        bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
-	ZebedeeURL                 string        `envconfig:"ZEBEDEE_URL"`
+	APIRouterURL               string        `envconfig:"API_ROUTER_URL"`
 	DownloaderURL              string        `envconfig:"DOWNLOADER_URL"`
 	PatternLibraryAssetsPath   string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	SiteDomain                 string        `envconfig:"SITE_DOMAIN"`
@@ -48,7 +47,6 @@ func Get() (*Config, error) {
 		BabbageURL:                 "http://localhost:8080",
 		RendererURL:                "http://localhost:20010",
 		CookiesControllerURL:       "http://localhost:24100",
-		CookiesRoutesEnabled:       false,
 		NewHomepageEnabled:         false,
 		HomepageControllerURL:      "http://localhost:24400",
 		DatasetRoutesEnabled:       false,
@@ -60,7 +58,7 @@ func Get() (*Config, error) {
 		FeedbackEnabled:            false,
 		SearchControllerURL:        "http://localhost:25000",
 		SearchRoutesEnabled:        false,
-		ZebedeeURL:                 "http://localhost:8082",
+		APIRouterURL:               "http://localhost:23200/v1",
 		DownloaderURL:              "http://localhost:23400",
 		PatternLibraryAssetsPath:   "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		SiteDomain:                 "ons.gov.uk",

@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ONSdigital/go-ns/handlers/requestID"
+	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -116,7 +116,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 
 	router := pat.New()
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		//securityHandler,
 	}
@@ -133,7 +133,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 
 	router := pat.New()
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		//securityHandler,
 		Handler,
@@ -156,7 +156,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 
 	router := pat.New()
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		//securityHandler,
 		Handler,
@@ -179,7 +179,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 
 	router := pat.New()
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		//securityHandler,
 		Handler,
@@ -202,7 +202,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 
 	router := pat.New()
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		//securityHandler,
 		Handler,

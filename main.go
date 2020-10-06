@@ -13,15 +13,15 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 
-	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
+	"github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/go-ns/handlers/requestID"
-	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
+	"github.com/ONSdigital/dp-net/handlers/reverseproxy"
+	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
@@ -105,21 +105,35 @@ func main() {
 
 	redirects.Init(assets.Asset)
 
+	// create ZebedeeClient proxying calls through the API Router
+	zebedeeClient := zebedee.New(cfg.APIRouterURL)
+
+	// Healthcheck API
+	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
+	if err != nil {
+		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.FATAL, log.Error(err))
+		os.Exit(1)
+	}
+	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
+	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
+		log.Event(ctx, "Failed to add api router checker to healthcheck", log.FATAL, log.Error(err))
+		os.Exit(1)
+	}
+
 	router := pat.New()
 
 	middleware := []alice.Constructor{
-		requestID.Handler(16),
+		dprequest.HandlerRequestID(16),
 		log.Middleware,
 		securityHandler,
+		healthcheckHandler(hc.Handler),
 		serverError.Handler,
 		redirects.Handler,
 	}
 
-	zebedeeClient := client.New(cfg.ZebedeeURL)
-
 	if cfg.DatasetRoutesEnabled {
 		middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
-			"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
+			"dataset_landing_page": reverseproxy.Create(datasetControllerURL, nil),
 		}, zebedeeClient, cfg))
 	}
 
@@ -131,26 +145,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Healthcheck API
-	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
-	if err != nil {
-		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.FATAL, log.Error(err))
-		os.Exit(1)
-	}
-	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
-	if err = hc.AddCheck("Zebedee", zebedeeClient.Checker); err != nil {
-		log.Event(ctx, "Failed to add Zebedee checker to healthcheck", log.FATAL, log.Error(err))
-		os.Exit(1)
-	}
-	router.HandleFunc("/health", hc.Handler)
-
 	reverseProxy := createReverseProxy("babbage", babbageURL)
 	router.Handle("/redir/{data:.*}", searchHandler)
 	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
 
-	if cfg.CookiesRoutesEnabled {
-		router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
-	}
+	router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 
 	if cfg.DatasetRoutesEnabled {
 		router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
@@ -206,6 +205,19 @@ func securityHandler(h http.Handler) http.Handler {
 		}
 		h.ServeHTTP(w, req)
 	})
+}
+
+// healthcheckHandler uses the provided handler for /health endpoint, and serves any other traffic to the next handler in chain
+func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(h http.Handler) http.Handler {
+	return func(h http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			if req.URL.Path == "/health" {
+				hc(w, req)
+				return
+			}
+			h.ServeHTTP(w, req)
+		})
+	}
 }
 
 //abHandler ... percentA is the percentage of request that handler 'a' is used
