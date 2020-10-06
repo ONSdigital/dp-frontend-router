@@ -157,6 +157,7 @@ func main() {
 	if cfg.FeedbackEnabled {
 		feedbackURL = feedbackControllerURL
 	}
+
 	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackURL))
 
 	// remove geo from prod
