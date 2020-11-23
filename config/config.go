@@ -12,7 +12,6 @@ type Config struct {
 	BabbageURL                 string        `envconfig:"BABBAGE_URL"`
 	RendererURL                string        `envconfig:"RENDERER_URL"`
 	CookiesControllerURL       string        `envconfig:"COOKIES_CONTROLLER_URL"`
-	NewHomepageEnabled         bool          `envconfig:"NEW_HOMEPAGE_ENABLED"`
 	HomepageControllerURL      string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	DatasetControllerURL       string        `envconfig:"DATASET_CONTROLLER_URL"`
 	FilterDatasetControllerURL string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
@@ -46,7 +45,6 @@ func Get() (*Config, error) {
 		BabbageURL:                 "http://localhost:8080",
 		RendererURL:                "http://localhost:20010",
 		CookiesControllerURL:       "http://localhost:24100",
-		NewHomepageEnabled:         false,
 		HomepageControllerURL:      "http://localhost:24400",
 		DatasetControllerURL:       "http://localhost:20200",
 		FilterDatasetControllerURL: "http://localhost:20001",
