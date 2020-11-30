@@ -165,14 +165,11 @@ func main() {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 
-	if cfg.NewHomepageEnabled {
-		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
-	}
-
 	if cfg.SearchRoutesEnabled {
 		router.Handle("/search", createReverseProxy("search", searchControllerURL))
 	}
 
+	router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
