@@ -28,10 +28,10 @@ type Config struct {
 	RedirectSecret                      string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	SQSAnalyticsURL                     string        `envconfig:"SQS_ANALYTICS_URL"`
 	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
-	ZebedeeRequestMaximumTimeoutSeconds int           `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
-	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	HealthckeckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 	HealthckeckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
+	ZebedeeRequestMaximumTimeoutSeconds int           `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
+	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 }
 
 var cfg *Config

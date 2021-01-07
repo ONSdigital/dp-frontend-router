@@ -39,6 +39,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.ContentTypeByteLimit, ShouldEqual, 5000000)
 				So(cfg.HealthckeckInterval, ShouldEqual, 30*time.Second)
 				So(cfg.HealthckeckCriticalTimeout, ShouldEqual, 90*time.Second)
+				So(cfg.ZebedeeRequestMaximumTimeoutSeconds, ShouldEqual, 5)
+				So(cfg.ZebedeeRequestMaximumRetries, ShouldEqual, 0)
 			})
 		})
 	})
