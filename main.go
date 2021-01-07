@@ -106,7 +106,7 @@ func main() {
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
-	zebedeeClient := zebedee.New(cfg.APIRouterURL)
+	zebedeeClient := zebedee.NewWithSetTimeoutAndMaxRetry(cfg.APIRouterURL, cfg.ZebedeeRequestMaximumTimeoutSeconds, cfg.ZebedeeRequestMaximumRetries)
 
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
@@ -165,14 +165,12 @@ func main() {
 		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
 	}
 
-	if cfg.NewHomepageEnabled {
-		router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
-	}
-
 	if cfg.SearchRoutesEnabled {
 		router.Handle("/search", createReverseProxy("search", searchControllerURL))
 	}
+	router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 
+	router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
 	router.Handle("/{uri:.*}", reverseProxy)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
