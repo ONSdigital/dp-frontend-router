@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	dphttp "github.com/ONSdigital/dp-net/http"
 	"math/rand"
 	"net"
 	"net/http"
@@ -106,7 +107,11 @@ func main() {
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
-	zebedeeClient := zebedee.NewWithSetTimeoutAndMaxRetry(cfg.APIRouterURL, cfg.ZebedeeRequestMaximumTimeoutSeconds, cfg.ZebedeeRequestMaximumRetries)
+	hcClienter := dphttp.NewClient()
+	hcClienter.SetMaxRetries(cfg.ZebedeeRequestMaximumRetries)
+	hcClienter.SetTimeout(time.Duration(cfg.ZebedeeRequestMaximumTimeoutSeconds) * time.Second)
+
+	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
 
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
