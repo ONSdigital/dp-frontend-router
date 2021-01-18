@@ -30,7 +30,7 @@ type Config struct {
 	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 	HealthckeckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 	HealthckeckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
-	ZebedeeRequestMaximumTimeoutSeconds int           `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
+	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 }
 
@@ -65,7 +65,7 @@ func Get() (*Config, error) {
 		ContentTypeByteLimit:                5000000,
 		HealthckeckCriticalTimeout:          90 * time.Second,
 		HealthckeckInterval:                 30 * time.Second,
-		ZebedeeRequestMaximumTimeoutSeconds: 5,
+		ZebedeeRequestMaximumTimeoutSeconds: 5 * time.Second,
 		ZebedeeRequestMaximumRetries:        0,
 	}
 

@@ -8,7 +8,7 @@ import (
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
 	"net/http"
-	"regexp"
+	"path/filepath"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -23,18 +23,13 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 
 			// Populate context here with language
 			req = dprequest.SetLocaleCode(req)
-			ok, err := regexp.MatchString(`^(?:data\.json)`, path)
-			if err != nil {
-				log.Event(req.Context(), "regular expression failed unable to get page type from zebedee", log.ERROR, log.Data{"path": path})
-			}
-
 			// Only submit requests to zebedee if looking for data.json
-			if !ok {
-				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
-					log.INFO, log.Data{"url": req.URL.String()})
+			if filepath.Base(req.URL.Path) != "data.json" {
+				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.INFO, log.Data{"url": path})
 				h.ServeHTTP(w, req)
 				return
 			}
+
 			// Construct contentPath with any collection if present in cookie
 			contentPath := "/data"
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
