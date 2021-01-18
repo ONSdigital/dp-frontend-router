@@ -109,7 +109,7 @@ func main() {
 	// create ZebedeeClient proxying calls through the API Router
 	hcClienter := dphttp.NewClient()
 	hcClienter.SetMaxRetries(cfg.ZebedeeRequestMaximumRetries)
-	hcClienter.SetTimeout(time.Duration(cfg.ZebedeeRequestMaximumTimeoutSeconds) * time.Second)
+	hcClienter.SetTimeout(cfg.ZebedeeRequestMaximumTimeoutSeconds)
 
 	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
 
