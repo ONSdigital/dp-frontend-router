@@ -3,14 +3,12 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"regexp"
-	"strings"
-
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
+	"net/http"
+	"path/filepath"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -25,25 +23,9 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 
 			// Populate context here with language
 			req = dprequest.SetLocaleCode(req)
-
-			if strings.HasSuffix(path, "/latest") {
-				log.Event(req.Context(), "Skipping content specific handling as it's a request to a known URL.",
-					log.INFO, log.Data{"url": req.URL.String()})
-				h.ServeHTTP(w, req)
-				return
-			}
-
-			// No point calling zebedee for these paths so skip middleware
-			if ok, err := regexp.MatchString(`^\/(?:datasets|filter|feedback|healthcheck)`, path); ok && err == nil {
+			// Only submit requests to zebedee if looking for data.json
+			if filepath.Base(req.URL.Path) != "data.json" {
 				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.INFO, log.Data{"url": path})
-				h.ServeHTTP(w, req)
-				return
-			}
-
-			// We can skip handling based on content type where the url points to a known/expected file extension
-			if ok, err := regexp.MatchString(`^*\.(?:xls|zip|csv|xslx)$`, req.URL.String()); ok && err == nil {
-				log.Event(req.Context(), "Skipping content specific handling as it's a request to download a known file extension.",
-					log.INFO, log.Data{"url": req.URL.String()})
 				h.ServeHTTP(w, req)
 				return
 			}
