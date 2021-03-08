@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	dphttp "github.com/ONSdigital/dp-net/http"
 	"math/rand"
 	"net"
 	"net/http"
@@ -11,6 +10,8 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	dphttp "github.com/ONSdigital/dp-net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
@@ -158,12 +159,7 @@ func main() {
 	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
 
-	feedbackURL := datasetControllerURL
-	if cfg.FeedbackEnabled {
-		feedbackURL = feedbackControllerURL
-	}
-
-	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackURL))
+	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
 
 	// remove geo from prod
 	if cfg.GeographyEnabled {
