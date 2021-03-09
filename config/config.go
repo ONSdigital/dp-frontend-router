@@ -53,7 +53,6 @@ func Get() (*Config, error) {
 		GeographyControllerURL:              "http://localhost:23700",
 		GeographyEnabled:                    false,
 		FeedbackControllerURL:               "http://localhost:25200",
-		FeedbackEnabled:                     false,
 		SearchControllerURL:                 "http://localhost:25000",
 		SearchRoutesEnabled:                 false,
 		APIRouterURL:                        "http://localhost:23200/v1",
