@@ -1,6 +1,7 @@
 package analytics
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/analytics"
@@ -15,12 +16,12 @@ type searchHandler struct {
 }
 
 // NewSearchHandler creates a new search handler
-func NewSearchHandler(SQSanalyticsURL, RedirectSecret string) (http.Handler, error) {
+func NewSearchHandler(ctx context.Context, SQSanalyticsURL, RedirectSecret string) (http.Handler, error) {
 	var b analytics.ServiceBackend
 	var err error
 
 	if len(SQSanalyticsURL) > 0 {
-		b, err = analytics.NewSQSBackend(SQSanalyticsURL)
+		b, err = analytics.NewSQSBackend(ctx, SQSanalyticsURL)
 		if err != nil {
 			return nil, err
 		}

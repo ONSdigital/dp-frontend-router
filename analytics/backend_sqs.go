@@ -1,34 +1,40 @@
 package analytics
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
 
 	"github.com/ONSdigital/log.go/log"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
 )
 
 var _ ServiceBackend = &sqsBackend{}
 
+//go:generate moq -out analyticstest/sqsclient.go -pkg analyticstest . SQSClient
+type SQSClient interface {
+	SendMessage(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error)
+}
+
 type sqsBackend struct {
-	sqsService  sqsiface.SQSAPI // *sqs.SQS
-	queueURL    string
-	sendMessage func(sqs.SendMessageRequest) (*sqs.SendMessageOutput, error)
+	sqsClient SQSClient
+	queueURL  string
 }
 
 // NewSQSBackend creates a new SQS backend for storing analytics data
-func NewSQSBackend(queueURL string) (ServiceBackend, error) {
-	cfg, err := external.LoadDefaultAWSConfig()
+func NewSQSBackend(ctx context.Context, queueURL string) (ServiceBackend, error) {
+	cfg, err := config.LoadDefaultConfig(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return &sqsBackend{sqs.New(cfg), queueURL, func(s sqs.SendMessageRequest) (*sqs.SendMessageOutput, error) {
-		return s.Send()
-	}}, nil
+	sqsClient := sqs.NewFromConfig(cfg)
+	return &sqsBackend{
+		sqsClient,
+		queueURL,
+	}, nil
 }
 
 func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, gID string, pageIndex, linkIndex, pageSize float64) {
@@ -51,12 +57,12 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 	}
 
 	json := string(jb)
-	smr := b.sqsService.SendMessageRequest(&sqs.SendMessageInput{
+	smi := &sqs.SendMessageInput{
 		MessageBody: &json,
 		QueueUrl:    &b.queueURL,
-	})
+	}
 
-	smo, err := b.sendMessage(smr)
+	smo, err := b.sqsClient.SendMessage(req.Context(), smi)
 	if err != nil {
 		log.Event(req.Context(), "error sending sqs message", log.ERROR, log.Error(err))
 		return

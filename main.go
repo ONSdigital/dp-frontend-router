@@ -143,7 +143,7 @@ func main() {
 
 	alice := alice.New(middleware...).Then(router)
 
-	searchHandler, err := analytics.NewSearchHandler(cfg.SQSAnalyticsURL, cfg.RedirectSecret)
+	searchHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
 		log.Event(ctx, "error creating search analytics handler", log.FATAL, log.Error(err))
 		os.Exit(1)
