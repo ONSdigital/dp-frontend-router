@@ -1,53 +1,49 @@
 package analytics
 
 import (
+	"context"
 	"encoding/json"
+	"github.com/ONSdigital/dp-frontend-router/analytics/analyticstest"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"net/http"
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
-
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-type fakeSQS struct {
-	sqsiface.SQSAPI
-	input *sqs.SendMessageInput
-}
-
-func (s *fakeSQS) SendMessageRequest(i *sqs.SendMessageInput) sqs.SendMessageRequest {
-	s.input = i
-	return sqs.SendMessageRequest{
-		Request: &aws.Request{},
-	}
-}
-
 func TestSQSBackend(t *testing.T) {
-	Convey("SQS backend should capture the right data", t, func() {
-		backend, err := NewSQSBackend("https://fake.url")
+
+	Convey("SQS backend initialise without error", t, func() {
+		backend, err := NewSQSBackend(context.Background(), "https://fake.url")
 		So(err, ShouldBeNil)
 		So(backend, ShouldNotBeNil)
+	})
 
-		fake := &fakeSQS{}
-		backend.(*sqsBackend).sqsService = fake
-		backend.(*sqsBackend).sendMessage = func(s sqs.SendMessageRequest) (*sqs.SendMessageOutput, error) {
-			msgID := "test-message-id"
-			return &sqs.SendMessageOutput{
-				MessageId: &msgID,
-			}, nil
+	Convey("SQS backend should capture the right data", t, func() {
+		mockSQSClient := &analyticstest.SQSClientMock{
+			SendMessageFunc: func(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error) {
+				msgID := "test-message-id"
+				return &sqs.SendMessageOutput{
+					MessageId: &msgID,
+				}, nil
+			},
+		}
+
+		sqsBackend := &sqsBackend{
+			mockSQSClient,
+			"https://fake.url",
 		}
 
 		fakeReq, err := http.NewRequest("GET", "/", nil)
 		So(err, ShouldBeNil)
 
-		backend.Store(fakeReq, "/some/url", "some term", "list type", "gaID", "gID", 10, 20, 30)
-		So(fake.input, ShouldNotBeNil)
+		sqsBackend.Store(fakeReq, "/some/url", "some term", "list type", "gaID", "gID", 10, 20, 30)
+		requestParams := mockSQSClient.SendMessageCalls()[0].Params
+		So(requestParams, ShouldNotBeNil)
 
 		var input map[string]interface{}
-		err = json.Unmarshal([]byte(*fake.input.MessageBody), &input)
+		err = json.Unmarshal([]byte(*requestParams.MessageBody), &input)
 		So(err, ShouldBeNil)
 		So(input, ShouldContainKey, "created")
 		So(input, ShouldContainKey, "gID")
