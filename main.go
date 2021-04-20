@@ -156,7 +156,7 @@ func main() {
 	router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
 
 	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-	router.Handle("/economy/inflationandpriceindices/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
+	router.Handle("/economy/inflationandpriceindices/datasets/understandingthedifferentapproachesofmeasuringowneroccupiershousingcosts/current", createReverseProxy("/economy/inflationandpriceindices/datasets/understandingthedifferentapproachesofmeasuringowneroccupiershousingcosts/current", datasetControllerURL))
 
 	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
 	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
