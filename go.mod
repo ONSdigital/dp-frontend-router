@@ -11,7 +11,7 @@ require (
 	github.com/ONSdigital/log.go v1.0.1
 	github.com/aws/aws-sdk-go-v2/config v1.1.5
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.3.1
-	github.com/dgrijalva/jwt-go v3.2.0+incompatible
+	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
 	github.com/gorilla/pat v1.0.1

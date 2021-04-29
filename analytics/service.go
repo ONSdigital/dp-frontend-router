@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ONSdigital/log.go/log"
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go/v4"
 )
 
 const pageIndexParam = "pageIndex"
