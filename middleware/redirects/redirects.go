@@ -68,7 +68,7 @@ func Init(asset func(name string) ([]byte, error)) {
 	}
 }
 
-//Handler ...
+// Handler ...
 func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 

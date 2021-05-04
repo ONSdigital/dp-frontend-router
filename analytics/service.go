@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/ONSdigital/log.go/log"
-	jwt "github.com/dgrijalva/jwt-go"
+	jwt "github.com/form3tech-oss/jwt-go"
 )
 
 const pageIndexParam = "pageIndex"
@@ -16,7 +16,6 @@ const linkIndexParam = "linkIndex"
 const urlParam = "url"
 const termParam = "term"
 const searchTypeParam = "type"
-const timestampKey = "timestamp"
 const gaIDParam = "ga"
 const gIDParam = "gid"
 
