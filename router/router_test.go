@@ -17,6 +17,27 @@ func NewHandlerMock() *routertest.HandlerMock {
 	}
 }
 
+func TestHasFileExt(t *testing.T) {
+
+	Convey("Given a URL that has a file extension", t, func() {
+		Convey("When the HasFileExt function is called", func() {
+			Convey("Then true is returned", func() {
+				So(router.HasFileExt("/some/path"), ShouldBeFalse)
+				So(router.HasFileExt("/"), ShouldBeFalse)
+				So(router.HasFileExt("/"), ShouldBeFalse)
+			})
+		})
+	})
+
+	Convey("Given a URL that has no file extension", t, func() {
+		Convey("When the HasFileExt function is called", func() {
+			Convey("Then false is returned", func() {
+				So(router.HasFileExt("/some/path.json"), ShouldBeTrue)
+			})
+		})
+	})
+}
+
 func TestRouter(t *testing.T) {
 
 	Convey("Given a configured router", t, func() {
@@ -305,6 +326,7 @@ func TestRouter(t *testing.T) {
 		Convey("When a legacy page request is made", func() {
 
 			url := "/economy"
+			expectedZebedeeURL := "/data?uri=" + url
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
@@ -313,6 +335,7 @@ func TestRouter(t *testing.T) {
 
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+				So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldEqual, expectedZebedeeURL)
 			})
 
 			Convey("Then the request is sent to the babbage", func() {
@@ -324,18 +347,35 @@ func TestRouter(t *testing.T) {
 		Convey("When a data.json request is made", func() {
 
 			url := "/somepage/data.json"
-			expectedZebedeeURL := "/data?uri=" + url
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			router := router.New(config)
 			router.ServeHTTP(res, req)
 
-			Convey("Then the request is sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
-				So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldResemble, expectedZebedeeURL)
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
 
+		Convey("When a request with a file extension is made", func() {
+
+			url := "/website.css"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is not sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to the babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
 	})
 }

@@ -6,9 +6,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
+	"github.com/gorilla/mux"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
@@ -70,6 +72,8 @@ func New(cfg Config) http.Handler {
 
 	router.Handle("/", cfg.HomepageHandler)
 
+	router.MatcherFunc(hasFileExtMatcher).Handler(cfg.BabbageHandler)
+
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)
 	babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
@@ -98,4 +102,12 @@ func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(
 			h.ServeHTTP(w, req)
 		})
 	}
+}
+
+func HasFileExt(path string) bool {
+	return len(filepath.Ext(path)) > 0
+}
+
+func hasFileExtMatcher(request *http.Request, match *mux.RouteMatch) bool {
+	return HasFileExt(request.URL.Path)
 }
