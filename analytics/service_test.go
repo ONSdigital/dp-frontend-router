@@ -303,9 +303,9 @@ func Test_extractIntParam(t *testing.T) {
 	})
 }
 
-// The following code is borrowed from v3.2.2 of alternative library:
+// The following code is borrowed from v3.2.2 of library:
 // github.com/form3tech-oss/jwt-go
-// and tweaked a little to demonstrate issues with original library:
+// and tweaked a little to demonstrate issues with the previously used library:
 // github.com/dgrijalva/jwt-go
 // BUT the code won't work with v4 of original library
 
