@@ -56,8 +56,6 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		return "", errors.Wrap(err, "Invalid redirect data")
 	}
 
-	log.Event(r.Context(), "jwt token", log.INFO, log.Data{"token": token})
-
 	var url, term, listType, gaID, gID string
 	var pageIndex, linkIndex, pageSize float64
 
