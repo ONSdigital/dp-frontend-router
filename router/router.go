@@ -48,7 +48,6 @@ func New(cfg Config) http.Handler {
 		healthcheckHandler(cfg.HealthCheckHandler),
 		serverError.Handler,
 		redirects.Handler,
-		allRoutesMiddleware,
 	}
 
 	alice := alice.New(middleware...).Then(router)
@@ -70,7 +69,10 @@ func New(cfg Config) http.Handler {
 	}
 
 	router.Handle("/", cfg.HomepageHandler)
-	router.Handle("/{uri:.*}", cfg.BabbageHandler)
+
+	babbageRouter := router.PathPrefix("/").Subrouter()
+	babbageRouter.Use(allRoutesMiddleware)
+	babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
 
 	return alice
 }
