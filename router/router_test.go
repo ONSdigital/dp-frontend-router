@@ -34,6 +34,7 @@ func TestHasFileExt(t *testing.T) {
 			Convey("Then false is returned", func() {
 				So(router.HasFileExt("/some/path"), ShouldBeFalse)
 				So(router.HasFileExt("/"), ShouldBeFalse)
+				So(router.HasFileExt("/test/module.test/data"), ShouldBeFalse)
 			})
 		})
 	})
