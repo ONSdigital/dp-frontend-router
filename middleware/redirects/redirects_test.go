@@ -118,7 +118,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		//securityHandler,
+		// securityHandler,
 	}
 	alice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
@@ -135,7 +135,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		//securityHandler,
+		// securityHandler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -158,7 +158,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		//securityHandler,
+		// securityHandler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -181,7 +181,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		//securityHandler,
+		// securityHandler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)
@@ -204,7 +204,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		//securityHandler,
+		// securityHandler,
 		Handler,
 	}
 	alice := alice.New(middleware...).Then(router)

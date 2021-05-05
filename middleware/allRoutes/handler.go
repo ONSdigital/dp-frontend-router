@@ -3,18 +3,19 @@ package allRoutes
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"path/filepath"
+
 	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
-	"net/http"
-	"path/filepath"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
 const HeaderOnsPageType = "ONS-Page-Type"
 
-//Handler implements the middleware for dp-frontend-router. It sets the locale code, obtains the necessary cookies for the request path and access_token,
+// Handler implements the middleware for dp-frontend-router. It sets the locale code, obtains the necessary cookies for the request path and access_token,
 // authenticates with Zebedee if required,  and obtains the "ONS-Page-Type" header to use the handler for the page type, if present.
 func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client, cfg *config.Config) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
@@ -39,7 +40,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				contentPath += "?uri=" + path
 			}
 
-			//FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
+			// FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
 			/// Update: Is this still needed when using the Zebedee client?
 
