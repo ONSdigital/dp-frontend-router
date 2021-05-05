@@ -50,6 +50,8 @@ func New(cfg Config) http.Handler {
 
 	alice := alice.New(middleware...).Then(router)
 
+	router.Handle("/", cfg.HomepageHandler)
+
 	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
@@ -65,8 +67,6 @@ func New(cfg Config) http.Handler {
 	if cfg.SearchRoutesEnabled {
 		router.Handle("/search", cfg.SearchHandler)
 	}
-
-	router.Handle("/", cfg.HomepageHandler)
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
 	router.MatcherFunc(hasFileExtMatcher).Handler(cfg.BabbageHandler)
