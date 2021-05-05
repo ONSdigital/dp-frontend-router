@@ -39,10 +39,6 @@ func New(cfg Config) http.Handler {
 
 	router := pat.New()
 
-	allRoutesMiddleware := allRoutes.Handler(map[string]http.Handler{
-		"dataset_landing_page": cfg.DatasetHandler,
-	}, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
-
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -72,7 +68,16 @@ func New(cfg Config) http.Handler {
 
 	router.Handle("/", cfg.HomepageHandler)
 
+	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
 	router.MatcherFunc(hasFileExtMatcher).Handler(cfg.BabbageHandler)
+
+	// If it is a known babbage endpoint go directly to babbage instead of using the allRoutesMiddleware
+	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(cfg.BabbageHandler)
+
+	// all other requests go through the allRoutesMiddleware to check the page type first
+	allRoutesMiddleware := allRoutes.Handler(map[string]http.Handler{
+		"dataset_landing_page": cfg.DatasetHandler,
+	}, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
 
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)
@@ -104,10 +109,45 @@ func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(
 	}
 }
 
+var knownBabbageEndpoints = []string{
+	"/chartconfig",
+	"/chartimage",
+	"/generator",
+	"/visualisations",
+	"/timeseriestool",
+	"/search",
+	"/file",
+	"/resource",
+	"/ons",
+	"/file",
+	"/calendar",
+	"/chart",
+	"/embed",
+	"/export",
+	"/hash",
+}
+
+// IsKnownBabbageEndpoint returns true if the given path matches a known babbage endpoint
+func IsKnownBabbageEndpoint(path string) bool {
+	for _, endpoint := range knownBabbageEndpoints {
+		if strings.HasPrefix(path, endpoint) {
+			return true
+		}
+	}
+	return false
+}
+
+// hasFileExtMatcher is a mux MatcherFunc implementation, allowing routes to be matched on having a file extension
+func isKnownBabbageEndpointMatcher(request *http.Request, match *mux.RouteMatch) bool {
+	return IsKnownBabbageEndpoint(request.URL.Path)
+}
+
+// HasFileExt returns true if the given path has a file extension
 func HasFileExt(path string) bool {
 	return len(filepath.Ext(path)) > 0
 }
 
+// hasFileExtMatcher is a mux MatcherFunc implementation, allowing routes to be matched on having a file extension
 func hasFileExtMatcher(request *http.Request, match *mux.RouteMatch) bool {
 	return HasFileExt(request.URL.Path)
 }
