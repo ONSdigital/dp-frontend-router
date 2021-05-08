@@ -43,7 +43,7 @@ func IsKnownBabbageEndpoint(path string) bool {
 	return false
 }
 
-// hasFileExtMatcher is a mux MatcherFunc implementation, allowing routes to be matched on having a file extension
+// isKnownBabbageEndpointMatcher is a mux MatcherFunc implementation, allowing routes to be matched on known babbage endpoints
 func isKnownBabbageEndpointMatcher(request *http.Request, match *mux.RouteMatch) bool {
 	return IsKnownBabbageEndpoint(request.URL.Path)
 }
