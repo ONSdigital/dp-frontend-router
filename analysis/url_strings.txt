@@ -1,0 +1,15 @@
+localhost:20000/embed
+
+localhost:20000/embed/visualisations/
+
+
+-=-=-
+
+curl -X GET http://localhost:20000/embed/visualisations/economy/grossdomesticproductgdp/methodologies/grossdomesticproductgdpqmi
+
+curl -X GET http://localhost:20000/embed/visualisations/economy/grossdomesticproductgdp/qmis/grossdomesticproductgdpqmi
+
+
+-=-=-
+
+go run autocannon.go --pipelining=12 --uri=http://localhost:20000/embed/visualisations/

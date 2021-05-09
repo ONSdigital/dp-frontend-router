@@ -1,0 +1,494 @@
+dp-frontend-router crash
+------------------------
+
+( during week ending Friday 24th April 2020 )
+
+
+Some tests, observations, possibly oversimplified analysis, suggestions:
+========================================================================
+
+Please note, these tests were run with 'HUMAN_LOG=1' which may have doubled the amount of time spent
+ in log.Event() in the results presented.
+[see profile_testing_writeup.txt where tests run with flag on and flag off to see difference].
+
+Tests carried out on:
+** Ubuntu 18.04LTS, 6core/12thread, SSD, 64GB RAM
+** go version go1.14 linux/amd64
+
+Test set up:
+
+(NOTE: no other services - like Zebedee ure running, which will no doubt contribute to observations seen)
+
+1. Adjust dp-front-end-router/main.go to have it run in Visual Studio Code under debug:
+
+var (
+	// BuildTime represents the time in which the service was built
+	BuildTime string = "1587727818"
+	// GitCommit represents the commit (SHA-1) hash of the service that is running
+	GitCommit string = "6584b786caac36b6214ffe04bf62f058d4021538"
+	// Version represents the version of the service that is running
+	Version string = "v1.14.0"
+)
+
+2. Run it in Debug mode
+
+3. In another terminal, run autocannon.go with line:
+
+	go run autocannon.go --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+	==> autocannon-go came from: https://github.com/GlenTiki/autocannon-go
+
+Test 1:
+=======
+
+Do the "Test set up" as above.
+
+Observation:
+dp-frontend-router gets hit with ~6500 Req/sec and Memory use does not grow.
+
+Test 2:
+=======
+
+Do the "Test set up" as above - AND
+
+Step # 4:
+
+4. whilst step 3 is running, in its terminal press cursor up and press Enter to line up the next HTTP load test.
+
+Do step 4 rapidly 30 times to line up a long stream of HTTP requests.
+
+Observation:
+dp-frontend-router gets hit with ~6500 Req/sec and Memory use grows by 6 G Bytes as visual studio code caches
+all of the log() outputs, as it attempts to output them in its DEBUG CONSOLE.
+Once the 'autocannon' HTTP Load tests have finished, it takes a LONG time for visual studio code to finish
+print / scrolling the Log() outputs from dp-frontend-router to its DEBUG CONSOLE ... and as it does this, the
+memory used is free'd.
+Thus NO memory Leaks.
+
+Test 3:
+=======
+
+Repeat Test 2, BUT do not run dp-frontend-router with visual studio code in debug mode, instead run it from a new
+terminal as follows:
+
+	go run main.go > /dev/null 2>&1
+
+Also, when it is running, open a 2nd terminal for autocannon and repeat step 4 from Test 3 for two instances of
+autocannon in their respective terminals.
+
+Observation:
+dp-frontend-router gets hit with ~11,500 Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage went up to about 75% on all cores.
+
+Test 4:
+=======
+
+First edit the log.go file that dp-frontend-router has been built against on your machine, [mine is
+ at: ~/gobook/pkg/mod/github/!o!n!sdigital/log.go@v1.0.0/log/log.go]
+and comment out on line, at ~line 70 as such:
+
+func Event(ctx context.Context, event string, opts ...option) {
+	//!!!	eventFuncInst.f(ctx, event, opts...)
+}
+
+this stops the very expensive CPU processing and output to terminal window that is also expensive of CPU cycles to
+render and scroll.
+
+Then, Repeat Test 3
+
+Observation:
+dp-frontend-router gets hit with ~68,000+ Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage went up to about 82% on all cores.
+
+Test 5:
+=======
+
+First build main.go for dp-frontend-router, and build autocannon.go
+
+then run the files as:
+
+./main in one terminal
+
+and run two instances of autocannon in seperate terminals, as:
+
+./autocannon --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+and do as step 4 of Test 2 for both instances of autocannon
+
+Observation:
+dp-frontend-router gets hit with ~70,800 Req/sec between both instances of autocannon and Memory use does NOT grow.
+CPU usage went up to about 82% on all cores.
+
+
+Analysis:
+=========
+
+From the observed behaviour in the above tests, one might surmise the following:
+
+When dp-frontend-router is running in its container on AWS, its log() output is being captured by some AWS utility
+and sent off to AWS log stash.
+I suspect this AWS utility is doing some sort of bandwidth limiting and in so doing building up its own cache of
+the Log() output from dp-frontend-router before sending to AWS log stash ... and thus memory use grows to the
+point of Docker container failure.
+
+However if all of the other services like Zebedee were running and being talked to by dp-frontend-router there may
+be much different observations.
+
+Conclusion:
+===========
+
+1. The jump in the amount of Requests/sec from Test 3 to Test 4 is significant and demonstrates Logging is taking
+a sizeable amount of CPU time ... a jump from ~11,500 to ~68,000+ Requests is quite something.
+
+2. The tests above would indicate that dp-frontend-router is NOT leaking memory, per se.
+
+However, to be more confident of that one would need to have the full suite of Apps running and talking to one
+another and then perform a 'pprof' run of dp-frontend-router with pprof set up to analyse memory usage over a
+period of ~60 seconds, etc and exercise it with two instances of autocannon again.
+
+3. One possibility (just speculation) could be that if all other services were running during the tests detailed here ...
+ As each socket connection is made and the request trickles out from dp-frontend-router to the other Applications ...
+  It takes a while for each request to complete such that more and more socket connections are opened ...
+   *** Due to the "Unbounded Parallelism" of dp-frontend-router code (hmmm) ... ***
+    And remain open ...
+     Each socket connection is handled with a "file descriptor" ...
+      The "file descriptor limit" is reached ...
+[
+ update: did "ulimit -n 10" before running dp-frontend-router and app carries on and you see following in log:
+  "raw": "http: Accept error: accept tcp [::]:20000: accept4: too many open files; retrying in 5ms"
+ So, the following 4 lines, in this scenario do not happen. (And Requests/Second was throttled to ~500).
+]
+       The App stops with a fatal error (or something similar) ...
+        The App has PID number 1 ...
+         When PID 1 stops the container STOPs
+
+          ... and the Container management system restarts the Container ...
+
+NOTE: See SECTION 8.6 - Concurrent Web Crawler (in The GO Programming Language 2016 edition)
+      ... AND in PARTICULAR Page 241, 2nd paragraph ... starting with the sentence "The program is TOO parallel." ...
+
+4. As per point number 3, but if the "file descriptor limit" is not reached, and as more and more socket connections
+are opened and remain open because other services are taking a while to respond ... then this process could fill memory.
+
+Suggestions:
+============
+
+  (I'm sure some of these have been considered, but for completness ...)
+
+1. Increase the memory available to the environment the dp-frontend-router container is running on.
+
+2. Consider using "github.com/rs/zerolog/log" to reduce log traffic and much better performance.
+   It's approach takes Uber's zap library to the next level. See its README.md at "https://github.com/rs/zerolog"
+   The part of the README.md that paints a significant picture is the 'Benchmarks' - *** - a must read.
+   This then has a link to Ubers zap library and its section on Performance "https://github.com/uber-go/zap#performance",
+   Where it states the following:
+=====
+For applications that log in the hot path, reflection-based serialization and string formatting are prohibitively
+expensive — they're CPU-intensive and make many small allocations. Put differently, using encoding/json and
+fmt.Fprintf to log tons of interface{}s makes your application slow.
+=====
+   And, ... on inspecting the ONS's https://github.com/ONSdigital/log.go/blob/master/log/log.go ... it would appear
+to be doing a number of CPU-intensive things.
+   And dp-frontend-router DOES log in the hot path.
+
+***	See APPENDIX 3 for an example of timing how long the log.Event() takes in createReverseProxy()
+ ... which is on the HOT PATH ...
+
+3. In dp-frontend-router, Add another Middleware layer before all other layers that does "HTTP requests rate limiting",
+by crafting ones own, such as:
+	https://pauladamsmith.com/blog/2016/04/max-clients-go-net-http.html
+   OR a library, such as:
+	https://github.com/ulule/limiter
+
+4. Run up an instance of the whole ONS website on a different 'test' domain name that is not advertised.
+   Adjust the performance logging tools that are gathering stats for memory usage, CPU usage and network usage for
+    the dp-frontend-router such that these particular statistics are being logged every 50ms - and also configured
+    to send this log data every 50ms (that is don't cache and write one a minute, or whatever).
+   Then hammer this new website from say 5 different computers at ONS at the same time with them using autocannon
+    (or something similar) in the manner described in step 4 above.
+   This last step, you ay want to build it up with regards the number of Load testing apps running at a time, just
+    start with 1 to start with and build up ...
+   Also for this test, have Cloudfare disabled.
+   With any luck this 'test' site will crash and you will have performance log files to analyse and gain a fuller
+    understanding of the real-time dynamic under load.
+
+5. Increase the RAM and CPU cores used to deploy dp-frontend-router:
+	RAM	  : increase by x4 to x8
+	CPU cores : increase by x4 to x8
+
+6. So ... How what is the "file descriptor limit" for the dp-frontend-router Application Container ???
+   Implement some sort of test that stresses the current limit, increase if need be and retest, loop this until happy.
+
+-=-=-
+
+
+APPENDIX 1:
+===========
+
+For each HTTP request made with autocannon, the following is being logged (~742 bytes):
+
+{
+  "created_at": "2020-04-25T19:19:57.26100652Z",
+  "event": "http request received",
+  "http": {
+    "method": "GET",
+    "path": "/embed/visualisations/",
+    "started_at": "2020-04-25T19:19:57.261005003Z",
+    "status_code": 0
+  },
+  "namespace": "dp-frontend-router",
+  "trace_id": "UXJcGYhgUQmtPqXT"
+}
+{
+  "created_at": "2020-04-25T19:19:57.261833223Z",
+  "event": "http request completed",
+  "http": {
+    "duration": 3423764,
+    "ended_at": "2020-04-25T19:19:57.261829164Z",
+    "method": "GET",
+    "path": "/embed/visualisations/",
+    "query": "%3Auri=embed%2Fvisualisations%2F",
+    "started_at": "2020-04-25T19:19:57.2584054Z",
+    "status_code": 502
+  },
+  "namespace": "dp-frontend-router",
+  "trace_id": "JlKnSSAQxcVCzZhr"
+}
+
+At say 8,000 requests per second, thats 742*8000 = 5,936,000 bytes / second [plus any other stuff] dumping to AWS
+ log stash ... hmmm.
+
+-=-=-
+
+There are other frequent entries in the log due to not having any other services running ... which may be making
+ these particular tests much worse.
+BUT these other entries ONLY occure when dp-frontend-router is receiving the HTTP requests.
+
+There are also the regular healthcheck log outputs at 30 second intervals, etc.
+
+
+APPENDIX 2:
+===========
+
+The output from autocannon for Test 5, typically looks like:
+
+running 10s test @ http://localhost:20000/embed/visualisations/
+10 connections with 12 pipelining factor.
+
+
++---------+------+------+-------+------+---------+---------+------+
+|  STAT   | 2.5% | 50%  | 97.5% | 99%  |   AVG   |  STDEV  | MAX  |
++---------+------+------+-------+------+---------+---------+------+
+| Latency | 0 ms | 0 ms | 0 ms  | 0 ms | 0.00 ms | 0.00 ms | 0 ms |
++---------+------+------+-------+------+---------+---------+------+
+
+
++-----------+--------+--------+--------+--------+----------+---------+--------+
+|   STAT    |   1%   |  2.5%  |  50%   | 97.5%  |   AVG    |  STDEV  |  MIN   |
++-----------+--------+--------+--------+--------+----------+---------+--------+
+| Req/Sec   |  33743 |  33743 |  34378 |  41720 | 35673.30 | 2802.76 |  33743 |
+| Bytes/Sec | 4.9 MB | 4.9 MB | 5.0 MB | 6.1 MB | 5.2 MB   | 409 kB  | 4.9 MB |
++-----------+--------+--------+--------+--------+----------+---------+--------+
+
+Req/Bytes counts sampled once per second.
+
+
+0 2xx responses, 356733 non 2xx responses.
+357k total requests in 10 seconds, 52 MB read.
+Done!
+
+
+APPENDIX 3:
+===========
+
+The measured timings that follow were as a result of making the following code adjustments, and following steps 1 to 3:
+
+1. In main.go of dp-frontend-router, change the chunk of code for createReverseProxy() to:
+-----
+
+var (
+	tMutex sync.Mutex
+
+	total_time     int64
+	total_requests int64
+	average_time   int64
+)
+
+func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
+	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
+	director := proxy.Director
+	proxy.Transport = &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   5 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+	proxy.Director = func(req *http.Request) {
+		{
+			start := time.Now()
+			log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
+				"destination": proxyURL,
+				"proxy_name":  proxyName,
+			})
+			duration := time.Since(start)
+			fmt.Printf("took : %s\n", duration)
+			tMutex.Lock()
+			total_requests++
+			total_time += duration.Nanoseconds()
+			//total_time += duration.Microseconds()
+			average_time = total_time / total_requests
+			tMutex.Unlock()
+			fmt.Printf("average : %v\n", average_time)
+		}
+		director(req)
+	}
+	return proxy
+}
+
+2. Build main.go and run as such:
+-----
+	go build main.go
+	
+	./main >l.txt 2>&1
+
+3. In another terminal in the autocannon folder, fire of a stress test of HTTP requests with:
+-----
+	./autocannon --pipelining=12 --uri=http://localhost:20000/embed/visualisations/
+
+Once autocannon has finished, wait 10 seconds and then do CTRL-C in the terminal for the dp-frontend-router's main.go
+
+4. The autocannon report will look similar to:
+-----
+
+10 connections with 12 pipelining factor.
+
+
++---------+------+------+-------+------+---------+---------+------+
+|  STAT   | 2.5% | 50%  | 97.5% | 99%  |   AVG   |  STDEV  | MAX  |
++---------+------+------+-------+------+---------+---------+------+
+| Latency | 0 ms | 0 ms | 0 ms  | 0 ms | 0.00 ms | 0.00 ms | 0 ms |
++---------+------+------+-------+------+---------+---------+------+
+
+
++-----------+--------+--------+--------+--------+---------+--------+--------+
+|   STAT    |   1%   |  2.5%  |  50%   | 97.5%  |   AVG   | STDEV  |  MIN   |
++-----------+--------+--------+--------+--------+---------+--------+--------+
+| Req/Sec   |   6452 |   6452 |   6715 |   6842 | 6678.10 | 113.81 |   6452 |
+| Bytes/Sec | 942 kB | 942 kB | 980 kB | 999 kB | 975 kB  | 17 kB  | 942 kB |
++-----------+--------+--------+--------+--------+---------+--------+--------+
+
+Req/Bytes counts sampled once per second.
+
+
+0 2xx responses, 66781 non 2xx responses.
+67k total requests in 10 seconds, 9.8 MB read.
+Done!
+
+5. The log.Error() output from the function that is being timed looks like:
+-----
+
+{
+  "created_at": "2020-04-26T15:19:23.282702353Z",
+  "data": {
+    "destination": {
+      "ForceQuery": false,
+      "Fragment": "",
+      "Host": "localhost:8080",
+      "Opaque": "",
+      "Path": "",
+      "RawPath": "",
+      "RawQuery": "",
+      "Scheme": "http",
+      "User": null
+    },
+    "proxy_name": "babbage"
+  },
+  "event": "proxying request",
+  "http": {
+    "method": "GET",
+    "path": "/embed/visualisations/",
+    "query": "%3Auri=embed%2Fvisualisations%2F",
+    "status_code": 0
+  },
+  "namespace": "dp-frontend-router",
+  "severity": 3,
+  "trace_id": "rEimNRKhbLUJLGqX"
+}
+took : 76.993µs
+average : 197844
+
+-=-=-
+
+*** The average above is in Nanoseconds, so that's 197 Microseconds  - JUST for the above output to a file on a
+ FAST SSD (via RAM buffering).
+
+The size of l.txt is : 121.9 Mega Bytes
+
+The average Requests per second for this test was 6678
+
+So, multiplying 197 by 6678 we get 1.315566 seconds  ... BUT thats running on 12 cores, so divide by 12 to
+ get 0.10963 seconds
+
+That's ~11% of time in just that one log.Event() that is on the HOT PATH during heavy load request.
+
+And NOTE: There are a number of other log.Event()'s that are on the HOT PATH for EVERY request.
+
+-=-=-
+
+197 Microseconds average to do a ONS log.Event() does not compare well to other libraries:
+
+[ the following copied from https://github.com/rs/zerolog on 26th April 2020 ]
+
+Log a message and 10 fields:
+Library 	Time 		Bytes Allocated 	Objects Allocated
+zerolog 	767 ns/op 	552 B/op 		6 allocs/op
+  ...
+log15 		20657 ns/op 	5632 B/op 		93 allocs/op
+
+
+Log a message with a logger that already has 10 fields of context:
+Library 	Time 		Bytes Allocated 	Objects Allocated
+zerolog 	52 ns/op 	0 B/op 			0 allocs/op
+  ...
+log15 		14179 ns/op 	2642 B/op 		44 allocs/op
+
+
+Log a static string, without any context or printf-style templating:
+Library 	Time 		Bytes Allocated 	Objects Allocated
+zerolog 	50 ns/op 	0 B/op 			0 allocs/op
+  ...
+log15 		5181 ns/op 	1592 B/op 		26 allocs/op
+
+
+In this Appendix's test *** :
+
+	1. At best, the ONS log.Event() is 9 times slower than the slowest alternative - log15
+
+	2. At worst, the ONS log.Event() is 256 times slower than the fastest alternative - zerolog
+
+
+[ that is if i have not made any mistake(s) in gathering the data presented ]
+
+Please note the above comparison number(s) should be taken "for indication and painting a picture ONLY",
+                                                           ============================================  
+ because i do not know the performance of the machine used when generating the performance timing for zerolog
+ and the others
+ AND
+ The test covered in this appendix will not be a direct comparison to the ones done on the other libraries,
+
+    BUT  probably close enough.
+
+-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+
+Obviously having Cloudflare running is the best thing to do.
+
+
+Hope this investigation / analysis helps,
+
+Rhys

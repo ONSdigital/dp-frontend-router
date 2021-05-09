@@ -2,13 +2,16 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
+	_ "net/http/pprof"
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	dphttp "github.com/ONSdigital/dp-net/http"
@@ -31,11 +34,11 @@ import (
 
 var (
 	// BuildTime represents the time in which the service was built
-	BuildTime string
+	BuildTime string = "1587727818"
 	// GitCommit represents the commit (SHA-1) hash of the service that is running
-	GitCommit string
+	GitCommit string = "6584b786caac36b6214ffe04bf62f058d4021538"
 	// Version represents the version of the service that is running
-	Version string
+	Version string = "v1.14.0"
 )
 
 func main() {
@@ -127,6 +130,16 @@ func main() {
 	}
 
 	router := pat.New()
+
+	router.PathPrefix("/debug/").Handler(http.DefaultServeMux)
+	/*
+			router.Handle("/debug/pprof/", http.HandlerFunc(pprof.Index))
+			router.Handle("/debug/pprof/cmdline", http.HandlerFunc(pprof.Cmdline))
+			router.Handle("/debug/pprof/profile", http.HandlerFunc(pprof.Profile))
+			router.Handle("/debug/pprof/symbol", http.HandlerFunc(pprof.Symbol))
+			router.Handle("/debug/pprof/trace", http.HandlerFunc(pprof.Trace))
+		//	router.Handle("/debug/pprof/heap", http.HandlerFunc(pprof.Handler("heap")))
+	*/
 
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
@@ -272,6 +285,14 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
+var (
+	tMutex sync.Mutex
+
+	total_time     int64
+	total_requests int64
+	average_time   int64
+)
+
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
@@ -287,10 +308,22 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
-			"destination": proxyURL,
-			"proxy_name":  proxyName,
-		})
+		{
+			start := time.Now()
+			log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
+				"destination": proxyURL,
+				"proxy_name":  proxyName,
+			})
+			duration := time.Since(start)
+			fmt.Printf("took : %s\n", duration)
+			tMutex.Lock()
+			total_requests++
+			total_time += duration.Nanoseconds()
+			//total_time += duration.Microseconds()
+			average_time = total_time / total_requests
+			tMutex.Unlock()
+			fmt.Printf("average : %v\n", average_time)
+		}
 		director(req)
 	}
 	return proxy
