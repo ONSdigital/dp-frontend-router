@@ -218,7 +218,7 @@ func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(
 	}
 }
 
-//abHandler ... percentA is the percentage of request that handler 'a' is used
+// abHandler ... percentA is the percentage of request that handler 'a' is used
 //
 // FIXME this isn't used anymore, it could be removed, but seems like it might be useful?
 func abHandler(a, b http.Handler, percentA int) http.Handler {
