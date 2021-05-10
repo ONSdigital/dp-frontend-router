@@ -25,25 +25,6 @@ func Test_extractIntParam(t *testing.T) {
 		So(err, ShouldBeNil)
 
 		q := r.URL.Query()
-		// using: https://jwt.io/#debugger-io
-		// the q.Set() below has:
-		// HEADER:ALGORITHM & TOKEN TYPE
-		/*
-			{
-			  "alg": "HS256"
-			}
-		*/
-		// PAYLOAD: DATA
-		/*
-			{
-			  "index": 1,
-			  "pageSize": 10,
-			  "term": "Integrated",
-			  "page": 1,
-			  "uri": "/peoplepopulationandcommunity/housing/bulletins/integratedhouseholdsurveyexperimentalstatistics/2014-10-07",
-			  "listType": "search"
-			}
-		*/
 		q.Set(":data", "eyJhbGciOiJIUzI1NiJ9.eyJpbmRleCI6MSwicGFnZVNpemUiOjEwLCJ0ZXJtIjoiSW50ZWdyYXRlZCIsInBhZ2UiOjEsInVyaSI6Ii9wZW9wbGVwb3B1bGF0aW9uYW5kY29tbXVuaXR5L2hvdXNpbmcvYnVsbGV0aW5zL2ludGVncmF0ZWRob3VzZWhvbGRzdXJ2ZXlleHBlcmltZW50YWxzdGF0aXN0aWNzLzIwMTQtMTAtMDciLCJsaXN0VHlwZSI6InNlYXJjaCJ9.MQnW73Zca_7DZbYXjQC9FMIbCiJjNe--AKcCpLU2azw")
 		r.URL.RawQuery = q.Encode()
 
