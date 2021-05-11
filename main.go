@@ -11,22 +11,17 @@ import (
 	"strings"
 	"time"
 
-	dphttp "github.com/ONSdigital/dp-net/http"
+	"github.com/ONSdigital/dp-frontend-router/router"
 
-	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
-	"github.com/ONSdigital/go-ns/handlers/reverseProxy"
+	dphttp "github.com/ONSdigital/dp-net/http"
 
 	"github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
-	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
-	"github.com/gorilla/pat"
-	"github.com/justinas/alice"
 )
 
 var (
@@ -126,67 +121,53 @@ func main() {
 		os.Exit(1)
 	}
 
-	router := pat.New()
-
-	middleware := []alice.Constructor{
-		dprequest.HandlerRequestID(16),
-		log.Middleware,
-		securityHandler,
-		healthcheckHandler(hc.Handler),
-		serverError.Handler,
-		redirects.Handler,
-	}
-
-	middleware = append(middleware, allRoutes.Handler(map[string]http.Handler{
-		"dataset_landing_page": reverseProxy.Create(datasetControllerURL, nil),
-	}, zebedeeClient, cfg))
-
-	alice := alice.New(middleware...).Then(router)
-
-	searchHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
+	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
 		log.Event(ctx, "error creating search analytics handler", log.FATAL, log.Error(err))
 		os.Exit(1)
 	}
 
-	reverseProxy := createReverseProxy("babbage", babbageURL)
-	router.Handle("/redir/{data:.*}", searchHandler)
-	router.Handle("/download/{uri:.*}", createReverseProxy("download", downloaderURL))
+	downloadHandler := createReverseProxy("download", downloaderURL)
+	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
+	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
+	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
+	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
+	geographyHandler := createReverseProxy("geography", geographyControllerURL)
+	searchHandler := createReverseProxy("search", searchControllerURL)
+	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
+	babbageHandler := createReverseProxy("babbage", babbageURL)
 
-	router.Handle("/cookies{uri:.*}", createReverseProxy("cookies", cookiesControllerURL))
-
-	router.Handle("/datasets/{uri:.*}", createReverseProxy("datasets", datasetControllerURL))
-	router.Handle("/economy/inflationandpriceindices/datasets/understandingthedifferentapproachesofmeasuringowneroccupiershousingcosts/current", createReverseProxy("/economy/inflationandpriceindices/datasets/understandingthedifferentapproachesofmeasuringowneroccupiershousingcosts/current", datasetControllerURL))
-
-	router.Handle("/filters/{uri:.*}", createReverseProxy("filters", filterDatasetControllerURL))
-	router.Handle("/filter-outputs/{uri:.*}", createReverseProxy("filter-output", filterDatasetControllerURL))
-
-	router.Handle("/feedback{uri:.*}", createReverseProxy("feedback", feedbackControllerURL))
-
-	// remove geo from prod
-	if cfg.GeographyEnabled {
-		router.Handle("/geography{uri:.*}", createReverseProxy("geography", geographyControllerURL))
+	routerConfig := router.Config{
+		AnalyticsHandler:     analyticsHandler,
+		DownloadHandler:      downloadHandler,
+		CookieHandler:        cookieHandler,
+		DatasetHandler:       datasetHandler,
+		HealthCheckHandler:   hc.Handler,
+		FilterHandler:        filterHandler,
+		FeedbackHandler:      feedbackHandler,
+		GeographyEnabled:     cfg.GeographyEnabled,
+		GeographyHandler:     geographyHandler,
+		SearchRoutesEnabled:  cfg.SearchRoutesEnabled,
+		SearchHandler:        searchHandler,
+		HomepageHandler:      homepageHandler,
+		BabbageHandler:       babbageHandler,
+		ZebedeeClient:        zebedeeClient,
+		ContentTypeByteLimit: cfg.ContentTypeByteLimit,
 	}
 
-	if cfg.SearchRoutesEnabled {
-		router.Handle("/search", createReverseProxy("search", searchControllerURL))
-	}
-	router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
-
-	router.Handle("/", createReverseProxy("homepage", homepageControllerURL))
-	router.Handle("/{uri:.*}", reverseProxy)
+	httpHandler := router.New(routerConfig)
 
 	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
 
 	s := &http.Server{
 		Addr:         cfg.BindAddr,
-		Handler:      alice,
+		Handler:      httpHandler,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	}
 
-	// Start healthcheck
+	// Start health check
 	hc.Start(ctx)
 
 	// Start server
