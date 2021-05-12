@@ -1,6 +1,9 @@
 package router
 
 import (
+	"net/http"
+	"strings"
+
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
@@ -8,8 +11,6 @@ import (
 	"github.com/ONSdigital/log.go/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	"net/http"
-	"strings"
 )
 
 //go:generate moq -out routertest/handler.go -pkg routertest . Handler
@@ -20,6 +21,7 @@ type Config struct {
 	AnalyticsHandler     http.Handler
 	DownloadHandler      http.Handler
 	DatasetHandler       http.Handler
+	PrefixDatasetHandler http.Handler
 	CookieHandler        http.Handler
 	FilterHandler        http.Handler
 	FeedbackHandler      http.Handler
@@ -75,6 +77,7 @@ func New(cfg Config) http.Handler {
 	// all other requests go through the allRoutesMiddleware to check the page type first
 	allRoutesMiddleware := allRoutes.Handler(map[string]http.Handler{
 		"dataset_landing_page": cfg.DatasetHandler,
+		"dataset":              cfg.PrefixDatasetHandler,
 	}, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
 
 	babbageRouter := router.PathPrefix("/").Subrouter()

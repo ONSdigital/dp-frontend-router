@@ -58,6 +58,13 @@ func main() {
 		os.Exit(1)
 	}
 
+	var prefixedDatasetURL = cfg.DatasetControllerURL + "/dataset"
+	prefixDatasetControllerURL, err := url.Parse(prefixedDatasetURL)
+	if err != nil {
+		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL}, log.Error(err))
+		os.Exit(1)
+	}
+
 	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
 		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL}, log.Error(err))
@@ -130,6 +137,7 @@ func main() {
 	downloadHandler := createReverseProxy("download", downloaderURL)
 	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
+	prefixDatasetHandler := createReverseProxy("datasets", prefixDatasetControllerURL)
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
 	geographyHandler := createReverseProxy("geography", geographyControllerURL)
@@ -142,6 +150,7 @@ func main() {
 		DownloadHandler:      downloadHandler,
 		CookieHandler:        cookieHandler,
 		DatasetHandler:       datasetHandler,
+		PrefixDatasetHandler: prefixDatasetHandler,
 		HealthCheckHandler:   hc.Handler,
 		FilterHandler:        filterHandler,
 		FeedbackHandler:      feedbackHandler,
