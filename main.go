@@ -140,6 +140,7 @@ func main() {
 		AnalyticsHandler:     analyticsHandler,
 		DownloadHandler:      downloadHandler,
 		CookieHandler:        cookieHandler,
+		DatasetEnabled:       cfg.DatasetEnabled,
 		DatasetHandler:       datasetHandler,
 		HealthCheckHandler:   hc.Handler,
 		FilterHandler:        filterHandler,

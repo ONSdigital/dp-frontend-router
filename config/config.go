@@ -13,6 +13,7 @@ type Config struct {
 	RendererURL                         string        `envconfig:"RENDERER_URL"`
 	CookiesControllerURL                string        `envconfig:"COOKIES_CONTROLLER_URL"`
 	HomepageControllerURL               string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
+	DatasetEnabled                      bool          `envconfig:"DATASET_ENABLED"`
 	DatasetControllerURL                string        `envconfig:"DATASET_CONTROLLER_URL"`
 	FilterDatasetControllerURL          string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
 	GeographyControllerURL              string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
@@ -48,6 +49,7 @@ func Get() (*Config, error) {
 		RendererURL:                         "http://localhost:20010",
 		CookiesControllerURL:                "http://localhost:24100",
 		HomepageControllerURL:               "http://localhost:24400",
+		DatasetEnabled:                      false,
 		DatasetControllerURL:                "http://localhost:20200",
 		FilterDatasetControllerURL:          "http://localhost:20001",
 		GeographyControllerURL:              "http://localhost:23700",
