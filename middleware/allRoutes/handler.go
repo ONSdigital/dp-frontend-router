@@ -1,35 +1,31 @@
 package allRoutes
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"path/filepath"
-
-	client "github.com/ONSdigital/dp-api-clients-go/zebedee"
-	"github.com/ONSdigital/dp-frontend-router/config"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/log"
+	"net/http"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
 const HeaderOnsPageType = "ONS-Page-Type"
 
+//go:generate moq -out allroutestest/zebedeeclient.go -pkg allroutestest . ZebedeeClient
+type ZebedeeClient interface {
+	GetWithHeaders(ctx context.Context, userAccessToken, path string) ([]byte, http.Header, error)
+}
+
 // Handler implements the middleware for dp-frontend-router. It sets the locale code, obtains the necessary cookies for the request path and access_token,
 // authenticates with Zebedee if required,  and obtains the "ONS-Page-Type" header to use the handler for the page type, if present.
-func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client, cfg *config.Config) func(h http.Handler) http.Handler {
+func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient, contentTypeByteLimit int) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			path := req.URL.Path
 
 			// Populate context here with language
 			req = dprequest.SetLocaleCode(req)
-			// Only submit requests to zebedee if looking for data.json
-			if filepath.Base(req.URL.Path) != "data.json" {
-				log.Event(req.Context(), "Skipping content specific handling as not relevant on this path.", log.INFO, log.Data{"url": path})
-				h.ServeHTTP(w, req)
-				return
-			}
 
 			// Construct contentPath with any collection if present in cookie
 			contentPath := "/data"
@@ -61,7 +57,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient *client.Client
 				return
 			}
 
-			if len(b) > cfg.ContentTypeByteLimit {
+			if len(b) > contentTypeByteLimit {
 				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", log.WARN)
 				h.ServeHTTP(w, req)
 				return
