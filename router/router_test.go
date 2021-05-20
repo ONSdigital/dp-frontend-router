@@ -413,5 +413,44 @@ func TestRouter(t *testing.T) {
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
+
+		Convey("When a /data request is made", func() {
+
+			url := "/somepage/data"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is not sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a /latest request is made", func() {
+
+			url := "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/latest"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is not sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
 	})
 }

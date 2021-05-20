@@ -23,6 +23,11 @@ var knownBabbageEndpoints = []string{
 	"/hash",
 }
 
+var knownBabbageEndpointSuffixes = []string{
+	"/data",
+	"/latest",
+}
+
 var knownBabbageEndpointPrefixes = []string{
 	"/visualisations/",
 	"/ons/",
@@ -37,6 +42,11 @@ func IsKnownBabbageEndpoint(path string) bool {
 	}
 	for _, endpoint := range knownBabbageEndpointPrefixes {
 		if strings.HasPrefix(path, endpoint) {
+			return true
+		}
+	}
+	for _, endpoint := range knownBabbageEndpointSuffixes {
+		if strings.HasSuffix(path, endpoint) {
 			return true
 		}
 	}
