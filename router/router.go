@@ -22,6 +22,7 @@ type Config struct {
 	DownloadHandler      http.Handler
 	DatasetEnabled       bool
 	DatasetHandler       http.Handler
+	PrefixDatasetHandler http.Handler
 	CookieHandler        http.Handler
 	FilterHandler        http.Handler
 	FeedbackHandler      http.Handler
@@ -75,7 +76,6 @@ func New(cfg Config) http.Handler {
 	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(cfg.BabbageHandler)
 
 	// all other requests go through the allRoutesMiddleware to check the page type first
-
 	handlers := map[string]http.Handler{
 		"dataset_landing_page": cfg.DatasetHandler,
 	}
