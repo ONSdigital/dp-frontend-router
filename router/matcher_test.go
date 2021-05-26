@@ -43,6 +43,8 @@ func TestIsKnownBabbageEndpoint(t *testing.T) {
 				So(router.IsKnownBabbageEndpoint("/file"), ShouldBeTrue)
 				So(router.IsKnownBabbageEndpoint("/ons/some/more/url"), ShouldBeTrue)
 				So(router.IsKnownBabbageEndpoint("/timeseriestool"), ShouldBeTrue)
+				So(router.IsKnownBabbageEndpoint("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/latest"), ShouldBeTrue)
+				So(router.IsKnownBabbageEndpoint("/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/2020/data"), ShouldBeTrue)
 			})
 		})
 	})
