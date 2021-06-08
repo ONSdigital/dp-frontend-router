@@ -28,6 +28,7 @@ dp-frontend-router
 | HEALTHCHECK_CRITICAL_TIMEOUT     | 90s                                     | The period of time after which failing checks will result in critical global check 
 | ZEBEDEE_REQUEST_TIMEOUT_SECONDS  | 5s                                      | The period of time to wait before timing out when communicating with Zebedee
 | ZEBEDEE_REQUEST_MAXIMUM_RETRIES  | 0                                       | The number of retry attempts to make to Zebedee 
+| DATASET_ENABLED                  | false                                   | Flag to enable dataset template
 
 
 
