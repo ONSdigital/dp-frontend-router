@@ -2,13 +2,14 @@ package router_test
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes/allroutestest"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
 	. "github.com/smartystreets/goconvey/convey"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func NewHandlerMock() *routertest.HandlerMock {
@@ -127,6 +128,54 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to the dataset handler", func() {
 				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a dataset request is made, but the dataset handler is not enabled", func() {
+
+			url := "/datasets/cpih"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.DatasetEnabled = false
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then no request is sent to the dataset handler", func() {
+				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a dataset request is made, and the dataset handler is enabled", func() {
+
+			url := "/datasets/cpih"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.DatasetEnabled = true
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to the dataset handler", func() {
+				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+
+			Convey("Then no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
 
