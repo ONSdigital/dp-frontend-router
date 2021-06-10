@@ -117,7 +117,26 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
-		Convey("When a dataset request is made, but the dataset handler is not enabled", func() {
+		Convey("When a CMD dataset request is made", func() {
+
+			url := "/datasets/cpih"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to the dataset handler", func() {
+				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a legacy dataset request is made, but the dataset handler is not enabled", func() {
 
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
 			req := httptest.NewRequest("GET", url, nil)
@@ -141,7 +160,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
-		Convey("When a dataset request is made, and the dataset handler is enabled", func() {
+		Convey("When a legacy dataset request is made, and the dataset handler is enabled", func() {
 
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
 			req := httptest.NewRequest("GET", url, nil)
