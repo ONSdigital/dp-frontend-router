@@ -151,7 +151,7 @@ func TestRouter(t *testing.T) {
 			})
 
 			Convey("Then no request is sent to the dataset handler", func() {
-				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(len(prefixDatasetHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 
 			Convey("Then the request is sent to Babbage", func() {
