@@ -11,7 +11,7 @@ import (
 	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/lang"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 )
 
 type responseInterceptor struct {
@@ -24,7 +24,7 @@ type responseInterceptor struct {
 
 func (rI *responseInterceptor) WriteHeader(status int) {
 	if status >= 400 {
-		log.Event(rI.req.Context(), "Intercepted error response", log.Data{"status": status}, log.INFO)
+		log.Info(rI.req.Context(), "Intercepted error response", log.Data{"status": status})
 		rI.intercepted = true
 		if status == 404 {
 			rI.renderErrorPage(404, "404 - The webpage you are requesting does not exist on the site", `<p> The page may have been moved, updated or deleted or you may have typed the web address incorrectly, please check the url and spelling. Alternatively, please try the <a href="#nav-search">search</a>, or return to the <a href="/" title="Our homepage" target="_self">homepage</a>.</p>`)
@@ -45,7 +45,7 @@ func (rI *responseInterceptor) renderErrorPage(code int, title, description stri
 		if err != nil {
 			rI.writeHeaders()
 			rI.ResponseWriter.WriteHeader(http.StatusInternalServerError)
-			log.Event(rI.req.Context(), "error calling renderer", log.Error(err), log.ERROR)
+			log.Error(rI.req.Context(), "error calling renderer", err)
 			return
 		}
 	}
@@ -103,7 +103,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		}
 	}
 
-	log.Event(rI.req.Context(), "returning error page", log.INFO)
+	log.Info(rI.req.Context(), "returning error page")
 	rI.ResponseWriter.WriteHeader(code)
 	rI.ResponseWriter.Write(b)
 
