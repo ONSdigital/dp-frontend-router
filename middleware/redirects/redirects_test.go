@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	dprequest "github.com/ONSdigital/dp-net/request"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
 	. "github.com/smartystreets/goconvey/convey"

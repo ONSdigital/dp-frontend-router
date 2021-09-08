@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/ONSdigital/dp-frontend-router/analytics"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 )
 
 type httpRedirector func(w http.ResponseWriter, r *http.Request, urlStr string, code int)
@@ -37,11 +37,11 @@ func NewSearchHandler(ctx context.Context, SQSanalyticsURL, RedirectSecret strin
 // HandleSearch - http Handler func for dealing with Babbage Search requests. Captures search analytics data and redirects
 // the user to the requested resource.
 func (sh searchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Event(r.Context(), "capturing search analytics data", log.INFO)
+	log.Info(r.Context(), "capturing search analytics data")
 	redirectURL, err := sh.service.CaptureAnalyticsData(r)
 
 	if err != nil {
-		log.Event(r.Context(), "error capturing analytics data", log.ERROR, log.Error(err))
+		log.Error(r.Context(), "error capturing analytics data", err)
 		w.WriteHeader(400)
 		// FIXME probably want to display a better error page than this
 		w.Write([]byte(err.Error()))

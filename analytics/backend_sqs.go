@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 )
@@ -52,7 +52,7 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	jb, err := json.Marshal(&data)
 	if err != nil {
-		log.Event(req.Context(), "error marshaling json", log.ERROR, log.Error(err))
+		log.Error(req.Context(), "error marshaling json", err)
 		return
 	}
 
@@ -64,9 +64,9 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 
 	smo, err := b.sqsClient.SendMessage(req.Context(), smi)
 	if err != nil {
-		log.Event(req.Context(), "error sending sqs message", log.ERROR, log.Error(err))
+		log.Error(req.Context(), "error sending sqs message", err)
 		return
 	}
 
-	log.Event(req.Context(), "stored analytics data in SQS", log.INFO, log.Data{"message_id": *smo.MessageId})
+	log.Info(req.Context(), "stored analytics data in SQS", log.Data{"message_id": *smo.MessageId})
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/ONSdigital/dp-frontend-router/router"
 	"math/rand"
 	"net"
 	"net/http"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/router"
+
 	dphttp "github.com/ONSdigital/dp-net/http"
 
 	"github.com/ONSdigital/dp-api-clients-go/zebedee"
@@ -20,7 +21,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 )
 
 var (
@@ -35,67 +36,67 @@ var (
 func main() {
 	log.Namespace = "dp-frontend-router"
 
+	ctx := context.Background()
+
 	cfg, err := config.Get()
 	if err != nil {
-		log.Event(nil, "unable to retrieve service configuration", log.FATAL, log.Error(err))
+		log.Fatal(ctx, "unable to retrieve service configuration", err)
 		os.Exit(1)
 	}
 
-	ctx := context.Background()
-
-	log.Event(ctx, "got service configuration", log.INFO, log.Data{"config": cfg})
+	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
 	cookiesControllerURL, err := url.Parse(cfg.CookiesControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL})
 		os.Exit(1)
 	}
 
 	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL})
 		os.Exit(1)
 	}
 
 	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL})
 		os.Exit(1)
 	}
 
 	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL})
 		os.Exit(1)
 	}
 
 	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL})
 		os.Exit(1)
 	}
 
 	searchControllerURL, err := url.Parse(cfg.SearchControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "SearchControllerURL", "value": cfg.SearchControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "SearchControllerURL", "value": cfg.SearchControllerURL})
 		os.Exit(1)
 	}
 
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL})
 		os.Exit(1)
 	}
 
 	downloaderURL, err := url.Parse(cfg.DownloaderURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL})
 		os.Exit(1)
 	}
 
 	feedbackControllerURL, err := url.Parse(cfg.FeedbackControllerURL)
 	if err != nil {
-		log.Event(nil, "configuration value is invalid", log.FATAL, log.Data{"config_name": "FeedbackControllerURL", "value": cfg.FeedbackControllerURL}, log.Error(err))
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FeedbackControllerURL", "value": cfg.FeedbackControllerURL})
 		os.Exit(1)
 	}
 
@@ -111,18 +112,18 @@ func main() {
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
-		log.Event(ctx, "Failed to obtain VersionInfo for healthcheck", log.FATAL, log.Error(err))
+		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
 		os.Exit(1)
 	}
 	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
-		log.Event(ctx, "Failed to add api router checker to healthcheck", log.FATAL, log.Error(err))
+		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 		os.Exit(1)
 	}
 
 	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
-		log.Event(ctx, "error creating search analytics handler", log.FATAL, log.Error(err))
+		log.Fatal(ctx, "error creating search analytics handler", err)
 		os.Exit(1)
 	}
 
@@ -156,7 +157,7 @@ func main() {
 
 	httpHandler := router.New(routerConfig)
 
-	log.Event(nil, "Starting server", log.INFO, log.Data{"config": cfg})
+	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
 		Addr:         cfg.BindAddr,
@@ -171,7 +172,7 @@ func main() {
 
 	// Start server
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-		log.Event(ctx, "error starting server", log.FATAL, log.Error(err))
+		log.Fatal(ctx, "error starting server", err)
 		hc.Stop()
 		os.Exit(2)
 	}
@@ -205,10 +206,10 @@ func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(
 // FIXME this isn't used anymore, it could be removed, but seems like it might be useful?
 func abHandler(a, b http.Handler, percentA int) http.Handler {
 	if percentA == 0 {
-		log.Event(nil, "abHandler decision", log.INFO, log.Data{"percentA": percentA, "destination": "b"})
+		log.Info(context.Background(), "abHandler decision", log.Data{"percentA": percentA, "destination": "b"})
 		return b
 	} else if percentA == 100 {
-		log.Event(nil, "abHandler decision", log.INFO, log.Data{"percentA": percentA, "destination": "a"})
+		log.Info(context.Background(), "abHandler decision", log.Data{"percentA": percentA, "destination": "a"})
 		return a
 	}
 
@@ -231,7 +232,7 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 				cookieValue = "B"
 			}
 
-			log.Event(req.Context(), "abHandler decision", log.INFO, log.Data{"sel": sel, "handler": cookieValue})
+			log.Info(req.Context(), "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
 
 			expiration := time.Now().Add(365 * 24 * time.Hour)
 			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
@@ -241,13 +242,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 		// Use cookie value to direct to a or b handler
 		switch cookie.Value {
 		case "A":
-			log.Event(req.Context(), "abHandler decision", log.INFO, log.Data{"cookie": "A", "destination": "a"})
+			log.Info(req.Context(), "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
 			a.ServeHTTP(w, req)
 		case "B":
-			log.Event(req.Context(), "abHandler decision", log.INFO, log.Data{"cookie": "B", "destination": "b"})
+			log.Info(req.Context(), "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
 			b.ServeHTTP(w, req)
 		default:
-			log.Event(req.Context(), "abHandler invalid cookie value, reselecting", log.INFO)
+			log.Info(req.Context(), "abHandler invalid cookie value, reselecting")
 			cookie = nil
 			goto RETRY
 		}
@@ -269,7 +270,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.Event(req.Context(), "proxying request", log.INFO, log.HTTP(req, 0, 0, nil, nil), log.Data{
+		log.Info(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
