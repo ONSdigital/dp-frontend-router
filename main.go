@@ -10,6 +10,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"fmt"
 
 	"github.com/ONSdigital/dp-frontend-router/router"
 
@@ -35,7 +36,9 @@ var (
 
 func main() {
 	log.Namespace = "dp-frontend-router"
-
+	i :=0
+	i++
+	fmt.Println(i)
 	ctx := context.Background()
 
 	cfg, err := config.Get()
@@ -46,42 +49,56 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
+	i++
+	fmt.Println(i)
 	cookiesControllerURL, err := url.Parse(cfg.CookiesControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL})
 		os.Exit(1)
 	}
 
+i++
+	fmt.Println(i)
 	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL})
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL})
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL})
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL})
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	searchControllerURL, err := url.Parse(cfg.SearchControllerURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "SearchControllerURL", "value": cfg.SearchControllerURL})
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL})
@@ -100,6 +117,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println("?", i)
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
@@ -108,6 +127,9 @@ func main() {
 	hcClienter.SetTimeout(cfg.ZebedeeRequestMaximumTimeoutSeconds)
 
 	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
+
+	i++
+	fmt.Println(i)
 
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
@@ -121,6 +143,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	i++
+	fmt.Println(i)
 	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
 		log.Fatal(ctx, "error creating search analytics handler", err)
@@ -137,6 +161,8 @@ func main() {
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 
+	i++
+	fmt.Println(i)
 	routerConfig := router.Config{
 		AnalyticsHandler:     analyticsHandler,
 		DownloadHandler:      downloadHandler,
@@ -170,6 +196,8 @@ func main() {
 	// Start health check
 	hc.Start(ctx)
 
+	i++
+	fmt.Println("!", i)
 	// Start server
 	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(ctx, "error starting server", err)

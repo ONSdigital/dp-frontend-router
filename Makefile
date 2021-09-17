@@ -13,18 +13,35 @@ all: audit test build
 audit:
 	go list -m all | nancy sleuth
 
+.PHONY: assets
+assets:
+	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
+
+.PHONY: assets-debug
+assets-debug:
+	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -debug -o redirects.go -pkg assets redirects/...
+
+.PHONY: clean-assets
+clean-assets:
+	rm assets/redirects.go
+
 .PHONY: build
 build:
-	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
+	assets
 	go build -tags 'production' -o $(BINPATH)/dp-frontend-router -ldflags="-X 'main.BuildTime=$(BUILD_TIME)' -X 'main.GitCommit=$(GIT_COMMIT)' -X 'main.Version=$(VERSION)'"
 
 .PHONY: debug
 debug:
-	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -debug -o redirects.go -pkg assets redirects/...
+	assets-debug
 	go build -tags 'debug' -o $(BINPATH)/dp-frontend-router -ldflags="-X 'main.BuildTime=$(BUILD_TIME)' -X 'main.GitCommit=$(GIT_COMMIT)' -X 'main.Version=$(VERSION)'"
 	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
+.PHONY: debug-run
+debug-run:
+	HUMAN_LOG=1 go run -ldflags "-X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT) -X main.Version=$(VERSION)" -race $(LDFLAGS) main.go
+	clean-assets
+
 .PHONY: test
 test:
-	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
+	assets
 	go test -race -cover -tags 'production' ./...

@@ -8,6 +8,7 @@ import (
 
 // Config represents service configuration for dp-frontend-router
 type Config struct {
+	AssetsDirectory                     string        `envconfig:"ASSETS_DIRECTORY"`
 	BindAddr                            string        `envconfig:"BIND_ADDR"`
 	BabbageURL                          string        `envconfig:"BABBAGE_URL"`
 	RendererURL                         string        `envconfig:"RENDERER_URL"`
@@ -43,6 +44,7 @@ func Get() (*Config, error) {
 	}
 
 	cfg := &Config{
+		AssetsDirectory:                     "assets",
 		BindAddr:                            ":20000",
 		BabbageURL:                          "http://localhost:8080",
 		RendererURL:                         "http://localhost:20010",
