@@ -30,6 +30,8 @@ type Config struct {
 	GeographyEnabled       bool
 	GeographyHandler       http.Handler
 	SearchRoutesEnabled    bool
+	ArticlesHandler        http.Handler
+	BulletinsEnabled       bool
 	EnableSearchABTest     bool
 	SearchABTestPercentage int
 	SiteDomain             string
@@ -83,9 +85,13 @@ func New(cfg Config) http.Handler {
 	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(cfg.BabbageHandler)
 
 	// all other requests go through the allRoutesMiddleware to check the page type first
-	allRoutesMiddleware := allRoutes.Handler(map[string]http.Handler{
+	handlers := map[string]http.Handler{
 		"dataset_landing_page": cfg.DatasetHandler,
-	}, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
+	}
+	if cfg.BulletinsEnabled {
+		handlers["bulletin"] = cfg.ArticlesHandler
+	}
+	allRoutesMiddleware := allRoutes.Handler(handlers, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
 
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)

@@ -21,6 +21,8 @@ type Config struct {
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
 	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
+	ArticlesControllerURL               string        `envconfig:"ARTICLES_CONTROLLER_URL"`
+	BulletinsEnabled                    bool          `envconfig:"BULLETINS_ENABLED"`
 	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
@@ -57,6 +59,8 @@ func Get() (*Config, error) {
 		FeedbackControllerURL:               "http://localhost:25200",
 		SearchControllerURL:                 "http://localhost:25000",
 		SearchRoutesEnabled:                 false,
+		ArticlesControllerURL:               "http://localhost:26500",
+		BulletinsEnabled:                    false,
 		APIRouterURL:                        "http://localhost:23200/v1",
 		DownloaderURL:                       "http://localhost:23400",
 		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",

@@ -82,6 +82,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	articlesControllerURL, err := url.Parse(cfg.ArticlesControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "ArticlesControllerURL", "value": cfg.ArticlesControllerURL})
+		os.Exit(1)
+	}
+
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL})
@@ -136,6 +142,7 @@ func main() {
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
 	geographyHandler := createReverseProxy("geography", geographyControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
+	articlesHandler := createReverseProxy("articles", articlesControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 
@@ -151,6 +158,8 @@ func main() {
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
 		SearchHandler:          searchHandler,
+		ArticlesHandler:        articlesHandler,
+		BulletinsEnabled:       cfg.BulletinsEnabled,
 		EnableSearchABTest:     enableSearchABTest,
 		SearchABTestPercentage: cfg.SearchABTestPercentage,
 		SiteDomain:             cfg.SiteDomain,

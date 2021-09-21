@@ -2,10 +2,12 @@ package router_test
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes/allroutestest"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
@@ -33,6 +35,7 @@ func TestRouter(t *testing.T) {
 		babbageHandler := NewHandlerMock()
 		geographyHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
+		articlesHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
 			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
@@ -41,21 +44,23 @@ func TestRouter(t *testing.T) {
 		}
 
 		config := router.Config{
-			AnalyticsHandler:   analyticsHandler,
-			SearchHandler:      searchHandler,
-			DownloadHandler:    downloadHandler,
-			HealthCheckHandler: healthCheckHandler.ServeHTTPFunc,
-			CookieHandler:      cookieHandler,
-			DatasetHandler:     datasetHandler,
-			FilterHandler:      filterHandler,
-			FeedbackHandler:    feedbackHandler,
-			ZebedeeClient:      zebedeeClient,
-			BabbageHandler:     babbageHandler,
-			GeographyHandler:   geographyHandler,
-			HomepageHandler:    homepageHandler,
+			AnalyticsHandler:     analyticsHandler,
+			SearchHandler:        searchHandler,
+			DownloadHandler:      downloadHandler,
+			HealthCheckHandler:   healthCheckHandler.ServeHTTPFunc,
+			CookieHandler:        cookieHandler,
+			DatasetHandler:       datasetHandler,
+			FilterHandler:        filterHandler,
+			FeedbackHandler:      feedbackHandler,
+			ZebedeeClient:        zebedeeClient,
+			BabbageHandler:       babbageHandler,
+			GeographyHandler:     geographyHandler,
+			HomepageHandler:      homepageHandler,
+			ArticlesHandler:      articlesHandler,
+			ContentTypeByteLimit: 10000,
 		}
 
-		Convey("When a analytics request is made", func() {
+		Convey("When an analytics request is made", func() {
 
 			url := "/redir/123"
 			req := httptest.NewRequest("GET", url, nil)
@@ -278,6 +283,64 @@ func TestRouter(t *testing.T) {
 			Convey("Then no request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
+		})
+
+		Convey("When a bulletin request is made", func() {
+
+			url := "/businessindustryandtrade/constructionindustry/bulletins/constructionoutputingreatbritain/july2021"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			// mock allRouteHandler's zebedee response to return bulletin page type
+			zebedeeResponseBody := json.RawMessage(`{"type":"bulletin"}`)
+			zebedeeClient = &allroutestest.ZebedeeClientMock{
+				GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
+					return zebedeeResponseBody, http.Header{allRoutes.HeaderOnsPageType: {"bulletin"}}, nil
+				},
+			}
+			config.ZebedeeClient = zebedeeClient
+			expectedZebedeeURL := "/data?uri=" + url
+
+			Convey("And the bulletin flag is not enabled", func() {
+				config.BulletinsEnabled = false
+				router := router.New(config)
+				router.ServeHTTP(res, req)
+
+				Convey("Then a request is sent to Zebedee to check the page type", func() {
+					So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+					So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldEqual, expectedZebedeeURL)
+				})
+
+				Convey("And no request is sent to the articles handler", func() {
+					So(len(articlesHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				})
+
+				Convey("And the request is sent to Babbage", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+					So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+				})
+			})
+
+			Convey("And the bulletin flag is enabled", func() {
+				config.BulletinsEnabled = true
+				router := router.New(config)
+				router.ServeHTTP(res, req)
+
+				Convey("Then a request is sent to Zebedee to check the page type", func() {
+					So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+					So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldEqual, expectedZebedeeURL)
+				})
+
+				Convey("And the request is sent to the articles handler", func() {
+					So(len(articlesHandler.ServeHTTPCalls()), ShouldEqual, 1)
+					So(articlesHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+				})
+
+				Convey("And no request is sent to Babbage", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				})
+			})
+
 		})
 
 		Convey("When a homepage request is made", func() {

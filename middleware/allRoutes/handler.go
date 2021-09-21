@@ -4,13 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/v2/log"
-	"net/http"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
-const HeaderOnsPageType = "ONS-Page-Type"
+const HeaderOnsPageType = "Ons-Page-Type"
 
 //go:generate moq -out allroutestest/zebedeeclient.go -pkg allroutestest . ZebedeeClient
 type ZebedeeClient interface {

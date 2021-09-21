@@ -13,6 +13,7 @@ dp-frontend-router
 | GEOGRAPHY_CONTROLLER_URL         | http://localhost:23700                  | The URL of dp-frontend-geography-controller
 | FEEDBACK_CONTROLLER_URL          | http://localhost:25200                  | The URL of dp-frontend-feedback-controller
 | SEARCH_CONTROLLER_URL            | http://localhost:25000                  | The URL of dp-frontend-search-controller
+| ARTICLES_CONTROLLER_URL          | http://localhost:26500                  | The URL of dp-frontend-articles-controller
 | ZEBEDEE_URL                      | http://localhost:8082                   | The URL of zebedee
 | PATTERN_LIBRARY_ASSETS_PATH      | https://cdn.ons.gov.uk/sixteens/e42235b | The URL to the sixteens build to use
 | SITE_DOMAIN                      | ons.gov.uk                              | The domain hosting the site
@@ -28,7 +29,7 @@ dp-frontend-router
 | HEALTHCHECK_CRITICAL_TIMEOUT     | 90s                                     | The period of time after which failing checks will result in critical global check 
 | ZEBEDEE_REQUEST_TIMEOUT_SECONDS  | 5s                                      | The period of time to wait before timing out when communicating with Zebedee
 | ZEBEDEE_REQUEST_MAXIMUM_RETRIES  | 0                                       | The number of retry attempts to make to Zebedee 
-
+| BULLETINS_ENABLED                | false                                   | Flag to send bulletin requests to dp-frontend-articles-controller
 
 
 ### Licence
