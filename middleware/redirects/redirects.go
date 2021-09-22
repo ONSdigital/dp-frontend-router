@@ -5,11 +5,8 @@ import (
 	"context"
 	"encoding/csv"
 	"net/http"
-	"os"
-	"fmt"
-
+	
 	"github.com/ONSdigital/log.go/v2/log"
-	"github.com/ONSdigital/dp-frontend-router/config"
 )
 
 var redirects = make(map[string]string)
@@ -19,16 +16,6 @@ var redirects = make(map[string]string)
 var PanicOnInitError = true
 
 func Init(asset func(name string) ([]byte, error)) {
-	cfg, err := config.Get()
-	if err != nil{
-		if PanicOnInitError {
-			panic("Unable to get config: " + err.Error())
-		}
-	}
-
-	assetsDir := cfg.AssetsDirectory
-	d, _ := os.Getwd()
-	fmt.Println("pwd: ", d + assetsDir)
 	b, err := asset("redirects/redirects.csv")
 	if err != nil {
 		log.Error(context.Background(), "can't find redirects.csv", err)

@@ -35,7 +35,7 @@ var (
 
 func main() {
 	log.Namespace = "dp-frontend-router"
-	
+
 	ctx := context.Background()
 
 	cfg, err := config.Get()
