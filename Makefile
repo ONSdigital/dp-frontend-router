@@ -26,13 +26,11 @@ clean-assets:
 	rm assets/redirects.go
 
 .PHONY: build
-build:
-	assets
+build: assets
 	go build -tags 'production' -o $(BINPATH)/dp-frontend-router -ldflags="-X 'main.BuildTime=$(BUILD_TIME)' -X 'main.GitCommit=$(GIT_COMMIT)' -X 'main.Version=$(VERSION)'"
 
 .PHONY: debug
-debug:
-	assets-debug
+debug: assets-debug
 	go build -tags 'debug' -o $(BINPATH)/dp-frontend-router -ldflags="-X 'main.BuildTime=$(BUILD_TIME)' -X 'main.GitCommit=$(GIT_COMMIT)' -X 'main.Version=$(VERSION)'"
 	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
@@ -42,6 +40,5 @@ debug-run:
 	clean-assets
 
 .PHONY: test
-test:
-	assets
+test: assets
 	go test -race -cover -tags 'production' ./...
