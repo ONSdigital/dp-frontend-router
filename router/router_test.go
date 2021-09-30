@@ -2,13 +2,14 @@ package router_test
 
 import (
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes/allroutestest"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
 	. "github.com/smartystreets/goconvey/convey"
-	"net/http"
-	"net/http/httptest"
-	"testing"
 )
 
 func NewHandlerMock() *routertest.HandlerMock {
