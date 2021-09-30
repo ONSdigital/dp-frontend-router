@@ -32,6 +32,8 @@ type Config struct {
 	HealthckeckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
+	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
+	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 }
 
 var cfg *Config
@@ -66,6 +68,8 @@ func Get() (*Config, error) {
 		HealthckeckInterval:                 30 * time.Second,
 		ZebedeeRequestMaximumTimeoutSeconds: 5 * time.Second,
 		ZebedeeRequestMaximumRetries:        0,
+		EnableSearchABTest:                  false,
+		SearchABTestPercentage:              10,
 	}
 
 	return cfg, envconfig.Process("", cfg)
