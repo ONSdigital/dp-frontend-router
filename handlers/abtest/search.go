@@ -1,0 +1,85 @@
+package abtest
+
+import (
+	"context"
+	"math/rand"
+	"net/http"
+	"time"
+
+	"github.com/ONSdigital/dp-cookies/cookies"
+	"github.com/ONSdigital/log.go/log"
+)
+
+func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain string) http.Handler {
+	/// move this to main.go/config.go
+	if percentage < 0 || percentage > 100 {
+		log.Event(context.Background(), "search A/B percentage must be set between 0 and 100", log.ERROR)
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			oldSearch.ServeHTTP(w, req)
+		})
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		cookie, err := cookies.GetABTest(req)
+		if err != nil && err != cookies.ErrABTestCookieNotFound {
+			log.Event(req.Context(), "error getting a/b test cookie", log.WARN, log.Error(err))
+		}
+
+		if cookie.NewSearch == nil && cookie.OldSearch == nil {
+			servs := randomiseABTestCookie(percentage, time.Now())
+			cookieErr := cookies.SetABTest(w, servs, domain)
+			if cookieErr != nil {
+				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
+				oldSearch.ServeHTTP(w, req)
+				return
+			}
+			servABTest(newSearch, oldSearch, w, req, servs)
+			return
+		}
+
+		if cookie.NewSearch.Before(time.Now().UTC()) && cookie.OldSearch.Before(time.Now().UTC()) {
+			servs := randomiseABTestCookie(percentage, time.Now())
+			cookieErr := cookies.SetABTest(w, servs, domain)
+			if cookieErr != nil {
+				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
+				oldSearch.ServeHTTP(w, req)
+				return
+			}
+			servABTest(newSearch, oldSearch, w, req, servs)
+			return
+		}
+
+		servABTest(newSearch, oldSearch, w, req, cookie)
+	})
+}
+
+func setTime24HoursAhead(now time.Time) time.Time {
+	return now.UTC().Add(24 * time.Duration(time.Hour))
+}
+
+func randomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
+	var newSearch time.Time
+	var oldSearch time.Time
+	if rand.Intn(100) < percentage {
+		newSearch = setTime24HoursAhead(now)
+		oldSearch = now.UTC()
+	} else {
+		newSearch = now.UTC()
+		oldSearch = setTime24HoursAhead(now)
+	}
+
+	return cookies.ABServices{
+		NewSearch: &newSearch,
+		OldSearch: &oldSearch,
+	}
+}
+
+func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *http.Request, cookie cookies.ABServices) {
+	if cookie.NewSearch.After(time.Now().UTC()) {
+		newSearch.ServeHTTP(w, req)
+	}
+	if cookie.OldSearch.After(time.Now().UTC()) {
+		oldSearch.ServeHTTP(w, req)
+	}
+}
