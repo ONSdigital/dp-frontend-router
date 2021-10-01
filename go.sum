@@ -42,6 +42,8 @@ github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym
 github.com/ONSdigital/dp-api-clients-go v1.28.0/go.mod h1:iyJy6uRL4B6OYOJA0XMr5UHt6+Q8XmN9uwmURO+9Oj4=
 github.com/ONSdigital/dp-api-clients-go v1.34.2 h1:4oVv0YbpxZn4V1H/X7RFQqlAPdXBlthKTarvrDq+tbU=
 github.com/ONSdigital/dp-api-clients-go v1.34.2/go.mod h1:kX+YKuoLYLfkeLHMvQKRRydZVxO7ZEYyYiwG2xhV51E=
+github.com/ONSdigital/dp-cookies v0.3.2 h1:xNjMXd1upjigCweTnuiW098Cn9ycmrC6li4zXBbRSt0=
+github.com/ONSdigital/dp-cookies v0.3.2/go.mod h1:qyvkAXoVLMNU9Xf1U5zFGRnuWyLxQ/mHloXUXyzcgb8=
 github.com/ONSdigital/dp-healthcheck v1.0.5 h1:DXnohGIqXaLLeYGdaGOhgkZjAbWMNoLAjQ3EgZeMT3M=
 github.com/ONSdigital/dp-healthcheck v1.0.5/go.mod h1:2wbVAUHMl9+4tWhUlxYUuA1dnf2+NrwzC+So5f5BMLk=
 github.com/ONSdigital/dp-mocking v0.0.0-20190905163309-fee2702ad1b9/go.mod h1:BcIRgitUju//qgNePRBmNjATarTtynAgc0yV29VpLEk=
