@@ -30,9 +30,6 @@ func TestABSearchHandler(t *testing.T) {
 
 	Convey("SearchHandler", t, func() {
 		newSearch, oldSearch := NewHandlerMock(), NewHandlerMock()
-		// _ = abtest.SearchHandler(newSearch, oldSearch, 1, domain)
-
-		// TODO call abtesthandler
 
 		Convey("request to old or new search if no cookie is set", func() {
 			req := httptest.NewRequest("GET", "/search", nil)
