@@ -100,6 +100,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
+
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
@@ -149,7 +151,7 @@ func main() {
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
 		SearchHandler:          searchHandler,
-		EnableSearchABTest:     cfg.EnableSearchABTest,
+		EnableSearchABTest:     enableSearchABTest,
 		SearchABTestPercentage: cfg.SearchABTestPercentage,
 		SiteDomain:             cfg.SiteDomain,
 		HomepageHandler:        homepageHandler,

@@ -1,7 +1,6 @@
 package abtest
 
 import (
-	"context"
 	"math/rand"
 	"net/http"
 	"time"
@@ -14,13 +13,6 @@ import (
 type Handler http.Handler
 
 func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain string) http.Handler {
-	/// move this to main.go/config.go
-	if percentage < 0 || percentage > 100 {
-		log.Event(context.Background(), "search A/B percentage must be set between 0 and 100", log.ERROR)
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			oldSearch.ServeHTTP(w, req)
-		})
-	}
 	rand.Seed(time.Now().UnixNano())
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
