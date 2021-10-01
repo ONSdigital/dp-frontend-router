@@ -10,6 +10,9 @@ import (
 	"github.com/ONSdigital/log.go/log"
 )
 
+//go:generate moq -out searchtest/handler.go -pkg test . Handler
+type Handler http.Handler
+
 func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain string) http.Handler {
 	/// move this to main.go/config.go
 	if percentage < 0 || percentage > 100 {
@@ -21,13 +24,15 @@ func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain str
 	rand.Seed(time.Now().UnixNano())
 
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		// Retrieve AB Test Cookie
 		cookie, err := cookies.GetABTest(req)
 		if err != nil && err != cookies.ErrABTestCookieNotFound {
 			log.Event(req.Context(), "error getting a/b test cookie", log.WARN, log.Error(err))
 		}
 
+		// If AB Test cookie not set, create new AB Test cookie
 		if cookie.NewSearch == nil && cookie.OldSearch == nil {
-			servs := randomiseABTestCookie(percentage, time.Now())
+			servs := RandomiseABTestCookie(percentage, time.Now())
 			cookieErr := cookies.SetABTest(w, servs, domain)
 			if cookieErr != nil {
 				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
@@ -38,8 +43,9 @@ func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain str
 			return
 		}
 
+		// If AB Test cookie expired, set new AB Test cookie
 		if cookie.NewSearch.Before(time.Now().UTC()) && cookie.OldSearch.Before(time.Now().UTC()) {
-			servs := randomiseABTestCookie(percentage, time.Now())
+			servs := RandomiseABTestCookie(percentage, time.Now())
 			cookieErr := cookies.SetABTest(w, servs, domain)
 			if cookieErr != nil {
 				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
@@ -58,7 +64,7 @@ func setTime24HoursAhead(now time.Time) time.Time {
 	return now.UTC().Add(24 * time.Duration(time.Hour))
 }
 
-func randomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
+func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	var newSearch time.Time
 	var oldSearch time.Time
 	if rand.Intn(100) < percentage {
