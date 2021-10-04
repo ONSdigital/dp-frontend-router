@@ -75,7 +75,7 @@ func Get() (*Config, error) {
 	return cfg, envconfig.Process("", cfg)
 }
 
-// IsEnableSearchABTest checks wehther ab test is enabled and that percentage is a sensuible int value
+// IsEnableSearchABTest checks whether ab test is enabled and that percentage is a sensible int value
 func IsEnableSearchABTest(cfg Config) bool {
 	percentage := cfg.SearchABTestPercentage
 	if cfg.EnableSearchABTest && percentage > 0 && percentage < 100 {
