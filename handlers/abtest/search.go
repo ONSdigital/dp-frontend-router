@@ -22,38 +22,40 @@ func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain str
 			log.Event(req.Context(), "error getting a/b test cookie", log.WARN, log.Error(err))
 		}
 
+		now := time.Now().UTC()
+
 		// If AB Test cookie not set, create new AB Test cookie
 		if cookie.NewSearch == nil && cookie.OldSearch == nil {
-			servs := RandomiseABTestCookie(percentage, time.Now())
+			servs := RandomiseABTestCookie(percentage, now)
 			cookieErr := cookies.SetABTest(w, servs, domain)
 			if cookieErr != nil {
 				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
 				oldSearch.ServeHTTP(w, req)
 				return
 			}
-			servABTest(newSearch, oldSearch, w, req, servs)
+			servABTest(newSearch, oldSearch, w, req, servs, now)
 			return
 		}
 
 		// If AB Test cookie expired, set new AB Test cookie
-		if cookie.NewSearch.Before(time.Now().UTC()) && cookie.OldSearch.Before(time.Now().UTC()) {
-			servs := RandomiseABTestCookie(percentage, time.Now())
+		if cookie.NewSearch.Before(now) && cookie.OldSearch.Before(now) {
+			servs := RandomiseABTestCookie(percentage, now)
 			cookieErr := cookies.SetABTest(w, servs, domain)
 			if cookieErr != nil {
 				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
 				oldSearch.ServeHTTP(w, req)
 				return
 			}
-			servABTest(newSearch, oldSearch, w, req, servs)
+			servABTest(newSearch, oldSearch, w, req, servs, now)
 			return
 		}
 
-		servABTest(newSearch, oldSearch, w, req, cookie)
+		servABTest(newSearch, oldSearch, w, req, cookie, now)
 	})
 }
 
 func setTime24HoursAhead(now time.Time) time.Time {
-	return now.UTC().Add(24 * time.Duration(time.Hour))
+	return now.Add(24 * time.Duration(time.Hour))
 }
 
 func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
@@ -61,9 +63,9 @@ func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	var oldSearch time.Time
 	if rand.Intn(100) < percentage {
 		newSearch = setTime24HoursAhead(now)
-		oldSearch = now.UTC()
+		oldSearch = now
 	} else {
-		newSearch = now.UTC()
+		newSearch = now
 		oldSearch = setTime24HoursAhead(now)
 	}
 
@@ -73,11 +75,11 @@ func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	}
 }
 
-func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *http.Request, cookie cookies.ABServices) {
-	if cookie.NewSearch.After(time.Now().UTC()) {
+func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *http.Request, cookie cookies.ABServices, now time.Time) {
+	if cookie.NewSearch.After(now) {
 		newSearch.ServeHTTP(w, req)
 	}
-	if cookie.OldSearch.After(time.Now().UTC()) {
+	if cookie.OldSearch.After(now) {
 		oldSearch.ServeHTTP(w, req)
 	}
 }
