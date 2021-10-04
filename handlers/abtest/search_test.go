@@ -11,7 +11,6 @@ import (
 	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest/searchtest"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/pat"
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -83,13 +82,11 @@ func TestABSearchHandler(t *testing.T) {
 	Convey("randomiseABTestCookie returns the correct result", t, func() {
 		Convey("sets new search for twenty for hours when set to 100 of traffic", func() {
 			result := abtest.RandomiseABTestCookie(100, now)
-			spew.Dump(result)
 			So(result, ShouldResemble, cookies.ABServices{NewSearch: &tomorrow, OldSearch: &now})
 		})
 
 		Convey("sets old search for twenty for hours when set to 0 of traffic", func() {
 			result := abtest.RandomiseABTestCookie(0, now)
-			spew.Dump(result)
 			So(result, ShouldResemble, cookies.ABServices{NewSearch: &now, OldSearch: &tomorrow})
 		})
 	})
