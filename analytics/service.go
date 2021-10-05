@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	jwt "github.com/form3tech-oss/jwt-go"
 )
 
@@ -99,7 +99,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 	}
 
 	// FIXME do we want to log as well as store in backend?
-	log.Event(r.Context(), "search analytics data", log.INFO, log.Data{
+	log.Info(r.Context(), "search analytics data", log.Data{
 		urlParam:        url,
 		termParam:       term,
 		searchTypeParam: listType,

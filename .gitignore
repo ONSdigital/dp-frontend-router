@@ -4,3 +4,4 @@ build
 *.iml
 .idea
 assets/redirects.go
+.go/

@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	dprequest "github.com/ONSdigital/dp-net/request"
-	"github.com/ONSdigital/log.go/log"
+	"github.com/ONSdigital/log.go/v2/log"
 	"net/http"
 )
 
@@ -31,7 +31,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			contentPath := "/data"
 			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
 				contentPath += "/" + c.Value + "?uri=" + path
-				log.Event(req.Context(), "generated from 'collection' cookie", log.INFO, log.Data{"contentPath": contentPath})
+				log.Info(req.Context(), "generated from 'collection' cookie", log.Data{"contentPath": contentPath})
 			} else {
 				contentPath += "?uri=" + path
 			}
@@ -45,20 +45,20 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			c, err := req.Cookie(`access_token`)
 			if err == nil && len(c.Value) > 0 {
 				userAccessToken = c.Value
-				log.Event(req.Context(), "Obtained access_token Cookie", log.INFO, log.Data{"value": c.Value})
+				log.Info(req.Context(), "Obtained access_token Cookie", log.Data{"value": c.Value})
 			}
 
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
 				// intentionally log as info with the error in log.data to prevent the full stack trace being logged as zebedee 404's are common
-				log.Event(req.Context(), "Zebedee GET failed", log.INFO, log.Data{"error": err.Error(), "path": path})
+				log.Info(req.Context(), "Zebedee GET failed", log.Data{"error": err.Error(), "path": path})
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			if len(b) > contentTypeByteLimit {
-				log.Event(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling", log.WARN)
+				log.Warn(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling")
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -68,12 +68,12 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 				DatasetID string `json:"apiDatasetId"`
 			}{}
 			if err := json.Unmarshal(b, &zebResp); err != nil {
-				log.Event(req.Context(), "json unmarshal error", log.ERROR, log.Error(err))
+				log.Error(req.Context(), "json unmarshal error", err)
 				h.ServeHTTP(w, req)
 				return
 			}
 
-			log.Event(req.Context(), "zebedee response", log.INFO, log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
+			log.Info(req.Context(), "zebedee response", log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
 
 			pageType := headers.Get(HeaderOnsPageType)
 
@@ -83,7 +83,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			}
 
 			if h, ok := routesHandler[pageType]; ok {
-				log.Event(req.Context(), "Using handler for page type", log.INFO, log.Data{"pageType": pageType, "path": contentPath})
+				log.Info(req.Context(), "Using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
 				h.ServeHTTP(w, req)
 				return
 			}
