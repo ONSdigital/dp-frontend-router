@@ -13,8 +13,6 @@ import (
 type Handler http.Handler
 
 func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain string) http.Handler {
-	rand.Seed(time.Now().UnixNano())
-
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// Retrieve AB Test Cookie
 		cookie, err := cookies.GetABTest(req)
@@ -61,6 +59,7 @@ func HandleCookieCreationAndServ(w http.ResponseWriter, req *http.Request, newSe
 func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	var newSearch time.Time
 	var oldSearch time.Time
+	rand.Seed(time.Now().UnixNano())
 	if rand.Intn(100) < percentage {
 		newSearch = setTime24HoursAhead(now)
 		oldSearch = now
