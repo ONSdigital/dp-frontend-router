@@ -26,27 +26,13 @@ func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain str
 
 		// If AB Test cookie not set, create new AB Test cookie
 		if cookie.NewSearch == nil && cookie.OldSearch == nil {
-			servs := RandomiseABTestCookie(percentage, now)
-			cookieErr := cookies.SetABTest(w, servs, domain)
-			if cookieErr != nil {
-				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
-				oldSearch.ServeHTTP(w, req)
-				return
-			}
-			servABTest(newSearch, oldSearch, w, req, servs, now)
+			HandleCookieCreationAndServ(w, req, newSearch, oldSearch, percentage, domain, now)
 			return
 		}
 
 		// If AB Test cookie expired, set new AB Test cookie
 		if cookie.NewSearch.Before(now) && cookie.OldSearch.Before(now) {
-			servs := RandomiseABTestCookie(percentage, now)
-			cookieErr := cookies.SetABTest(w, servs, domain)
-			if cookieErr != nil {
-				log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
-				oldSearch.ServeHTTP(w, req)
-				return
-			}
-			servABTest(newSearch, oldSearch, w, req, servs, now)
+			HandleCookieCreationAndServ(w, req, newSearch, oldSearch, percentage, domain, now)
 			return
 		}
 
@@ -58,6 +44,20 @@ func setTime24HoursAhead(now time.Time) time.Time {
 	return now.Add(24 * time.Duration(time.Hour))
 }
 
+// HandleCookieCreationAndServ calls randomise, creates a cookie and servs the request
+func HandleCookieCreationAndServ(w http.ResponseWriter, req *http.Request, newSearch, oldSearch http.Handler, percentage int, domain string, now time.Time) {
+	servs := RandomiseABTestCookie(percentage, now)
+	err := cookies.SetABTest(w, servs, domain)
+	if err != nil {
+		log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
+		oldSearch.ServeHTTP(w, req)
+		return
+	}
+	servABTest(newSearch, oldSearch, w, req, servs, now)
+	return
+}
+
+// RandomiseABTestCookie randomly sets expiry times for new and old search services
 func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	var newSearch time.Time
 	var oldSearch time.Time
