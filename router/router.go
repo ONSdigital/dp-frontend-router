@@ -1,6 +1,10 @@
 package router
 
 import (
+	"net/http"
+	"strings"
+
+	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
@@ -8,29 +12,30 @@ import (
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/pat"
 	"github.com/justinas/alice"
-	"net/http"
-	"strings"
 )
 
 //go:generate moq -out routertest/handler.go -pkg routertest . Handler
 type Handler http.Handler
 
 type Config struct {
-	HealthCheckHandler   func(w http.ResponseWriter, req *http.Request)
-	AnalyticsHandler     http.Handler
-	DownloadHandler      http.Handler
-	DatasetHandler       http.Handler
-	CookieHandler        http.Handler
-	FilterHandler        http.Handler
-	FeedbackHandler      http.Handler
-	ContentTypeByteLimit int
-	ZebedeeClient        allRoutes.ZebedeeClient
-	GeographyEnabled     bool
-	GeographyHandler     http.Handler
-	SearchRoutesEnabled  bool
-	SearchHandler        http.Handler
-	HomepageHandler      http.Handler
-	BabbageHandler       http.Handler
+	HealthCheckHandler     func(w http.ResponseWriter, req *http.Request)
+	AnalyticsHandler       http.Handler
+	DownloadHandler        http.Handler
+	DatasetHandler         http.Handler
+	CookieHandler          http.Handler
+	FilterHandler          http.Handler
+	FeedbackHandler        http.Handler
+	ContentTypeByteLimit   int
+	ZebedeeClient          allRoutes.ZebedeeClient
+	GeographyEnabled       bool
+	GeographyHandler       http.Handler
+	SearchRoutesEnabled    bool
+	EnableSearchABTest     bool
+	SearchABTestPercentage int
+	SiteDomain             string
+	SearchHandler          http.Handler
+	HomepageHandler        http.Handler
+	BabbageHandler         http.Handler
 }
 
 func New(cfg Config) http.Handler {
@@ -62,8 +67,13 @@ func New(cfg Config) http.Handler {
 		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
 	}
 
+	// abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy, int(a))
 	if cfg.SearchRoutesEnabled {
-		router.Handle("/search", cfg.SearchHandler)
+		if cfg.EnableSearchABTest {
+			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
+		} else {
+			router.Handle("/search", cfg.SearchHandler)
+		}
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
