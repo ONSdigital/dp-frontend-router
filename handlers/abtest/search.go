@@ -14,13 +14,20 @@ type Handler http.Handler
 
 func SearchHandler(newSearch, oldSearch http.Handler, percentage int, domain string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		now := time.Now().UTC()
+
+		// Check if user has choosen to exit new search
+		exitNewSearch, ok := req.URL.Query()["exit-new-search"]
+		if ok && len(exitNewSearch[0]) > 0 {
+			HandleSearchExit(w, req, oldSearch, now, domain)
+			return
+		}
+
 		// Retrieve AB Test Cookie
 		cookie, err := cookies.GetABTest(req)
 		if err != nil && err != cookies.ErrABTestCookieNotFound {
 			log.Event(req.Context(), "error getting a/b test cookie", log.WARN, log.Error(err))
 		}
-
-		now := time.Now().UTC()
 
 		// If AB Test cookie not set, create new AB Test cookie
 		if cookie.NewSearch == nil && cookie.OldSearch == nil {
@@ -47,7 +54,7 @@ func HandleCookieCreationAndServ(w http.ResponseWriter, req *http.Request, newSe
 	servs := RandomiseABTestCookie(percentage, now)
 	err := cookies.SetABTest(w, servs, domain)
 	if err != nil {
-		log.Event(req.Context(), "error setting a/b test cookie. direct use to old search", log.ERROR, log.Error(err))
+		log.Event(req.Context(), "error setting a/b test cookie. directing user to old search", log.ERROR, log.Error(err))
 		oldSearch.ServeHTTP(w, req)
 		return
 	}
@@ -81,4 +88,17 @@ func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *h
 	if cookie.OldSearch.After(now) {
 		oldSearch.ServeHTTP(w, req)
 	}
+}
+
+func HandleSearchExit(w http.ResponseWriter, req *http.Request, oldSearch http.Handler, now time.Time, domain string) {
+	tomorrow := setTime24HoursAhead(now)
+	err := cookies.UpdateNewSearch(req, w, now, domain)
+	if err != nil {
+		log.Event(req.Context(), "error update new search value of a/b test cookie. directing user to old search", log.ERROR, log.Error(err))
+	}
+	err = cookies.UpdateOldSearch(req, w, tomorrow, domain)
+	if err != nil {
+		log.Event(req.Context(), "error update old search value of a/b test cookie. directing user to old search", log.ERROR, log.Error(err))
+	}
+	oldSearch.ServeHTTP(w, req)
 }
