@@ -67,7 +67,6 @@ func New(cfg Config) http.Handler {
 		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
 	}
 
-	// abHandler(http.HandlerFunc(homepage.Handler(cfg.RendererURL)), reverseProxy, int(a))
 	if cfg.SearchRoutesEnabled {
 		if cfg.EnableSearchABTest {
 			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
