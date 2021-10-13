@@ -100,6 +100,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
+
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
@@ -138,21 +140,24 @@ func main() {
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 
 	routerConfig := router.Config{
-		AnalyticsHandler:     analyticsHandler,
-		DownloadHandler:      downloadHandler,
-		CookieHandler:        cookieHandler,
-		DatasetHandler:       datasetHandler,
-		HealthCheckHandler:   hc.Handler,
-		FilterHandler:        filterHandler,
-		FeedbackHandler:      feedbackHandler,
-		GeographyEnabled:     cfg.GeographyEnabled,
-		GeographyHandler:     geographyHandler,
-		SearchRoutesEnabled:  cfg.SearchRoutesEnabled,
-		SearchHandler:        searchHandler,
-		HomepageHandler:      homepageHandler,
-		BabbageHandler:       babbageHandler,
-		ZebedeeClient:        zebedeeClient,
-		ContentTypeByteLimit: cfg.ContentTypeByteLimit,
+		AnalyticsHandler:       analyticsHandler,
+		DownloadHandler:        downloadHandler,
+		CookieHandler:          cookieHandler,
+		DatasetHandler:         datasetHandler,
+		HealthCheckHandler:     hc.Handler,
+		FilterHandler:          filterHandler,
+		FeedbackHandler:        feedbackHandler,
+		GeographyEnabled:       cfg.GeographyEnabled,
+		GeographyHandler:       geographyHandler,
+		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
+		SearchHandler:          searchHandler,
+		EnableSearchABTest:     enableSearchABTest,
+		SearchABTestPercentage: cfg.SearchABTestPercentage,
+		SiteDomain:             cfg.SiteDomain,
+		HomepageHandler:        homepageHandler,
+		BabbageHandler:         babbageHandler,
+		ZebedeeClient:          zebedeeClient,
+		ContentTypeByteLimit:   cfg.ContentTypeByteLimit,
 	}
 
 	httpHandler := router.New(routerConfig)

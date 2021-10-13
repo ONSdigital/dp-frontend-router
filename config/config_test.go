@@ -45,3 +45,28 @@ func TestSpec(t *testing.T) {
 		})
 	})
 }
+
+func TestIsEnabledABSearch(t *testing.T) {
+	Convey("IsEnabledABSearch returns expected value", t, func() {
+		Convey("false when EnableSearchABTest is false", func() {
+			cfg := Config{EnableSearchABTest: false, SearchABTestPercentage: 10}
+			result := IsEnableSearchABTest(cfg)
+			So(result, ShouldBeFalse)
+		})
+		Convey("false when SearchABTestPercentage is below 0", func() {
+			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: -10}
+			result := IsEnableSearchABTest(cfg)
+			So(result, ShouldBeFalse)
+		})
+		Convey("false when SearchABTestPercentage is over 100", func() {
+			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: 110}
+			result := IsEnableSearchABTest(cfg)
+			So(result, ShouldBeFalse)
+		})
+		Convey("true when EnableSearchABTest is set and a sensible percentage int is used", func() {
+			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: 10}
+			result := IsEnableSearchABTest(cfg)
+			So(result, ShouldBeTrue)
+		})
+	})
+}
