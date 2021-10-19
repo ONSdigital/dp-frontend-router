@@ -30,6 +30,17 @@ func TestABSearchHandler(t *testing.T) {
 	Convey("SearchHandler", t, func() {
 		newSearch, oldSearch := NewHandlerMock(), NewHandlerMock()
 
+		Convey("if request contains exit-new-search query param request is handled by old search", func() {
+			req := httptest.NewRequest("GET", "/search?exit-new-search=true", nil)
+			res := httptest.NewRecorder()
+
+			router := mockRouter(newSearch, oldSearch, 100, domain)
+			router.ServeHTTP(res, req)
+			So(len(oldSearch.ServeHTTPCalls()), ShouldEqual, 1)
+			So(oldSearch.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, "/search")
+			So(len(newSearch.ServeHTTPCalls()), ShouldEqual, 0)
+		})
+
 		Convey("request to old or new search if no cookie is set", func() {
 			req := httptest.NewRequest("GET", "/search", nil)
 			res := httptest.NewRecorder()
