@@ -92,13 +92,9 @@ func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *h
 
 func HandleSearchExit(w http.ResponseWriter, req *http.Request, oldSearch http.Handler, now time.Time, domain string) {
 	tomorrow := setTime24HoursAhead(now)
-	err := cookies.UpdateNewSearch(req, w, now, domain)
+	err := cookies.UpdateSearch(req, w, now, tomorrow, domain)
 	if err != nil {
 		log.Event(req.Context(), "error update new search value of a/b test cookie. directing user to old search", log.ERROR, log.Error(err))
-	}
-	err = cookies.UpdateOldSearch(req, w, tomorrow, domain)
-	if err != nil {
-		log.Event(req.Context(), "error update old search value of a/b test cookie. directing user to old search", log.ERROR, log.Error(err))
 	}
 	oldSearch.ServeHTTP(w, req)
 }
