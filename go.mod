@@ -20,7 +20,4 @@ require (
 	github.com/smartystreets/goconvey v1.6.4
 )
 
-require (
-	github.com/gorilla/context v1.1.1 // indirect
-	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
-)
+require github.com/gorilla/context v1.1.1 // indirect

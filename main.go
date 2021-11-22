@@ -100,6 +100,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	areaProfileControllerURL, err := url.Parse(cfg.AreaProfilesControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "AreaProfileControllerURL", "value": cfg.AreaProfilesControllerURL})
+		os.Exit(1)
+	}
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -138,9 +144,15 @@ func main() {
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
+	var areaProfileHandler http.Handler
+	if cfg.AreaProfilesRoutesEnabled {
+		areaProfileHandler = createReverseProxy("areas", areaProfileControllerURL)
+	}
 
 	routerConfig := router.Config{
 		AnalyticsHandler:       analyticsHandler,
+		AreaProfileEnabled:     cfg.AreaProfilesRoutesEnabled,
+		AreaProfileHandler:     areaProfileHandler,
 		DownloadHandler:        downloadHandler,
 		CookieHandler:          cookieHandler,
 		DatasetHandler:         datasetHandler,

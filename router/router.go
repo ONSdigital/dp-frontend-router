@@ -20,6 +20,8 @@ type Handler http.Handler
 type Config struct {
 	HealthCheckHandler     func(w http.ResponseWriter, req *http.Request)
 	AnalyticsHandler       http.Handler
+	AreaProfileEnabled     bool
+	AreaProfileHandler     http.Handler
 	DownloadHandler        http.Handler
 	DatasetHandler         http.Handler
 	CookieHandler          http.Handler
