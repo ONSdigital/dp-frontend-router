@@ -21,23 +21,6 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.9.1 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.4.2 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.5.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.2.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.3.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.4.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.7.1 // indirect
-	github.com/aws/smithy-go v1.8.0 // indirect
-	github.com/fatih/color v1.12.0 // indirect
-	github.com/gopherjs/gopherjs v0.0.0-20210918183006-daae65060a40 // indirect
 	github.com/gorilla/context v1.1.1 // indirect
-	github.com/hokaccha/go-prettyjson v0.0.0-20210113012101-fb4e108d2519 // indirect
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
-	github.com/jtolds/gls v4.20.0+incompatible // indirect
-	github.com/mattn/go-colorable v0.1.8 // indirect
-	github.com/mattn/go-isatty v0.0.13 // indirect
-	github.com/smartystreets/assertions v1.2.0 // indirect
-	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d // indirect
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
 )
