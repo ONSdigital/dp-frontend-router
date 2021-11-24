@@ -140,13 +140,15 @@ func main() {
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
-	geographyHandler := createReverseProxy("geography", geographyControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
-	var areaProfileHandler http.Handler
+	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
+	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
-		areaProfileHandler = createReverseProxy("areas", areaProfileControllerURL)
+		geographyHandler = redirects.DynamicRedirectHandler("/geography/", "/areas/")
+	} else {
+		geographyHandler = createReverseProxy("geography", geographyControllerURL)
 	}
 
 	routerConfig := router.Config{

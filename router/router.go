@@ -65,7 +65,10 @@ func New(cfg Config) http.Handler {
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
-	if cfg.GeographyEnabled {
+	if cfg.AreaProfileEnabled {
+		router.Handle("/areas{uri:.*}", cfg.AreaProfileHandler)
+		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
+	} else if cfg.GeographyEnabled {
 		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
 	}
 
