@@ -60,13 +60,22 @@ func TestDynamicRedirect(t *testing.T) {
 	router.HandleFunc("/redirected{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
 	})
 
-	Convey("Test that a redirect request reaches the handler", t, func() {
+	Convey("Test that a redirect request is redirected to the new url", t, func() {
 		req, _ := http.NewRequest("GET", "/original", nil)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 301)
 		So(w.Header(), ShouldContainKey, "Location")
 		So(w.Header()["Location"], ShouldContain, "/redirected")
+	})
+
+	Convey("Test that a redirect request with a path extension is redirected to the new url with the same path extension", t, func() {
+		req, _ := http.NewRequest("GET", "/original/extension", nil)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected/extension")
 	})
 }
 
