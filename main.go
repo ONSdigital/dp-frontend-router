@@ -146,7 +146,7 @@ func main() {
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
-		geographyHandler = redirects.DynamicRedirectHandler("/geography/", "/areas/")
+		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
 	} else {
 		geographyHandler = createReverseProxy("geography", geographyControllerURL)
 	}
