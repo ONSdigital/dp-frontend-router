@@ -100,6 +100,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	areaProfileControllerURL, err := url.Parse(cfg.AreaProfilesControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "AreaProfileControllerURL", "value": cfg.AreaProfilesControllerURL})
+		os.Exit(1)
+	}
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -134,13 +140,21 @@ func main() {
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
-	geographyHandler := createReverseProxy("geography", geographyControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
+	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
+	var geographyHandler http.Handler
+	if cfg.AreaProfilesRoutesEnabled {
+		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
+	} else {
+		geographyHandler = createReverseProxy("geography", geographyControllerURL)
+	}
 
 	routerConfig := router.Config{
 		AnalyticsHandler:       analyticsHandler,
+		AreaProfileEnabled:     cfg.AreaProfilesRoutesEnabled,
+		AreaProfileHandler:     areaProfileHandler,
 		DownloadHandler:        downloadHandler,
 		CookieHandler:          cookieHandler,
 		DatasetHandler:         datasetHandler,
