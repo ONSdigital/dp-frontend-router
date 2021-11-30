@@ -20,7 +20,7 @@ func TestRedirect(t *testing.T) {
 	middleware := []alice.Constructor{
 		Handler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	var handled bool
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
 		handled = true
@@ -32,7 +32,7 @@ func TestRedirect(t *testing.T) {
 		handled = false
 		req, _ := http.NewRequest("GET", "/", nil)
 		w := httptest.NewRecorder()
-		alice.ServeHTTP(w, req)
+		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 200)
 		So(handled, ShouldBeTrue)
 	})
@@ -41,12 +41,42 @@ func TestRedirect(t *testing.T) {
 		handled = false
 		req, _ := http.NewRequest("GET", "/redirect", nil)
 		w := httptest.NewRecorder()
-		alice.ServeHTTP(w, req)
+		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 307)
 		So(handled, ShouldBeFalse)
-		So(w.HeaderMap, ShouldContainKey, "Location")
+		So(w.Header(), ShouldContainKey, "Location")
 	})
 
+}
+
+func TestDynamicRedirect(t *testing.T) {
+
+	router := pat.New()
+	middleware := []alice.Constructor{
+		Handler,
+	}
+	testAlice := alice.New(middleware...).Then(router)
+	router.Handle("/original{uri:.*}", DynamicRedirectHandler("/original", "/redirected"))
+	router.HandleFunc("/redirected{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
+	})
+
+	Convey("Test that a redirect request is redirected to the new url", t, func() {
+		req, _ := http.NewRequest("GET", "/original", nil)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected")
+	})
+
+	Convey("Test that a redirect request with a path extension is redirected to the new url with the same path extension", t, func() {
+		req, _ := http.NewRequest("GET", "/original/extension", nil)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected/extension")
+	})
 }
 
 func TestInit(t *testing.T) {
@@ -56,7 +86,7 @@ func TestInit(t *testing.T) {
 	var asset = func(name string) ([]byte, error) {
 		called = true
 		if shouldError {
-			return nil, errors.New("Error")
+			return nil, errors.New("error")
 		}
 		return returnBytes, nil
 
@@ -120,12 +150,12 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 		log.Middleware,
 		// securityHandler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	for n := 0; n < b.N; n++ {
-		alice.ServeHTTP(nil, req)
+		testAlice.ServeHTTP(nil, req)
 	}
 }
 
@@ -138,12 +168,12 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 		// securityHandler,
 		Handler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	for n := 0; n < b.N; n++ {
-		alice.ServeHTTP(nil, req)
+		testAlice.ServeHTTP(nil, req)
 	}
 }
 
@@ -161,12 +191,12 @@ func BenchmarkWith100Redirects(b *testing.B) {
 		// securityHandler,
 		Handler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	for n := 0; n < b.N; n++ {
-		alice.ServeHTTP(nil, req)
+		testAlice.ServeHTTP(nil, req)
 	}
 }
 
@@ -184,12 +214,12 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 		// securityHandler,
 		Handler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	for n := 0; n < b.N; n++ {
-		alice.ServeHTTP(nil, req)
+		testAlice.ServeHTTP(nil, req)
 	}
 }
 
@@ -207,11 +237,11 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 		// securityHandler,
 		Handler,
 	}
-	alice := alice.New(middleware...).Then(router)
+	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", nil)
 
 	for n := 0; n < b.N; n++ {
-		alice.ServeHTTP(nil, req)
+		testAlice.ServeHTTP(nil, req)
 	}
 }

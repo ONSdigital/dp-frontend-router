@@ -5,7 +5,8 @@ import (
 	"context"
 	"encoding/csv"
 	"net/http"
-	
+	"strings"
+
 	"github.com/ONSdigital/log.go/v2/log"
 )
 
@@ -80,5 +81,15 @@ func Handler(h http.Handler) http.Handler {
 		}
 
 		h.ServeHTTP(w, req)
+	})
+}
+
+// DynamicRedirectHandler redirects requests to the provide 'to' base path
+func DynamicRedirectHandler(redirectFrom, redirectTo string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		redirect := strings.Replace(req.URL.Path, redirectFrom, redirectTo, 1)
+		log.Info(req.Context(), "redirect found", log.Data{"location": redirect}, log.HTTP(req, 0, 0, nil, nil))
+		http.Redirect(w, req, redirect, http.StatusMovedPermanently)
+		return
 	})
 }
