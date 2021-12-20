@@ -26,6 +26,8 @@ type Config struct {
 	DatasetHandler         http.Handler
 	CookieHandler          http.Handler
 	FilterHandler          http.Handler
+	FilterFlexHandler      http.Handler
+	FilterFlexEnabled      bool
 	FeedbackHandler        http.Handler
 	ContentTypeByteLimit   int
 	ZebedeeClient          allRoutes.ZebedeeClient
@@ -78,6 +80,10 @@ func New(cfg Config) http.Handler {
 		} else {
 			router.Handle("/search", cfg.SearchHandler)
 		}
+	}
+
+	if cfg.FilterFlexEnabled {
+		router.Handle("/flex/{uri:.*}", cfg.FilterFlexHandler)
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
