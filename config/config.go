@@ -25,6 +25,8 @@ type Config struct {
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
 	AreaProfilesRoutesEnabled           bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
+	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
+	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
 	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	SiteDomain                          string        `envconfig:"SITE_DOMAIN"`
 	RedirectSecret                      string        `envconfig:"REDIRECT_SECRET" json:"-"`
@@ -63,6 +65,8 @@ func Get() (*Config, error) {
 		DownloaderURL:                       "http://localhost:23400",
 		AreaProfilesControllerURL:           "http://localhost:26600",
 		AreaProfilesRoutesEnabled:           false,
+		FilterFlexDatasetServiceURL:         "http://localhost:20100",
+		FilterFlexRoutesEnabled:             false,
 		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		SiteDomain:                          "ons.gov.uk",
 		RedirectSecret:                      "secret",

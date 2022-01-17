@@ -106,6 +106,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	filterFlexDatasetServiceURL, err := url.Parse(cfg.FilterFlexDatasetServiceURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FilterFlexDatasetServiceURL", "value": cfg.FilterFlexDatasetServiceURL})
+		os.Exit(1)
+	}
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -144,6 +150,7 @@ func main() {
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
+	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
 		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
@@ -161,6 +168,8 @@ func main() {
 		HealthCheckHandler:     hc.Handler,
 		FilterHandler:          filterHandler,
 		FeedbackHandler:        feedbackHandler,
+		FilterFlexEnabled:      cfg.FilterFlexRoutesEnabled,
+		FilterFlexHandler:      filterFlexHandler,
 		GeographyEnabled:       cfg.GeographyEnabled,
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
