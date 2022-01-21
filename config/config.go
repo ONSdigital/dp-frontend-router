@@ -38,6 +38,7 @@ type Config struct {
 	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
+	CensusHubRoutesEnabled              bool          `envconfig:"CENSUS_HUB_ROUTES_ENABLED"`
 }
 
 var cfg *Config
@@ -71,6 +72,7 @@ func Get() (*Config, error) {
 		SiteDomain:                          "ons.gov.uk",
 		RedirectSecret:                      "secret",
 		SQSAnalyticsURL:                     "",
+		CensusHubRoutesEnabled:              false,
 		ContentTypeByteLimit:                5000000,
 		HealthckeckCriticalTimeout:          90 * time.Second,
 		HealthckeckInterval:                 30 * time.Second,
