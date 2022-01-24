@@ -3,7 +3,7 @@
 ## Configuration
 
 | Environment variable            | Default                                   | Description                                                                        |
-| ------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------- |
+|---------------------------------|-------------------------------------------|------------------------------------------------------------------------------------|
 | BIND_ADDR                       | :20000                                    | The host and port to bind to.                                                      |
 | BABBAGE_URL                     | <https://localhost:8080>                  | The URL of the babbage instance to use                                             |
 | RENDERER_URL                    | <http://localhost:20010>                  | The URL of dp-frontend-renderer                                                    |
@@ -20,6 +20,8 @@
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                     |
 | AREA_PROFILE_CONTROLLER_URL     | <http://localhost:26600>                  | The URL of dp-frontend-area-profiles.                                              |
 | AREA_PROFILE_ROUTES_ENABLED     | false                                     | Area profiles routes enabled                                                       |
+| INTERACTIVES_CONTROLLER_URL     | <http://localhost:27300>                  | The URL of dp-frontend-interactives-controller                                     |
+| INTERACTIVES_ROUTES_ENABLED     | false                                     | Interactives routes enabled                                                        |
 | PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b> | The URL to the sixteens build to use                                               |
 | SITE_DOMAIN                     | ons.gov.uk                                | The domain hosting the site                                                        |
 | REDIRECT_SECRET                 | secret                                    | Pre-shared key for signing/encrypting redirect data                                |

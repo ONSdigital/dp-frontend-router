@@ -37,6 +37,7 @@ func TestRouter(t *testing.T) {
 		babbageHandler := NewHandlerMock()
 		geographyHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
+		interactivesHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
 			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
@@ -72,6 +73,7 @@ func TestRouter(t *testing.T) {
 			BabbageHandler:     babbageHandler,
 			GeographyHandler:   geographyHandler,
 			HomepageHandler:    homepageHandler,
+			InteractivesHandler: interactivesHandler,
 		}
 
 		Convey("When a analytics request is made", func() {
@@ -463,6 +465,53 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a request for a interactives endpoint is made, but the interactives handler is not enabled", func() {
+
+			url := "/interactives/an_identifier"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then no request is sent to the interactive visualisation handler", func() {
+				So(len(interactivesHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a request for a interactives endpoint is made, and the interactives handler is enabled", func() {
+
+			url := "/interactives/an_identifier"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.InteractivesEnabled = true
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then the request is sent to the interactive visualisation handler", func() {
+				So(len(interactivesHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(interactivesHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
 

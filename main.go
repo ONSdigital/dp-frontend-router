@@ -8,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/router"
@@ -115,6 +114,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	interactivesControllerURL, err := url.Parse(cfg.InteractivesControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "InteractivesControllerURL", "value": cfg.InteractivesControllerURL})
+		os.Exit(1)
+	}
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -136,7 +141,7 @@ func main() {
 		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
 		os.Exit(1)
 	}
-	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
+	hc := healthcheck.New(versionInfo, cfg.HealthcheckCriticalTimeout, cfg.HealthcheckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
 		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 		os.Exit(1)
@@ -158,6 +163,7 @@ func main() {
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
+	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
 		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
@@ -183,6 +189,8 @@ func main() {
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
 		SearchHandler:          searchHandler,
+		InteractivesHandler:    interactivesHandler,
+		InteractivesEnabled:    cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:     enableSearchABTest,
 		SearchABTestPercentage: cfg.SearchABTestPercentage,
 		CensusHubRoutesEnabled: cfg.CensusHubRoutesEnabled,
@@ -213,29 +221,6 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 		hc.Stop()
 		os.Exit(2)
-	}
-}
-
-// securityHandler ...
-func securityHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
-			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
-		}
-		h.ServeHTTP(w, req)
-	})
-}
-
-// healthcheckHandler uses the provided handler for /health endpoint, and serves any other traffic to the next handler in chain
-func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/health" {
-				hc(w, req)
-				return
-			}
-			h.ServeHTTP(w, req)
-		})
 	}
 }
 
