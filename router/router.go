@@ -6,6 +6,7 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
+	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/request"
@@ -24,10 +25,12 @@ type Config struct {
 	AreaProfileHandler     http.Handler
 	DownloadHandler        http.Handler
 	DatasetHandler         http.Handler
+	DatasetClient          datasetType.DatasetClient
 	CookieHandler          http.Handler
 	FilterHandler          http.Handler
 	FilterFlexHandler      http.Handler
 	FilterFlexEnabled      bool
+	FilterClient           datasetType.FilterClient
 	FeedbackHandler        http.Handler
 	ContentTypeByteLimit   int
 	ZebedeeClient          allRoutes.ZebedeeClient
@@ -68,7 +71,11 @@ func New(cfg Config) http.Handler {
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
-	router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
+	if cfg.FilterFlexEnabled {
+		router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
+	} else {
+		router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
+	}
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
@@ -85,10 +92,6 @@ func New(cfg Config) http.Handler {
 		} else {
 			router.Handle("/search", cfg.SearchHandler)
 		}
-	}
-
-	if cfg.FilterFlexEnabled {
-		router.Handle("/flex/{uri:.*}", cfg.FilterFlexHandler)
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware

@@ -44,6 +44,10 @@ github.com/ONSdigital/dp-api-clients-go v1.34.3/go.mod h1:kX+YKuoLYLfkeLHMvQKRRy
 github.com/ONSdigital/dp-api-clients-go v1.41.1/go.mod h1:Ga1+ANjviu21NFJI9wp5NctJIdB4TJLDGbpQFl2V8Wc=
 github.com/ONSdigital/dp-api-clients-go v1.43.0 h1:0982P/YxnYXvba1RhEcFmwF3xywC4eXokWQ8YH3Mm24=
 github.com/ONSdigital/dp-api-clients-go v1.43.0/go.mod h1:V5MfINik+o3OAF985UXUoMjXIfrZe3JKYa5AhZn5jts=
+github.com/ONSdigital/dp-api-clients-go/v2 v2.92.2 h1:KlxSi4kRz9nO5j5OjCgnjQsyoRAky5WOmMKQPbNPHA8=
+github.com/ONSdigital/dp-api-clients-go/v2 v2.92.2/go.mod h1:P3GYyqqXnbp4RjWhz0oYpUFjHPT6Ca4fEoh4huNkxHU=
+github.com/ONSdigital/dp-api-clients-go/v2 v2.92.3 h1:1+in8TOFEp7d6fdEBB8JJs+0yAboR2HEfJGfJ74KldY=
+github.com/ONSdigital/dp-api-clients-go/v2 v2.92.3/go.mod h1:P3GYyqqXnbp4RjWhz0oYpUFjHPT6Ca4fEoh4huNkxHU=
 github.com/ONSdigital/dp-cookies v0.3.3 h1:KXX4swf+OnljIYbsTYICIBjuRJoxQukGWKBTvBaISlA=
 github.com/ONSdigital/dp-cookies v0.3.3/go.mod h1:qyvkAXoVLMNU9Xf1U5zFGRnuWyLxQ/mHloXUXyzcgb8=
 github.com/ONSdigital/dp-healthcheck v1.0.5/go.mod h1:2wbVAUHMl9+4tWhUlxYUuA1dnf2+NrwzC+So5f5BMLk=
@@ -299,6 +303,8 @@ github.com/smartystreets/assertions v1.2.0 h1:42S6lae5dvLc7BrLu/0ugRtcFVjoJNMC/N
 github.com/smartystreets/assertions v1.2.0/go.mod h1:tcbTF8ujkAEcZ8TElKY+i30BzYlVhC/LOxJk7iOWnoo=
 github.com/smartystreets/goconvey v1.6.4 h1:fv0U8FUIMPNf1L9lnHLvLhgicrIVChEkdzIKYqbNC9s=
 github.com/smartystreets/goconvey v1.6.4/go.mod h1:syvi0/a8iFYH4r/RixwvyeAJjdLS9QV7WQ/tjFTllLA=
+github.com/smartystreets/goconvey v1.7.2 h1:9RBaZCeXEQ3UselpuwUQHltGVXvdwm6cv1hgR6gDIPg=
+github.com/smartystreets/goconvey v1.7.2/go.mod h1:Vw0tHAZW6lzCRk3xgdin6fKYcG+G3Pg9vgXWeJpQFMM=
 github.com/spf13/afero v1.6.0/go.mod h1:Ai8FlHk4v/PARR026UzYexafAt9roJ7LcLMAmO6Z93I=
 github.com/spf13/cast v1.3.1/go.mod h1:Qx5cxh0v+4UWYiBimWS+eyWzqEqokIECu5etghLkUJE=
 github.com/spf13/cobra v1.2.1/go.mod h1:ExllRjgxM/piMAM+3tAZvg8fsklGAf3tPfi+i8t68Nk=
@@ -374,6 +380,7 @@ golang.org/x/mod v0.2.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/mod v0.3.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/mod v0.4.0/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/mod v0.4.1/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
+golang.org/x/mod v0.4.2 h1:Gz96sIWK3OalVv/I/qNygP42zyoKp3xptRVCWRFEBvo=
 golang.org/x/mod v0.4.2/go.mod h1:s0Qsj1ACt9ePp/hMypM3fl4fZqREWJwdYDEqhRiZZUA=
 golang.org/x/net v0.0.0-20180724234803-3673e40ba225/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
 golang.org/x/net v0.0.0-20180826012351-8a410e7b638d/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=
@@ -549,6 +556,7 @@ golang.org/x/tools v0.0.0-20210105154028-b0ab187a4818/go.mod h1:emZCQorbCU4vsT4f
 golang.org/x/tools v0.0.0-20210106214847-113979e3529a/go.mod h1:emZCQorbCU4vsT4fOWvOPXz4eW1wZW4PmDk9uLelYpA=
 golang.org/x/tools v0.1.0/go.mod h1:xkSsbof2nBLbhDlRMhhhyNLN/zl3eTqcnHD5viDpcZ0=
 golang.org/x/tools v0.1.2/go.mod h1:o0xws9oXOQQZyjljx8fwUC0k7L1pTE6eaCbjGeHmOkk=
+golang.org/x/tools v0.1.5 h1:ouewzE6p+/VEB31YYnTbEJdi8pFqKp4P4n85vwo3DHA=
 golang.org/x/tools v0.1.5/go.mod h1:o0xws9oXOQQZyjljx8fwUC0k7L1pTE6eaCbjGeHmOkk=
 golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
 golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=

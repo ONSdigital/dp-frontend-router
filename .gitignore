@@ -5,3 +5,4 @@ build
 .idea
 assets/redirects.go
 .go/
+.vscode

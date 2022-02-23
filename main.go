@@ -15,6 +15,9 @@ import (
 
 	dphttp "github.com/ONSdigital/dp-net/http"
 
+	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
+	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
+	"github.com/ONSdigital/dp-api-clients-go/v2/health"
 	"github.com/ONSdigital/dp-api-clients-go/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -123,6 +126,10 @@ func main() {
 
 	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
 
+	hcClient := health.NewClient("api-router", cfg.APIRouterURL)
+	filterClient := filter.NewWithHealthClient(hcClient)
+	datasetClient := dataset.NewWithHealthClient(hcClient)
+
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
@@ -165,8 +172,10 @@ func main() {
 		DownloadHandler:        downloadHandler,
 		CookieHandler:          cookieHandler,
 		DatasetHandler:         datasetHandler,
+		DatasetClient:          datasetClient,
 		HealthCheckHandler:     hc.Handler,
 		FilterHandler:          filterHandler,
+		FilterClient:           filterClient,
 		FeedbackHandler:        feedbackHandler,
 		FilterFlexEnabled:      cfg.FilterFlexRoutesEnabled,
 		FilterFlexHandler:      filterFlexHandler,
