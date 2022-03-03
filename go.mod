@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/ONSdigital/dp-api-clients-go v1.43.0
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.92.3
 	github.com/ONSdigital/dp-cookies v0.3.3
 	github.com/ONSdigital/dp-healthcheck v1.1.3
 	github.com/ONSdigital/dp-net v1.2.0
@@ -17,7 +18,7 @@ require (
 	github.com/justinas/alice v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.9.1
-	github.com/smartystreets/goconvey v1.6.4
+	github.com/smartystreets/goconvey v1.7.2
 )
 
 require (
