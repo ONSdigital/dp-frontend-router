@@ -33,6 +33,7 @@
 | ZEBEDEE_REQUEST_MAXIMUM_RETRIES | 0                                         | The number of retry attempts to make to Zebedee                                    |
 | ENABLE_SEARCH_AB_TEST           | false                                     | Enable AB search                                                                   |
 | SEARCH_AB_TEST_PERCENTAGE       | 10                                        | AB search percentage                                                               |
+| PROXY_TIMEOUT                   | 5s                                        | The timeout for proxied requests                                                   |
 
 ### Licence
 
