@@ -41,6 +41,7 @@ type Config struct {
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 	CensusHubRoutesEnabled              bool          `envconfig:"CENSUS_HUB_ROUTES_ENABLED"`
+	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
 }
 
 var cfg *Config
@@ -84,6 +85,7 @@ func Get() (*Config, error) {
 		ZebedeeRequestMaximumRetries:        0,
 		EnableSearchABTest:                  false,
 		SearchABTestPercentage:              10,
+		ProxyTimeout:                        5 * time.Second,
 	}
 
 	return cfg, envconfig.Process("", cfg)

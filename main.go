@@ -153,22 +153,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	downloadHandler := createReverseProxy("download", downloaderURL)
-	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
-	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
-	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
-	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
-	searchHandler := createReverseProxy("search", searchControllerURL)
-	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
-	babbageHandler := createReverseProxy("babbage", babbageURL)
-	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
-	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
-	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL)
+	downloadHandler := createReverseProxy("download", downloaderURL, cfg.ProxyTimeout)
+	cookieHandler := createReverseProxy("cookies", cookiesControllerURL, cfg.ProxyTimeout)
+	datasetHandler := createReverseProxy("datasets", datasetControllerURL, cfg.ProxyTimeout)
+	filterHandler := createReverseProxy("filters", filterDatasetControllerURL, cfg.ProxyTimeout)
+	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL, cfg.ProxyTimeout)
+	searchHandler := createReverseProxy("search", searchControllerURL, cfg.ProxyTimeout)
+	homepageHandler := createReverseProxy("homepage", homepageControllerURL, cfg.ProxyTimeout)
+	babbageHandler := createReverseProxy("babbage", babbageURL, cfg.ProxyTimeout)
+	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL, cfg.ProxyTimeout)
+	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL, cfg.ProxyTimeout)
+	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL, cfg.ProxyTimeout)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
 		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
 	} else {
-		geographyHandler = createReverseProxy("geography", geographyControllerURL)
+		geographyHandler = createReverseProxy("geography", geographyControllerURL, cfg.ProxyTimeout)
 	}
 
 	routerConfig := router.Config{
@@ -278,13 +278,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
+func createReverseProxy(proxyName string, proxyURL *url.URL, timeout time.Duration) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
+			Timeout:   timeout,
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
 		MaxIdleConns:          100,

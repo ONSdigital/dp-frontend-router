@@ -48,6 +48,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.ZebedeeRequestMaximumTimeoutSeconds, ShouldEqual, 5*time.Second)
 				So(cfg.ZebedeeRequestMaximumRetries, ShouldEqual, 0)
 				So(cfg.CensusHubRoutesEnabled, ShouldBeFalse)
+				So(cfg.ProxyTimeout, ShouldEqual, 5*time.Second)
 			})
 		})
 	})
