@@ -8,7 +8,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/ONSdigital/dp-frontend-router/router"
@@ -115,6 +114,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	interactivesControllerURL, err := url.Parse(cfg.InteractivesControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "InteractivesControllerURL", "value": cfg.InteractivesControllerURL})
+		os.Exit(1)
+	}
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -136,7 +141,7 @@ func main() {
 		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
 		os.Exit(1)
 	}
-	hc := healthcheck.New(versionInfo, cfg.HealthckeckCriticalTimeout, cfg.HealthckeckInterval)
+	hc := healthcheck.New(versionInfo, cfg.HealthcheckCriticalTimeout, cfg.HealthcheckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
 		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 		os.Exit(1)
@@ -148,21 +153,22 @@ func main() {
 		os.Exit(1)
 	}
 
-	downloadHandler := createReverseProxy("download", downloaderURL)
-	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
-	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
-	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
-	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
-	searchHandler := createReverseProxy("search", searchControllerURL)
-	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
-	babbageHandler := createReverseProxy("babbage", babbageURL)
-	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
-	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
+	downloadHandler := createReverseProxy("download", downloaderURL, cfg.ProxyTimeout)
+	cookieHandler := createReverseProxy("cookies", cookiesControllerURL, cfg.ProxyTimeout)
+	datasetHandler := createReverseProxy("datasets", datasetControllerURL, cfg.ProxyTimeout)
+	filterHandler := createReverseProxy("filters", filterDatasetControllerURL, cfg.ProxyTimeout)
+	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL, cfg.ProxyTimeout)
+	searchHandler := createReverseProxy("search", searchControllerURL, cfg.ProxyTimeout)
+	homepageHandler := createReverseProxy("homepage", homepageControllerURL, cfg.ProxyTimeout)
+	babbageHandler := createReverseProxy("babbage", babbageURL, cfg.ProxyTimeout)
+	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL, cfg.ProxyTimeout)
+	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL, cfg.ProxyTimeout)
+	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL, cfg.ProxyTimeout)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
 		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
 	} else {
-		geographyHandler = createReverseProxy("geography", geographyControllerURL)
+		geographyHandler = createReverseProxy("geography", geographyControllerURL, cfg.ProxyTimeout)
 	}
 
 	routerConfig := router.Config{
@@ -183,6 +189,8 @@ func main() {
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
 		SearchHandler:          searchHandler,
+		InteractivesHandler:    interactivesHandler,
+		InteractivesEnabled:    cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:     enableSearchABTest,
 		SearchABTestPercentage: cfg.SearchABTestPercentage,
 		CensusHubRoutesEnabled: cfg.CensusHubRoutesEnabled,
@@ -213,29 +221,6 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 		hc.Stop()
 		os.Exit(2)
-	}
-}
-
-// securityHandler ...
-func securityHandler(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
-			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
-		}
-		h.ServeHTTP(w, req)
-	})
-}
-
-// healthcheckHandler uses the provided handler for /health endpoint, and serves any other traffic to the next handler in chain
-func healthcheckHandler(hc func(w http.ResponseWriter, req *http.Request)) func(h http.Handler) http.Handler {
-	return func(h http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			if req.URL.Path == "/health" {
-				hc(w, req)
-				return
-			}
-			h.ServeHTTP(w, req)
-		})
 	}
 }
 
@@ -293,13 +278,13 @@ func abHandler(a, b http.Handler, percentA int) http.Handler {
 	})
 }
 
-func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
+func createReverseProxy(proxyName string, proxyURL *url.URL, timeout time.Duration) http.Handler {
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
+			Timeout:   timeout,
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
 		MaxIdleConns:          100,
