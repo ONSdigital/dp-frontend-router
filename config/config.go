@@ -25,6 +25,8 @@ type Config struct {
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
 	AreaProfilesRoutesEnabled           bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
+	InteractivesControllerURL           string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
+	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
 	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
 	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
 	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
@@ -32,13 +34,14 @@ type Config struct {
 	RedirectSecret                      string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	SQSAnalyticsURL                     string        `envconfig:"SQS_ANALYTICS_URL"`
 	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
-	HealthckeckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
-	HealthckeckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
+	HealthcheckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
+	HealthcheckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 	CensusHubRoutesEnabled              bool          `envconfig:"CENSUS_HUB_ROUTES_ENABLED"`
+	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
 }
 
 var cfg *Config
@@ -66,6 +69,8 @@ func Get() (*Config, error) {
 		DownloaderURL:                       "http://localhost:23400",
 		AreaProfilesControllerURL:           "http://localhost:26600",
 		AreaProfilesRoutesEnabled:           false,
+		InteractivesControllerURL:           "http://localhost:27300",
+		InteractivesRoutesEnabled:           false,
 		FilterFlexDatasetServiceURL:         "http://localhost:20100",
 		FilterFlexRoutesEnabled:             false,
 		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
@@ -74,12 +79,13 @@ func Get() (*Config, error) {
 		SQSAnalyticsURL:                     "",
 		CensusHubRoutesEnabled:              false,
 		ContentTypeByteLimit:                5000000,
-		HealthckeckCriticalTimeout:          90 * time.Second,
-		HealthckeckInterval:                 30 * time.Second,
+		HealthcheckCriticalTimeout:          90 * time.Second,
+		HealthcheckInterval:                 30 * time.Second,
 		ZebedeeRequestMaximumTimeoutSeconds: 5 * time.Second,
 		ZebedeeRequestMaximumRetries:        0,
 		EnableSearchABTest:                  false,
 		SearchABTestPercentage:              10,
+		ProxyTimeout:                        5 * time.Second,
 	}
 
 	return cfg, envconfig.Process("", cfg)

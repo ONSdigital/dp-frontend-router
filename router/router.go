@@ -36,6 +36,8 @@ type Config struct {
 	ZebedeeClient          allRoutes.ZebedeeClient
 	GeographyEnabled       bool
 	GeographyHandler       http.Handler
+	InteractivesEnabled    bool
+	InteractivesHandler    http.Handler
 	SearchRoutesEnabled    bool
 	EnableSearchABTest     bool
 	CensusHubRoutesEnabled bool
@@ -92,6 +94,10 @@ func New(cfg Config) http.Handler {
 		} else {
 			router.Handle("/search", cfg.SearchHandler)
 		}
+	}
+
+	if cfg.InteractivesEnabled {
+		router.Handle("/interactives/{uri:.*}", cfg.InteractivesHandler)
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware

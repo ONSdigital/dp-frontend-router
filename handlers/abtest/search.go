@@ -58,7 +58,9 @@ func HandleCookieCreationAndServ(w http.ResponseWriter, req *http.Request, newSe
 		oldSearch.ServeHTTP(w, req)
 		return
 	}
+
 	servABTest(newSearch, oldSearch, w, req, servs, now)
+
 	return
 }
 
@@ -67,6 +69,7 @@ func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 	var newSearch time.Time
 	var oldSearch time.Time
 	rand.Seed(time.Now().UnixNano())
+
 	if rand.Intn(100) < percentage {
 		newSearch = setTime24HoursAhead(now)
 		oldSearch = now
@@ -84,9 +87,12 @@ func RandomiseABTestCookie(percentage int, now time.Time) cookies.ABServices {
 func servABTest(newSearch, oldSearch http.Handler, w http.ResponseWriter, req *http.Request, cookie cookies.ABServices, now time.Time) {
 	if cookie.NewSearch.After(now) {
 		newSearch.ServeHTTP(w, req)
+		return
 	}
+
 	if cookie.OldSearch.After(now) {
 		oldSearch.ServeHTTP(w, req)
+		return
 	}
 }
 

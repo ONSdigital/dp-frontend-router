@@ -4,9 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/v2/log"
-	"net/http"
 )
 
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
@@ -45,7 +46,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			c, err := req.Cookie(`access_token`)
 			if err == nil && len(c.Value) > 0 {
 				userAccessToken = c.Value
-				log.Info(req.Context(), "Obtained access_token Cookie", log.Data{"value": c.Value})
+				log.Info(req.Context(), "Obtained access_token Cookie")
 			}
 
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
