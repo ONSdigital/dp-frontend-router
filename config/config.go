@@ -29,7 +29,7 @@ type Config struct {
 	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
 	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
 	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
-	CensuAtlasURL                       string        `envconfig:"CENSUS_ATLAS_URL"`
+	CensusAtlasURL                      string        `envconfig:"CENSUS_ATLAS_URL"`
 	CensusAtlasRoutesEnabled            bool          `envconfig:"CENSUS_ATLAS_ROUTES_ENABLED"`
 	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	SiteDomain                          string        `envconfig:"SITE_DOMAIN"`
@@ -75,7 +75,7 @@ func Get() (*Config, error) {
 		InteractivesRoutesEnabled:           false,
 		FilterFlexDatasetServiceURL:         "http://localhost:20100",
 		FilterFlexRoutesEnabled:             false,
-		CensuAtlasURL:                       "http://localhost:28100",
+		CensusAtlasURL:                      "http://localhost:28100",
 		CensusAtlasRoutesEnabled:            false,
 		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		SiteDomain:                          "ons.gov.uk",

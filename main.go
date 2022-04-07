@@ -202,8 +202,8 @@ func main() {
 		BabbageHandler:         babbageHandler,
 		ZebedeeClient:          zebedeeClient,
 		ContentTypeByteLimit:   cfg.ContentTypeByteLimit,
-		CensusAtlasHandler:     censusAtlasHandler
-		CensusAtlasEnabled:     cfg.CensusAtlasEnabled
+		CensusAtlasHandler:     censusAtlasHandler,
+		CensusAtlasEnabled:     cfg.CensusAtlasRoutesEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)
@@ -307,7 +307,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 	return proxy
 }
 
-func urlFromConfig(ctx context.Context, serviceName, serviceURL string) string {
+func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL {
 	configuredServiceURL, err := url.Parse(serviceURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": serviceName, "value": serviceURL})
