@@ -120,6 +120,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
+
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -164,6 +166,7 @@ func main() {
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL)
+	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
 		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
@@ -199,6 +202,8 @@ func main() {
 		BabbageHandler:         babbageHandler,
 		ZebedeeClient:          zebedeeClient,
 		ContentTypeByteLimit:   cfg.ContentTypeByteLimit,
+		CensusAtlasHandler:     censusAtlasHandler,
+		CensusAtlasEnabled:     cfg.CensusAtlasRoutesEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)
@@ -300,4 +305,13 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		director(req)
 	}
 	return proxy
+}
+
+func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL {
+	configuredServiceURL, err := url.Parse(serviceURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": serviceName, "value": serviceURL})
+		os.Exit(1)
+	}
+	return configuredServiceURL
 }
