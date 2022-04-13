@@ -38,6 +38,7 @@ func TestRouter(t *testing.T) {
 		geographyHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
 		interactivesHandler := NewHandlerMock()
+		censusAtlasHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
 			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
@@ -58,22 +59,23 @@ func TestRouter(t *testing.T) {
 		}
 
 		config := router.Config{
-			AnalyticsHandler:   analyticsHandler,
-			SearchHandler:      searchHandler,
-			DownloadHandler:    downloadHandler,
-			HealthCheckHandler: healthCheckHandler.ServeHTTPFunc,
-			CookieHandler:      cookieHandler,
-			DatasetHandler:     datasetHandler,
-			DatasetClient:      datasetClient,
-			FilterHandler:      filterHandler,
-			FilterClient:       filterClient,
-			FilterFlexHandler:  filterFlexHandler,
-			FeedbackHandler:    feedbackHandler,
-			ZebedeeClient:      zebedeeClient,
-			BabbageHandler:     babbageHandler,
-			GeographyHandler:   geographyHandler,
-			HomepageHandler:    homepageHandler,
+			AnalyticsHandler:    analyticsHandler,
+			SearchHandler:       searchHandler,
+			DownloadHandler:     downloadHandler,
+			HealthCheckHandler:  healthCheckHandler.ServeHTTPFunc,
+			CookieHandler:       cookieHandler,
+			DatasetHandler:      datasetHandler,
+			DatasetClient:       datasetClient,
+			FilterHandler:       filterHandler,
+			FilterClient:        filterClient,
+			FilterFlexHandler:   filterFlexHandler,
+			FeedbackHandler:     feedbackHandler,
+			ZebedeeClient:       zebedeeClient,
+			BabbageHandler:      babbageHandler,
+			GeographyHandler:    geographyHandler,
+			HomepageHandler:     homepageHandler,
 			InteractivesHandler: interactivesHandler,
+			CensusAtlasHandler:  censusAtlasHandler,
 		}
 
 		Convey("When a analytics request is made", func() {
@@ -588,6 +590,37 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a census atlas request is made, but the census atlas handler is not enabled", func() {
+
+			url := "/census-atlas/"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.CensusAtlasEnabled = false
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then no request is sent to the census atlas handler", func() {
+				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+		})
+
+		Convey("When a census atlas request is made, and the census atlas handler is enabled", func() {
+
+			url := "/census-atlas/"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.CensusAtlasEnabled = true
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then the request is sent to the census atlas handler", func() {
+				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(censusAtlasHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
 
