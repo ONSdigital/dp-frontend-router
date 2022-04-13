@@ -595,7 +595,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, but the census atlas handler is not enabled", func() {
 
-			url := "/census-atlas/"
+			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
@@ -610,7 +610,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, and the census atlas handler is enabled", func() {
 
-			url := "/census-atlas/"
+			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
