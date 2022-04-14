@@ -11,7 +11,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/v2/log"
-	"github.com/gorilla/pat"
+	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 )
 
@@ -52,7 +52,7 @@ type Config struct {
 
 func New(cfg Config) http.Handler {
 
-	router := pat.New()
+	router := mux.NewRouter()
 
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),

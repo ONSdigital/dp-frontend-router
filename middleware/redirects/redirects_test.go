@@ -9,14 +9,14 @@ import (
 
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/v2/log"
-	"github.com/gorilla/pat"
+	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestRedirect(t *testing.T) {
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		Handler,
 	}
@@ -51,7 +51,7 @@ func TestRedirect(t *testing.T) {
 
 func TestDynamicRedirect(t *testing.T) {
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		Handler,
 	}
@@ -144,7 +144,7 @@ c,d`)
 
 func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -161,7 +161,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 
 func BenchmarkWithoutRedirects(b *testing.B) {
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -184,7 +184,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 		redirects[fmt.Sprintf("/test/%d", i)] = "/"
 	}
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -207,7 +207,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 		redirects[fmt.Sprintf("/test/%d", i)] = "/"
 	}
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -230,7 +230,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 		redirects[fmt.Sprintf("/test/%d", i)] = "/"
 	}
 
-	router := pat.New()
+	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,

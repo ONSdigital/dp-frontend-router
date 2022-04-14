@@ -624,5 +624,21 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
+		Convey("When a malicious URL with a redirect attempt is made", func() {
+
+			url := "//%5cexample.com"
+			req := httptest.NewRequest("GET", url, nil)
+			w := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(w, req)
+
+			Convey("Then the request is redirected but with the path properly escaped", func() {
+				res := w.Result()
+				So(res.StatusCode,ShouldEqual,http.StatusMovedPermanently)
+				So(res.Header.Get("Location"),ShouldResemble,"/%5Cexample.com")
+			})
+		})
+
 	})
 }
