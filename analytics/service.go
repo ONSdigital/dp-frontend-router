@@ -2,6 +2,7 @@ package analytics
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
 
 	"github.com/pkg/errors"
@@ -42,7 +43,8 @@ func NewServiceImpl(backend ServiceBackend, redirectSecret string) *ServiceImpl 
 
 // CaptureAnalyticsData - captures the analytics values
 func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
-	data := r.URL.Query().Get(":data")
+	vars := mux.Vars(r)
+	data := vars["data"]
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
