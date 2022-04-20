@@ -196,7 +196,6 @@ func main() {
 		InteractivesEnabled:    cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:     enableSearchABTest,
 		SearchABTestPercentage: cfg.SearchABTestPercentage,
-		CensusHubRoutesEnabled: cfg.CensusHubRoutesEnabled,
 		SiteDomain:             cfg.SiteDomain,
 		HomepageHandler:        homepageHandler,
 		BabbageHandler:         babbageHandler,
