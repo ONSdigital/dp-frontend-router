@@ -11,7 +11,7 @@ import (
 	"github.com/ONSdigital/dp-cookies/cookies"
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest/searchtest"
-	"github.com/gorilla/pat"
+	"github.com/gorilla/mux"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -104,7 +104,7 @@ func TestABSearchHandler(t *testing.T) {
 }
 
 func mockRouter(searchHandler, babbageHandler http.Handler, newSearchABTestPercentage int, siteDomain string) http.Handler {
-	router := pat.New()
+	router := mux.NewRouter()
 
 	router.Handle("/search", abtest.SearchHandler(searchHandler, babbageHandler, newSearchABTestPercentage, siteDomain))
 

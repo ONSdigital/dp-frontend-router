@@ -14,7 +14,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.9.1
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
 	github.com/gorilla/mux v1.8.0
-	github.com/gorilla/pat v1.0.1
 	github.com/justinas/alice v1.2.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.9.1
@@ -32,7 +31,6 @@ require (
 	github.com/aws/smithy-go v1.8.0 // indirect
 	github.com/fatih/color v1.12.0 // indirect
 	github.com/gopherjs/gopherjs v0.0.0-20210918183006-daae65060a40 // indirect
-	github.com/gorilla/context v1.1.1 // indirect
 	github.com/hokaccha/go-prettyjson v0.0.0-20210113012101-fb4e108d2519 // indirect
 	github.com/jteeuwen/go-bindata v3.0.7+incompatible // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect

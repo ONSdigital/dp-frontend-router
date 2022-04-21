@@ -11,7 +11,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/request"
 	"github.com/ONSdigital/log.go/v2/log"
-	"github.com/gorilla/pat"
+	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 )
 
@@ -40,7 +40,6 @@ type Config struct {
 	InteractivesHandler    http.Handler
 	SearchRoutesEnabled    bool
 	EnableSearchABTest     bool
-	CensusHubRoutesEnabled bool
 	SearchABTestPercentage int
 	SiteDomain             string
 	SearchHandler          http.Handler
@@ -52,7 +51,7 @@ type Config struct {
 
 func New(cfg Config) http.Handler {
 
-	router := pat.New()
+	router := mux.NewRouter()
 
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
@@ -66,10 +65,7 @@ func New(cfg Config) http.Handler {
 	alice := alice.New(middleware...).Then(router)
 
 	router.Handle("/", cfg.HomepageHandler)
-
-	if cfg.CensusHubRoutesEnabled {
-		router.Handle("/census", cfg.HomepageHandler)
-	}
+	router.Handle("/census", cfg.HomepageHandler)
 
 	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
@@ -103,7 +99,7 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.CensusAtlasEnabled {
-		router.Handle("/census-atlas/{uri:.*}", cfg.CensusAtlasHandler)
+		router.Handle("/census-atlas{uri:.*}", cfg.CensusAtlasHandler)
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware

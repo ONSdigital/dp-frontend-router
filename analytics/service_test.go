@@ -2,7 +2,9 @@ package analytics
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	jwt "github.com/form3tech-oss/jwt-go"
@@ -20,26 +22,22 @@ func Test_extractIntParam(t *testing.T) {
 		redirectSecret: "secret",
 	}
 	Convey("Given a valid redirect URL", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		data := "eyJhbGciOiJIUzI1NiJ9.eyJpbmRleCI6MSwicGFnZVNpemUiOjEwLCJ0ZXJtIjoiSW50ZWdyYXRlZCIsInBhZ2UiOjEsInVyaSI6Ii9wZW9wbGVwb3B1bGF0aW9uYW5kY29tbXVuaXR5L2hvdXNpbmcvYnVsbGV0aW5zL2ludGVncmF0ZWRob3VzZWhvbGRzdXJ2ZXlleHBlcmltZW50YWxzdGF0aXN0aWNzLzIwMTQtMTAtMDciLCJsaXN0VHlwZSI6InNlYXJjaCJ9.MQnW73Zca_7DZbYXjQC9FMIbCiJjNe--AKcCpLU2azw"
+		r, err := http.NewRequest("GET", "/redir/"+data, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
-		q.Set(":data", "eyJhbGciOiJIUzI1NiJ9.eyJpbmRleCI6MSwicGFnZVNpemUiOjEwLCJ0ZXJtIjoiSW50ZWdyYXRlZCIsInBhZ2UiOjEsInVyaSI6Ii9wZW9wbGVwb3B1bGF0aW9uYW5kY29tbXVuaXR5L2hvdXNpbmcvYnVsbGV0aW5zL2ludGVncmF0ZWRob3VzZWhvbGRzdXJ2ZXlleHBlcmltZW50YWxzdGF0aXN0aWNzLzIwMTQtMTAtMDciLCJsaXN0VHlwZSI6InNlYXJjaCJ9.MQnW73Zca_7DZbYXjQC9FMIbCiJjNe--AKcCpLU2azw")
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity/housing/bulletins/integratedhouseholdsurveyexperimentalstatistics/2014-10-07")
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity/housing/bulletins/integratedhouseholdsurveyexperimentalstatistics/2014-10-07")
+		})
+		router.ServeHTTP(rr, r)
 	})
 
 	Convey("Given a valid redirect URL, 2nd version", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
-		So(r, ShouldNotBeNil)
-		So(err, ShouldBeNil)
-
-		q := r.URL.Query()
-
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -55,21 +53,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity/housing/bulletins/integratedhouseholdsurveyexperimentalstatistics/2014-10-07")
-	})
-
-	Convey("Given a valid redirect URL, but payload has no uri", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity/housing/bulletins/integratedhouseholdsurveyexperimentalstatistics/2014-10-07")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, but payload has no uri", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -84,23 +82,23 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		_, err = s.CaptureAnalyticsData(r)
-		So(err, ShouldNotBeNil)
-		es := fmt.Sprintf("%s", err)
-		So(es, ShouldEqual, "url is a mandatory parameter")
-	})
-
-	Convey("Given a valid redirect URL, with bad secret", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			_, err = s.CaptureAnalyticsData(request)
+			So(err, ShouldNotBeNil)
+			es := fmt.Sprintf("%s", err)
+			So(es, ShouldEqual, "url is a mandatory parameter")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
-		// Create a new token object, specifying signing method and the claims
+	Convey("Given a valid redirect URL, with bad secret", t, func() {
+// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"index": 1,
@@ -110,24 +108,24 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacBadSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		_, err = s.CaptureAnalyticsData(r)
-		So(err, ShouldNotBeNil)
-		es := fmt.Sprintf("%s", err)
-		// The following contains two errors, ONS's + lib error
-		// We can only look for ONS's error, as the library error might change
-		So(es, ShouldContainSubstring, "Invalid redirect data")
-	})
-
-	Convey("Given a valid redirect URL, and nil aud", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			_, err = s.CaptureAnalyticsData(request)
+			So(err, ShouldNotBeNil)
+			es := fmt.Sprintf("%s", err)
+			// The following contains two errors, ONS's + lib error
+			// We can only look for ONS's error, as the library error might change
+			So(es, ShouldContainSubstring, "Invalid redirect data")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and nil aud", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -140,21 +138,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
-	})
-
-	Convey("Given a valid redirect URL, and Empty aud", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and Empty aud", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -167,21 +165,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
-	})
-
-	Convey("Given a valid redirect URL, and aud has a string", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and aud has a string", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -194,21 +192,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
-	})
-
-	Convey("Given a valid redirect URL, and aud has no elements in []string", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and aud has no elements in []string", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -221,21 +219,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
-	})
-
-	Convey("Given a valid redirect URL, and aud has one element in []string", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and aud has one element in []string", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -248,21 +246,21 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
-		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
-	})
-
-	Convey("Given a valid redirect URL, and aud has two elements in []string", t, func() {
-		r, err := http.NewRequest("GET", "/redir/{:data}", nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
-		q := r.URL.Query()
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
+	})
 
+	Convey("Given a valid redirect URL, and aud has two elements in []string", t, func() {
 		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -275,12 +273,18 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		q.Set(":data", tokenString)
-		r.URL.RawQuery = q.Encode()
-
-		url, err := s.CaptureAnalyticsData(r)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
-		So(url, ShouldEqual, "/peoplepopulationandcommunity")
+
+		rr := httptest.NewRecorder()
+		router := mux.NewRouter()
+		router.HandleFunc("/redir/{data:.*}", func(writer http.ResponseWriter, request *http.Request) {
+			url, err := s.CaptureAnalyticsData(request)
+			So(err, ShouldBeNil)
+			So(url, ShouldEqual, "/peoplepopulationandcommunity")
+		})
+		router.ServeHTTP(rr, r)
 	})
 }
 

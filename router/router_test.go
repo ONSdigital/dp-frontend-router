@@ -595,7 +595,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, but the census atlas handler is not enabled", func() {
 
-			url := "/census-atlas/"
+			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
@@ -610,7 +610,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, and the census atlas handler is enabled", func() {
 
-			url := "/census-atlas/"
+			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
@@ -621,6 +621,22 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to the census atlas handler", func() {
 				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(censusAtlasHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a malicious URL with a redirect attempt is made", func() {
+
+			url := "//%5cexample.com"
+			req := httptest.NewRequest("GET", url, nil)
+			w := httptest.NewRecorder()
+
+			router := router.New(config)
+			router.ServeHTTP(w, req)
+
+			Convey("Then the request is redirected but with the path properly escaped", func() {
+				res := w.Result()
+				So(res.StatusCode,ShouldEqual,http.StatusMovedPermanently)
+				So(res.Header.Get("Location"),ShouldResemble,"/%5Cexample.com")
 			})
 		})
 
