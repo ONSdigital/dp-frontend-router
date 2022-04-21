@@ -40,7 +40,6 @@ type Config struct {
 	InteractivesHandler    http.Handler
 	SearchRoutesEnabled    bool
 	EnableSearchABTest     bool
-	CensusHubRoutesEnabled bool
 	SearchABTestPercentage int
 	SiteDomain             string
 	SearchHandler          http.Handler
@@ -66,10 +65,7 @@ func New(cfg Config) http.Handler {
 	alice := alice.New(middleware...).Then(router)
 
 	router.Handle("/", cfg.HomepageHandler)
-
-	if cfg.CensusHubRoutesEnabled {
-		router.Handle("/census", cfg.HomepageHandler)
-	}
+	router.Handle("/census", cfg.HomepageHandler)
 
 	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)

@@ -42,7 +42,6 @@ type Config struct {
 	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
-	CensusHubRoutesEnabled              bool          `envconfig:"CENSUS_HUB_ROUTES_ENABLED"`
 	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
 }
 
@@ -81,7 +80,6 @@ func Get() (*Config, error) {
 		SiteDomain:                          "ons.gov.uk",
 		RedirectSecret:                      "secret",
 		SQSAnalyticsURL:                     "",
-		CensusHubRoutesEnabled:              false,
 		ContentTypeByteLimit:                5000000,
 		HealthcheckCriticalTimeout:          90 * time.Second,
 		HealthcheckInterval:                 30 * time.Second,
