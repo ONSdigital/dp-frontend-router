@@ -84,6 +84,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	relcalControllerURL, err := url.Parse(cfg.ReleaseCalendarControllerURL)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "ReleaseCalendarControllerURL", "value": cfg.ReleaseCalendarControllerURL})
+		os.Exit(1)
+	}
+
 	babbageURL, err := url.Parse(cfg.BabbageURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL})
@@ -161,6 +167,7 @@ func main() {
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
+	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
@@ -192,6 +199,9 @@ func main() {
 		GeographyHandler:       geographyHandler,
 		SearchRoutesEnabled:    cfg.SearchRoutesEnabled,
 		SearchHandler:          searchHandler,
+		RelCalHandler:          relcalHandler,
+		RelCalEnabled:          cfg.ReleaseCalendarEnabled,
+		RelCalPrivatePrefix:    cfg.ReleaseCalendarPrivateRoutePrefix,
 		InteractivesHandler:    interactivesHandler,
 		InteractivesEnabled:    cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:     enableSearchABTest,

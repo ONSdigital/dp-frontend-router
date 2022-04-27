@@ -43,6 +43,9 @@ type Config struct {
 	SearchABTestPercentage int
 	SiteDomain             string
 	SearchHandler          http.Handler
+	RelCalHandler          http.Handler
+	RelCalEnabled          bool
+	RelCalPrivatePrefix    string
 	HomepageHandler        http.Handler
 	BabbageHandler         http.Handler
 	CensusAtlasHandler     http.Handler
@@ -92,6 +95,17 @@ func New(cfg Config) http.Handler {
 		} else {
 			router.Handle("/search", cfg.SearchHandler)
 		}
+	}
+
+	if cfg.RelCalEnabled {
+		router.Handle("/releasecalendar", cfg.RelCalHandler)
+		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
+		router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
+	}
+	if cfg.RelCalPrivatePrefix != "" {
+		router.Handle(cfg.RelCalPrivatePrefix+"/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalPrivatePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalPrivatePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 
 	if cfg.InteractivesEnabled {

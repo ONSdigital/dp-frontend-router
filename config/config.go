@@ -21,6 +21,9 @@ type Config struct {
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
 	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
+	ReleaseCalendarControllerURL        string        `envconfig:"RELCAL_CONTROLLER_URL"`
+	ReleaseCalendarEnabled              bool          `envconfig:"RELCAL_ENABLED"`
+	ReleaseCalendarPrivateRoutePrefix   string        `envconfig:"RELCAL_PRIVATE_ROUTE_PREFIX"`
 	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
@@ -66,6 +69,9 @@ func Get() (*Config, error) {
 		FeedbackControllerURL:               "http://localhost:25200",
 		SearchControllerURL:                 "http://localhost:25000",
 		SearchRoutesEnabled:                 false,
+		ReleaseCalendarControllerURL:        "http://localhost:27700",
+		ReleaseCalendarEnabled:              false,
+		ReleaseCalendarPrivateRoutePrefix:   "",
 		APIRouterURL:                        "http://localhost:23200/v1",
 		DownloaderURL:                       "http://localhost:23400",
 		AreaProfilesControllerURL:           "http://localhost:26600",

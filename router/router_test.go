@@ -39,6 +39,7 @@ func TestRouter(t *testing.T) {
 		homepageHandler := NewHandlerMock()
 		interactivesHandler := NewHandlerMock()
 		censusAtlasHandler := NewHandlerMock()
+		releaseCalendarHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
 			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
@@ -76,6 +77,7 @@ func TestRouter(t *testing.T) {
 			HomepageHandler:     homepageHandler,
 			InteractivesHandler: interactivesHandler,
 			CensusAtlasHandler:  censusAtlasHandler,
+			RelCalHandler:       releaseCalendarHandler,
 		}
 
 		Convey("When a analytics request is made", func() {
@@ -624,6 +626,63 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
+		Convey("When a release calendar request is made, but the release calendar route is not enabled", func() {
+
+			url := "/releasecalendar"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.RelCalEnabled = false
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then no request is sent to the release calendar handler", func() {
+				So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+		})
+
+		Convey("When a release calendar request is made, and the release calendar route is enabled", func() {
+
+			url := "/releasecalendar"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.RelCalEnabled = true
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then the request is sent to the release calendar handler", func() {
+				So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a private route is enabled for the release calendar, but the 'normal' release calendar route is not enabled", func() {
+
+			config.RelCalEnabled = false
+			config.RelCalPrivatePrefix = "/test"
+			router := router.New(config)
+
+			Convey("Then no request is sent to the release calendar handler for a request on the 'normal' route", func() {
+				url := "/releasecalendar"
+				req := httptest.NewRequest("GET", url, nil)
+				res := httptest.NewRecorder()
+
+				router.ServeHTTP(res, req)
+				So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+
+			Convey("But a request is sent to the release calendar handler for a request on the private route", func() {
+				url := "/test/releasecalendar"
+				req := httptest.NewRequest("GET", url, nil)
+				res := httptest.NewRecorder()
+
+				router.ServeHTTP(res, req)
+				So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
 		Convey("When a malicious URL with a redirect attempt is made", func() {
 
 			url := "//%5cexample.com"
@@ -635,8 +694,8 @@ func TestRouter(t *testing.T) {
 
 			Convey("Then the request is redirected but with the path properly escaped", func() {
 				res := w.Result()
-				So(res.StatusCode,ShouldEqual,http.StatusMovedPermanently)
-				So(res.Header.Get("Location"),ShouldResemble,"/%5Cexample.com")
+				So(res.StatusCode, ShouldEqual, http.StatusMovedPermanently)
+				So(res.Header.Get("Location"), ShouldResemble, "/%5Cexample.com")
 			})
 		})
 
