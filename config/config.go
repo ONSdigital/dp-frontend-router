@@ -1,6 +1,7 @@
 package config
 
 import (
+	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -71,7 +72,6 @@ func Get() (*Config, error) {
 		SearchRoutesEnabled:                 false,
 		ReleaseCalendarControllerURL:        "http://localhost:27700",
 		ReleaseCalendarEnabled:              false,
-		ReleaseCalendarPrivateRoutePrefix:   "",
 		APIRouterURL:                        "http://localhost:23200/v1",
 		DownloaderURL:                       "http://localhost:23400",
 		AreaProfilesControllerURL:           "http://localhost:26600",
@@ -96,7 +96,13 @@ func Get() (*Config, error) {
 		ProxyTimeout:                        5 * time.Second,
 	}
 
-	return cfg, envconfig.Process("", cfg)
+	if err := envconfig.Process("", cfg); err != nil {
+		return cfg, err
+	}
+
+	cfg.ReleaseCalendarPrivateRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarPrivateRoutePrefix)
+
+	return cfg, nil
 }
 
 // IsEnableSearchABTest checks whether ab test is enabled and that percentage is a sensible int value
@@ -106,4 +112,13 @@ func IsEnableSearchABTest(cfg Config) bool {
 		return true
 	}
 	return false
+}
+
+// validatePrivatePrefix ensures that a non-empty private path prefix starts with a '/'
+func validatePrivatePrefix(prefix string) string {
+	if prefix != "" && !strings.HasPrefix(prefix, "/") {
+		return "/" + prefix
+	}
+
+	return prefix
 }
