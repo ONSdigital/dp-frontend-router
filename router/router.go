@@ -98,14 +98,14 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.RelCalEnabled {
-		router.Handle("/releasecalendar", cfg.RelCalHandler)
+		router.Handle("/releasecalendar{uri:.*}", cfg.RelCalHandler)
+		router.Handle("/releases{uri:.*}", cfg.RelCalHandler)
 		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 	if cfg.RelCalPrivatePrefix != "" {
-		router.Handle(cfg.RelCalPrivatePrefix+"/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalPrivatePrefix+"/releasecalendar{uri:.*}", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalPrivatePrefix+"/releases{uri:.*}", cfg.RelCalHandler)
 		router.Handle(cfg.RelCalPrivatePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle(cfg.RelCalPrivatePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 
 	if cfg.InteractivesEnabled {
