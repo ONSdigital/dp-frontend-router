@@ -22,9 +22,9 @@ type Config struct {
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
 	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
-	ReleaseCalendarControllerURL        string        `envconfig:"RELCAL_CONTROLLER_URL"`
-	ReleaseCalendarEnabled              bool          `envconfig:"RELCAL_ENABLED"`
-	ReleaseCalendarPrivateRoutePrefix   string        `envconfig:"RELCAL_PRIVATE_ROUTE_PREFIX"`
+	ReleaseCalendarControllerURL        string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
+	ReleaseCalendarEnabled              bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
+	ReleaseCalendarPrivateRoutePrefix   string        `envconfig:"RELEASE_CALENDAR_PRIVATE_ROUTE_PREFIX"`
 	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
