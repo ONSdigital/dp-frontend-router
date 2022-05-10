@@ -84,7 +84,7 @@ func TestIsEnabledABSearch(t *testing.T) {
 func TestValidatePrivatePrefix(t *testing.T) {
 	Convey("given an empty private path prefix", t, func() {
 		Convey("validatePrivatePrefix returns the empty private path prefix", func() {
-			So(validatePrivatePrefix("a-prefix"), ShouldEqual, "/a-prefix")
+			So(validatePrivatePrefix(""), ShouldEqual, "")
 		})
 	})
 
