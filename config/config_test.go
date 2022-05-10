@@ -83,20 +83,23 @@ func TestIsEnabledABSearch(t *testing.T) {
 
 func TestValidatePrivatePrefix(t *testing.T) {
 	Convey("given an empty private path prefix", t, func() {
+		prefix := ""
 		Convey("validatePrivatePrefix returns the empty private path prefix", func() {
-			So(validatePrivatePrefix(""), ShouldEqual, "")
+			So(validatePrivatePrefix(prefix), ShouldEqual, "")
 		})
 	})
 
 	Convey("given a private path prefix is set without an initial '/'", t, func() {
+		prefix := "a-prefix"
 		Convey("validatePrivatePrefix return the given private path prefix with an initial '/'", func() {
-			So(validatePrivatePrefix("a-prefix"), ShouldEqual, "/a-prefix")
+			So(validatePrivatePrefix(prefix), ShouldEqual, "/a-prefix")
 		})
 	})
 
 	Convey("given a private path prefix is set with an initial '/'", t, func() {
+		prefix := "/a-prefix"
 		Convey("validatePrivatePrefix returns the given private path prefix as valid", func() {
-			So(validatePrivatePrefix("/a-prefix"), ShouldEqual, "/a-prefix")
+			So(validatePrivatePrefix(prefix), ShouldEqual, "/a-prefix")
 		})
 	})
 }
