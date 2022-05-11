@@ -15,6 +15,10 @@ import (
 	"github.com/justinas/alice"
 )
 
+const (
+	HttpHeaderKeyXFrameOptions = "X-Frame-Options"
+)
+
 //go:generate moq -out routertest/handler.go -pkg routertest . Handler
 type Handler http.Handler
 
@@ -59,7 +63,7 @@ func New(cfg Config) http.Handler {
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
-		securityHandler,
+		SecurityHandler,
 		healthcheckHandler(cfg.HealthCheckHandler),
 		serverError.Handler,
 		redirects.Handler,
@@ -134,11 +138,13 @@ func New(cfg Config) http.Handler {
 	return alice
 }
 
-// securityHandler ...
-func securityHandler(h http.Handler) http.Handler {
+// SecurityHandler ...
+func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" && !strings.HasPrefix(req.URL.Path, "/visualisations/") {
-			w.Header().Set("X-Frame-Options", "SAMEORIGIN")
+		if req.URL.Path != "/embed" &&
+			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
+			!strings.HasPrefix(req.URL.Path, "/interactives/") {
+			w.Header().Set(HttpHeaderKeyXFrameOptions, "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)
 	})

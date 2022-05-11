@@ -12,6 +12,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType/mocks"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -19,6 +20,50 @@ func NewHandlerMock() *routertest.HandlerMock {
 	return &routertest.HandlerMock{
 		ServeHTTPFunc: func(in1 http.ResponseWriter, in2 *http.Request) {},
 	}
+}
+
+func TestSecurityHandler(t *testing.T) {
+	Convey("Given a security handler", t, func() {
+		res := httptest.NewRecorder()
+		handler := NewHandlerMock()
+		securityHandler := router.SecurityHandler(handler)
+
+		Convey("When a default request is made", func() {
+			url := "/"
+			req := httptest.NewRequest(http.MethodGet, url, nil)
+			securityHandler.ServeHTTP(res, req)
+
+			Convey("Then xframe-options header is SAMEORIGIN", func() {
+				So(res.Header().Get(router.HttpHeaderKeyXFrameOptions), ShouldEqual, "SAMEORIGIN")
+			})
+
+			Convey("And the request is sent to the underlying handler", func() {
+				So(len(handler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(handler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a handled request is made we want no xframe-options header", func() {
+			urls := []string{
+				"/embed",
+				"/visualisations/path",
+				"/interactives/path",
+			}
+			for i, url := range urls {
+				req := httptest.NewRequest(http.MethodGet, url, nil)
+				securityHandler.ServeHTTP(res, req)
+
+				Convey("Then no xframe-options header is set: "+url, func() {
+					So(res.Header().Get(router.HttpHeaderKeyXFrameOptions), ShouldBeEmpty)
+				})
+
+				Convey("And the request is sent to the underlying handler: "+url, func() {
+					So(len(handler.ServeHTTPCalls()), ShouldEqual, i+1)
+					So(handler.ServeHTTPCalls()[i].In2.URL.Path, ShouldResemble, url)
+				})
+			}
+		})
+	})
 }
 
 func TestRouter(t *testing.T) {
