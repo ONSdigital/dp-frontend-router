@@ -292,7 +292,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
 		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
+		IdleConnTimeout:       180 * time.Second,
 		TLSHandshakeTimeout:   5 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
