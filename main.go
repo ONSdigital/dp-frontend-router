@@ -212,7 +212,7 @@ func main() {
 	s := &http.Server{
 		Addr:         cfg.BindAddr,
 		Handler:      httpHandler,
-		ReadTimeout:  5 * time.Second,
+		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
 	}
