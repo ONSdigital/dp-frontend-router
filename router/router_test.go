@@ -698,7 +698,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
-		Convey("When a private route is enabled for the release calendar", func() {
+		Convey("When a private route prefix is enabled for the release calendar", func() {
 			config.RelCalPrivatePrefix = "/test"
 
 			Convey("And the 'normal' release calendar route is not enabled", func() {
@@ -741,14 +741,13 @@ func TestRouter(t *testing.T) {
 					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 				})
 
-				Convey("And a request is also sent to the release calendar handler for a request on the private route", func() {
+				Convey("And no request is sent to the release calendar handler for a request on the private route", func() {
 					url := "/test/releasecalendar"
 					req := httptest.NewRequest("GET", url, nil)
 					res := httptest.NewRecorder()
 
 					router.ServeHTTP(res, req)
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
 				})
 			})
 		})
