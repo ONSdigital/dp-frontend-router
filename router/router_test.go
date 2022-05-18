@@ -131,8 +131,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -150,8 +150,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -169,8 +169,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -188,8 +188,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -207,8 +207,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -240,8 +240,8 @@ func TestRouter(t *testing.T) {
 			}
 			config.DatasetClient = filterableDataset
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -273,8 +273,8 @@ func TestRouter(t *testing.T) {
 			}
 			config.DatasetClient = flexDataset
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -296,8 +296,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -315,8 +315,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -335,8 +335,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.GeographyEnabled = false
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
@@ -359,8 +359,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.GeographyEnabled = true
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -383,8 +383,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.SearchRoutesEnabled = false
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no request is sent to the search handler", func() {
 				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
@@ -403,8 +403,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.SearchRoutesEnabled = true
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -426,8 +426,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -446,8 +446,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
@@ -466,8 +466,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -485,8 +485,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -504,8 +504,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -523,8 +523,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no request is sent to the interactive visualisation handler", func() {
 				So(len(interactivesHandler.ServeHTTPCalls()), ShouldEqual, 0)
@@ -547,8 +547,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.InteractivesEnabled = true
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then the request is sent to the interactive visualisation handler", func() {
 				So(len(interactivesHandler.ServeHTTPCalls()), ShouldEqual, 1)
@@ -570,8 +570,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -589,8 +589,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -608,8 +608,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -627,8 +627,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
@@ -647,8 +647,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.CensusAtlasEnabled = false
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then no request is sent to the census atlas handler", func() {
 				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 0)
@@ -662,8 +662,8 @@ func TestRouter(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			config.CensusAtlasEnabled = true
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			r := router.New(config)
+			r.ServeHTTP(res, req)
 
 			Convey("Then the request is sent to the census atlas handler", func() {
 				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 1)
@@ -678,8 +678,8 @@ func TestRouter(t *testing.T) {
 
 			Convey("And the release calendar route is not enabled", func() {
 				config.RelCalEnabled = false
-				router := router.New(config)
-				router.ServeHTTP(res, req)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
 
 				Convey("Then no request is sent to the release calendar handler", func() {
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
@@ -688,8 +688,8 @@ func TestRouter(t *testing.T) {
 
 			Convey("And the release calendar route is enabled", func() {
 				config.RelCalEnabled = true
-				router := router.New(config)
-				router.ServeHTTP(res, req)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
 
 				Convey("Then the request is sent to the release calendar handler", func() {
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
@@ -704,14 +704,14 @@ func TestRouter(t *testing.T) {
 			Convey("And the 'normal' release calendar route is not enabled", func() {
 
 				config.RelCalEnabled = false
-				router := router.New(config)
+				r := router.New(config)
 
 				Convey("Then no request is sent to the release calendar handler for a request on the 'normal' route", func() {
 					url := "/releasecalendar"
 					req := httptest.NewRequest("GET", url, nil)
 					res := httptest.NewRecorder()
 
-					router.ServeHTTP(res, req)
+					r.ServeHTTP(res, req)
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
 				})
 
@@ -720,7 +720,7 @@ func TestRouter(t *testing.T) {
 					req := httptest.NewRequest("GET", url, nil)
 					res := httptest.NewRecorder()
 
-					router.ServeHTTP(res, req)
+					r.ServeHTTP(res, req)
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
 					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 				})
@@ -729,14 +729,14 @@ func TestRouter(t *testing.T) {
 			Convey("And the 'normal' release calendar route is enabled", func() {
 
 				config.RelCalEnabled = true
-				router := router.New(config)
+				r := router.New(config)
 
 				Convey("Then a request is sent to the release calendar handler for a request on the 'normal' route", func() {
 					url := "/releasecalendar"
 					req := httptest.NewRequest("GET", url, nil)
 					res := httptest.NewRecorder()
 
-					router.ServeHTTP(res, req)
+					r.ServeHTTP(res, req)
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
 					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 				})
@@ -746,7 +746,7 @@ func TestRouter(t *testing.T) {
 					req := httptest.NewRequest("GET", url, nil)
 					res := httptest.NewRecorder()
 
-					router.ServeHTTP(res, req)
+					r.ServeHTTP(res, req)
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
 				})
 			})
@@ -758,8 +758,8 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			w := httptest.NewRecorder()
 
-			router := router.New(config)
-			router.ServeHTTP(w, req)
+			r := router.New(config)
+			r.ServeHTTP(w, req)
 
 			Convey("Then the request is redirected but with the path properly escaped", func() {
 				res := w.Result()
