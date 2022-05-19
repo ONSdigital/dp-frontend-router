@@ -673,12 +673,12 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a release calendar request is made", func() {
 			url := "/releasecalendar"
-			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			Convey("And the release calendar route is not enabled", func() {
 				config.RelCalEnabled = false
 				r := router.New(config)
+				req := httptest.NewRequest("GET", url, nil)
 				r.ServeHTTP(res, req)
 
 				Convey("Then no request is sent to the release calendar handler", func() {
@@ -688,66 +688,30 @@ func TestRouter(t *testing.T) {
 
 			Convey("And the release calendar route is enabled", func() {
 				config.RelCalEnabled = true
-				r := router.New(config)
-				r.ServeHTTP(res, req)
 
-				Convey("Then the request is sent to the release calendar handler", func() {
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-				})
-			})
-		})
-
-		Convey("When a private route prefix is enabled for the release calendar", func() {
-			config.RelCalPrivatePrefix = "/test"
-
-			Convey("And the 'normal' release calendar route is not enabled", func() {
-
-				config.RelCalEnabled = false
-				r := router.New(config)
-
-				Convey("Then no request is sent to the release calendar handler for a request on the 'normal' route", func() {
-					url := "/releasecalendar"
+				Convey("And the route prefix is not set", func() {
+					config.RelCalRoutePrefix = ""
+					r := router.New(config)
 					req := httptest.NewRequest("GET", url, nil)
-					res := httptest.NewRecorder()
-
 					r.ServeHTTP(res, req)
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
+
+					Convey("Then the request is sent to the release calendar handler", func() {
+						So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
+						So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+					})
 				})
 
-				Convey("And a request is sent to the release calendar handler for a request on the private route", func() {
-					url := "/test/releasecalendar"
-					req := httptest.NewRequest("GET", url, nil)
-					res := httptest.NewRecorder()
-
+				Convey("And the route prefix is set", func() {
+					prefix := "/test"
+					config.RelCalRoutePrefix = prefix
+					r := router.New(config)
+					req := httptest.NewRequest("GET", prefix+url, nil)
 					r.ServeHTTP(res, req)
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-				})
-			})
 
-			Convey("And the 'normal' release calendar route is enabled", func() {
-
-				config.RelCalEnabled = true
-				r := router.New(config)
-
-				Convey("Then a request is sent to the release calendar handler for a request on the 'normal' route", func() {
-					url := "/releasecalendar"
-					req := httptest.NewRequest("GET", url, nil)
-					res := httptest.NewRecorder()
-
-					r.ServeHTTP(res, req)
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-				})
-
-				Convey("And no request is sent to the release calendar handler for a request on the private route", func() {
-					url := "/test/releasecalendar"
-					req := httptest.NewRequest("GET", url, nil)
-					res := httptest.NewRecorder()
-
-					r.ServeHTTP(res, req)
-					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
+					Convey("Then the request is sent to the release calendar handler", func() {
+						So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
+						So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, prefix+url)
+					})
 				})
 			})
 		})

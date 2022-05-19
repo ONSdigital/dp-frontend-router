@@ -32,7 +32,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.SearchRoutesEnabled, ShouldBeFalse)
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.ReleaseCalendarEnabled, ShouldBeFalse)
-				So(cfg.ReleaseCalendarPrivateRoutePrefix, ShouldEqual, "")
+				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
 				So(cfg.InteractivesControllerURL, ShouldEqual, "http://localhost:27300")
 				So(cfg.InteractivesRoutesEnabled, ShouldBeFalse)
 				So(cfg.APIRouterURL, ShouldEqual, "http://localhost:23200/v1")

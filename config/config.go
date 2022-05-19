@@ -24,7 +24,7 @@ type Config struct {
 	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	ReleaseCalendarControllerURL        string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	ReleaseCalendarEnabled              bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
-	ReleaseCalendarPrivateRoutePrefix   string        `envconfig:"RELEASE_CALENDAR_PRIVATE_ROUTE_PREFIX"`
+	ReleaseCalendarRoutePrefix          string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
@@ -100,7 +100,7 @@ func Get() (*Config, error) {
 		return cfg, err
 	}
 
-	cfg.ReleaseCalendarPrivateRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarPrivateRoutePrefix)
+	cfg.ReleaseCalendarRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarRoutePrefix)
 
 	return cfg, nil
 }

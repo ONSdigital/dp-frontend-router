@@ -49,7 +49,7 @@ type Config struct {
 	SearchHandler          http.Handler
 	RelCalHandler          http.Handler
 	RelCalEnabled          bool
-	RelCalPrivatePrefix    string
+	RelCalRoutePrefix      string
 	HomepageHandler        http.Handler
 	BabbageHandler         http.Handler
 	CensusAtlasHandler     http.Handler
@@ -101,15 +101,10 @@ func New(cfg Config) http.Handler {
 		}
 	}
 
-	switch {
-	case cfg.RelCalEnabled:
-		router.Handle("/releasecalendar", cfg.RelCalHandler)
-		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
-	case cfg.RelCalPrivatePrefix != "":
-		router.Handle(cfg.RelCalPrivatePrefix+"/releasecalendar", cfg.RelCalHandler)
-		router.Handle(cfg.RelCalPrivatePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle(cfg.RelCalPrivatePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
+	if cfg.RelCalEnabled {
+		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 
 	if cfg.InteractivesEnabled {

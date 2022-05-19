@@ -201,7 +201,7 @@ func main() {
 		SearchHandler:          searchHandler,
 		RelCalHandler:          relcalHandler,
 		RelCalEnabled:          cfg.ReleaseCalendarEnabled,
-		RelCalPrivatePrefix:    cfg.ReleaseCalendarPrivateRoutePrefix,
+		RelCalRoutePrefix:      cfg.ReleaseCalendarRoutePrefix,
 		InteractivesHandler:    interactivesHandler,
 		InteractivesEnabled:    cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:     enableSearchABTest,
