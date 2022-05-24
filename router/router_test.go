@@ -2,6 +2,8 @@ package router_test
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -85,6 +87,7 @@ func TestRouter(t *testing.T) {
 		interactivesHandler := NewHandlerMock()
 		censusAtlasHandler := NewHandlerMock()
 		releaseCalendarHandler := NewHandlerMock()
+		prefixDatasetHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
 			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
@@ -105,24 +108,25 @@ func TestRouter(t *testing.T) {
 		}
 
 		config := router.Config{
-			AnalyticsHandler:    analyticsHandler,
-			SearchHandler:       searchHandler,
-			DownloadHandler:     downloadHandler,
-			HealthCheckHandler:  healthCheckHandler.ServeHTTPFunc,
-			CookieHandler:       cookieHandler,
-			DatasetHandler:      datasetHandler,
-			DatasetClient:       datasetClient,
-			FilterHandler:       filterHandler,
-			FilterClient:        filterClient,
-			FilterFlexHandler:   filterFlexHandler,
-			FeedbackHandler:     feedbackHandler,
-			ZebedeeClient:       zebedeeClient,
-			BabbageHandler:      babbageHandler,
-			GeographyHandler:    geographyHandler,
-			HomepageHandler:     homepageHandler,
-			InteractivesHandler: interactivesHandler,
-			CensusAtlasHandler:  censusAtlasHandler,
-			RelCalHandler:       releaseCalendarHandler,
+			AnalyticsHandler:     analyticsHandler,
+			SearchHandler:        searchHandler,
+			DownloadHandler:      downloadHandler,
+			HealthCheckHandler:   healthCheckHandler.ServeHTTPFunc,
+			CookieHandler:        cookieHandler,
+			DatasetHandler:       datasetHandler,
+			PrefixDatasetHandler: prefixDatasetHandler,
+			DatasetClient:        datasetClient,
+			FilterHandler:        filterHandler,
+			FilterClient:         filterClient,
+			FilterFlexHandler:    filterFlexHandler,
+			FeedbackHandler:      feedbackHandler,
+			ZebedeeClient:        zebedeeClient,
+			BabbageHandler:       babbageHandler,
+			GeographyHandler:     geographyHandler,
+			HomepageHandler:      homepageHandler,
+			InteractivesHandler:  interactivesHandler,
+			CensusAtlasHandler:   censusAtlasHandler,
+			RelCalHandler:        releaseCalendarHandler,
 		}
 
 		Convey("When a analytics request is made", func() {
@@ -729,6 +733,65 @@ func TestRouter(t *testing.T) {
 				res := w.Result()
 				So(res.StatusCode, ShouldEqual, http.StatusMovedPermanently)
 				So(res.Header.Get("Location"), ShouldResemble, "/%5Cexample.com")
+			})
+		})
+
+		Convey("When a legacy dataset request is made, but the dataset handler is not enabled", func() {
+
+			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			config.DatasetEnabled = false
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+			})
+
+			Convey("Then no request is sent to the dataset handler", func() {
+				So(len(prefixDatasetHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a legacy dataset request is made, and the dataset handler is enabled", func() {
+
+			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
+			req := httptest.NewRequest("GET", url, nil)
+			res := httptest.NewRecorder()
+
+			// mock allRouteHandler's zebedee response to return dataset page type
+			zebedeeResponseBody := json.RawMessage(`{"type":"dataset","apiDatasetId":""}`)
+			zebedeeClient = &allroutestest.ZebedeeClientMock{
+				GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
+					return zebedeeResponseBody, http.Header{allRoutes.HeaderOnsPageType: {"dataset"}}, nil
+				},
+			}
+			config.ZebedeeClient = zebedeeClient
+			expectedZebedeeURL := "/data?uri=" + url
+
+			config.DatasetEnabled = true
+			router := router.New(config)
+			router.ServeHTTP(res, req)
+
+			Convey("Then a request is sent to Zebedee to check the page type", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
+				So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldEqual, expectedZebedeeURL)
+			})
+
+			Convey("Then the request is sent to the prefix dataset handler", func() {
+				So(len(prefixDatasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(prefixDatasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+
+			Convey("Then no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
 

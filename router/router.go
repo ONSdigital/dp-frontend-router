@@ -29,6 +29,8 @@ type Config struct {
 	AreaProfileHandler     http.Handler
 	DownloadHandler        http.Handler
 	DatasetHandler         http.Handler
+	DatasetEnabled         bool
+	PrefixDatasetHandler   http.Handler
 	DatasetClient          datasetType.DatasetClient
 	CookieHandler          http.Handler
 	FilterHandler          http.Handler
@@ -122,9 +124,13 @@ func New(cfg Config) http.Handler {
 	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(cfg.BabbageHandler)
 
 	// all other requests go through the allRoutesMiddleware to check the page type first
-	allRoutesMiddleware := allRoutes.Handler(map[string]http.Handler{
+	handlers := map[string]http.Handler{
 		"dataset_landing_page": cfg.DatasetHandler,
-	}, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
+	}
+	if cfg.DatasetEnabled {
+		handlers["dataset"] = cfg.PrefixDatasetHandler
+	}
+	allRoutesMiddleware := allRoutes.Handler(handlers, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
 
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)
