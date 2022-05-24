@@ -29,9 +29,9 @@ type Config struct {
 	AreaProfileHandler       http.Handler
 	DownloadHandler          http.Handler
 	DatasetHandler           http.Handler
+	DatasetClient            datasetType.DatasetClient
 	NewDatasetRoutingEnabled bool
 	PrefixDatasetHandler     http.Handler
-	DatasetClient            datasetType.DatasetClient
 	CookieHandler            http.Handler
 	FilterHandler            http.Handler
 	FilterFlexHandler        http.Handler
@@ -51,7 +51,7 @@ type Config struct {
 	SearchHandler            http.Handler
 	RelCalHandler            http.Handler
 	RelCalEnabled            bool
-	RelCalPrivatePrefix      string
+	RelCalRoutePrefix        string
 	HomepageHandler          http.Handler
 	BabbageHandler           http.Handler
 	CensusAtlasHandler       http.Handler
