@@ -23,39 +23,39 @@ const (
 type Handler http.Handler
 
 type Config struct {
-	HealthCheckHandler     func(w http.ResponseWriter, req *http.Request)
-	AnalyticsHandler       http.Handler
-	AreaProfileEnabled     bool
-	AreaProfileHandler     http.Handler
-	DownloadHandler        http.Handler
-	DatasetHandler         http.Handler
-	DatasetEnabled         bool
-	PrefixDatasetHandler   http.Handler
-	DatasetClient          datasetType.DatasetClient
-	CookieHandler          http.Handler
-	FilterHandler          http.Handler
-	FilterFlexHandler      http.Handler
-	FilterFlexEnabled      bool
-	FilterClient           datasetType.FilterClient
-	FeedbackHandler        http.Handler
-	ContentTypeByteLimit   int
-	ZebedeeClient          allRoutes.ZebedeeClient
-	GeographyEnabled       bool
-	GeographyHandler       http.Handler
-	InteractivesEnabled    bool
-	InteractivesHandler    http.Handler
-	SearchRoutesEnabled    bool
-	EnableSearchABTest     bool
-	SearchABTestPercentage int
-	SiteDomain             string
-	SearchHandler          http.Handler
-	RelCalHandler          http.Handler
-	RelCalEnabled          bool
-	RelCalRoutePrefix      string
-	HomepageHandler        http.Handler
-	BabbageHandler         http.Handler
-	CensusAtlasHandler     http.Handler
-	CensusAtlasEnabled     bool
+	HealthCheckHandler       func(w http.ResponseWriter, req *http.Request)
+	AnalyticsHandler         http.Handler
+	AreaProfileEnabled       bool
+	AreaProfileHandler       http.Handler
+	DownloadHandler          http.Handler
+	DatasetHandler           http.Handler
+	NewDatasetRoutingEnabled bool
+	PrefixDatasetHandler     http.Handler
+	DatasetClient            datasetType.DatasetClient
+	CookieHandler            http.Handler
+	FilterHandler            http.Handler
+	FilterFlexHandler        http.Handler
+	FilterFlexEnabled        bool
+	FilterClient             datasetType.FilterClient
+	FeedbackHandler          http.Handler
+	ContentTypeByteLimit     int
+	ZebedeeClient            allRoutes.ZebedeeClient
+	GeographyEnabled         bool
+	GeographyHandler         http.Handler
+	InteractivesEnabled      bool
+	InteractivesHandler      http.Handler
+	SearchRoutesEnabled      bool
+	EnableSearchABTest       bool
+	SearchABTestPercentage   int
+	SiteDomain               string
+	SearchHandler            http.Handler
+	RelCalHandler            http.Handler
+	RelCalEnabled            bool
+	RelCalPrivatePrefix      string
+	HomepageHandler          http.Handler
+	BabbageHandler           http.Handler
+	CensusAtlasHandler       http.Handler
+	CensusAtlasEnabled       bool
 }
 
 func New(cfg Config) http.Handler {
@@ -127,7 +127,7 @@ func New(cfg Config) http.Handler {
 	handlers := map[string]http.Handler{
 		"dataset_landing_page": cfg.DatasetHandler,
 	}
-	if cfg.DatasetEnabled {
+	if cfg.NewDatasetRoutingEnabled {
 		handlers["dataset"] = cfg.PrefixDatasetHandler
 	}
 	allRoutesMiddleware := allRoutes.Handler(handlers, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)

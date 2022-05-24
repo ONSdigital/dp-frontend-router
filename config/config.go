@@ -47,7 +47,7 @@ type Config struct {
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
-	DatasetEnabled                      bool          `envconfig:"DATASET_ENABLED"`
+	NewDatasetRoutingEnabled            bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
 }
 
 var cfg *Config
@@ -95,7 +95,7 @@ func Get() (*Config, error) {
 		EnableSearchABTest:                  false,
 		SearchABTestPercentage:              10,
 		ProxyTimeout:                        5 * time.Second,
-		DatasetEnabled:                      false,
+		NewDatasetRoutingEnabled:            false,
 	}
 
 	if err := envconfig.Process("", cfg); err != nil {

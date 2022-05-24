@@ -742,7 +742,7 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
-			config.DatasetEnabled = false
+			config.NewDatasetRoutingEnabled = false
 			router := router.New(config)
 			router.ServeHTTP(res, req)
 
@@ -776,7 +776,7 @@ func TestRouter(t *testing.T) {
 			config.ZebedeeClient = zebedeeClient
 			expectedZebedeeURL := "/data?uri=" + url
 
-			config.DatasetEnabled = true
+			config.NewDatasetRoutingEnabled = true
 			router := router.New(config)
 			router.ServeHTTP(res, req)
 
