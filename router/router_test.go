@@ -766,17 +766,22 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
+			expectedZebedeeURL := "/data?uri=" + url
+
 			// mock allRouteHandler's zebedee response to return dataset page type
 			zebedeeResponseBody := json.RawMessage(`{"type":"dataset","apiDatasetId":""}`)
 			zebedeeClient = &allroutestest.ZebedeeClientMock{
 				GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
-					return zebedeeResponseBody, http.Header{allRoutes.HeaderOnsPageType: {"dataset"}}, nil
+					h := http.Header{}
+					h.Add(allRoutes.HeaderOnsPageType, "dataset")
+					return zebedeeResponseBody, h, nil
 				},
 			}
 			config.ZebedeeClient = zebedeeClient
-			expectedZebedeeURL := "/data?uri=" + url
 
 			config.NewDatasetRoutingEnabled = true
+			config.ContentTypeByteLimit = 5 * 1000 * 1000
+
 			router := router.New(config)
 			router.ServeHTTP(res, req)
 
