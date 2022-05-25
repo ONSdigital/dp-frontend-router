@@ -235,6 +235,7 @@ func main() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
+		MaxHeaderBytes: 1024,
 	}
 
 	// Start health check
