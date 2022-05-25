@@ -77,8 +77,10 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			log.Info(req.Context(), "zebedee response", log.Data{"type": zebResp.Type, "datasetID": zebResp.DatasetID})
 
 			pageType := headers.Get(HeaderOnsPageType)
+			fmt.Printf("===== Page type: %s\n Body: %s\n Lookup: %v", pageType, b, routesHandler[pageType])
 
 			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
+				fmt.Println("redirecting to datasets")
 				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)
 				return
 			}
