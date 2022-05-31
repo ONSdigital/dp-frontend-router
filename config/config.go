@@ -9,45 +9,45 @@ import (
 
 // Config represents service configuration for dp-frontend-router
 type Config struct {
-	BindAddr                            string        `envconfig:"BIND_ADDR"`
+	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
+	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
+	AreaProfilesRoutesEnabled           bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
 	BabbageURL                          string        `envconfig:"BABBAGE_URL"`
-	RendererURL                         string        `envconfig:"RENDERER_URL"`
+	BindAddr                            string        `envconfig:"BIND_ADDR"`
+	CensusAtlasRoutesEnabled            bool          `envconfig:"CENSUS_ATLAS_ROUTES_ENABLED"`
+	CensusAtlasURL                      string        `envconfig:"CENSUS_ATLAS_URL"`
+	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 	CookiesControllerURL                string        `envconfig:"COOKIES_CONTROLLER_URL"`
-	HomepageControllerURL               string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	DatasetControllerURL                string        `envconfig:"DATASET_CONTROLLER_URL"`
-	FilterDatasetControllerURL          string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
-	GeographyControllerURL              string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
-	GeographyEnabled                    bool          `envconfig:"GEOGRAPHY_ENABLED"`
+	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
+	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	FeedbackControllerURL               string        `envconfig:"FEEDBACK_CONTROLLER_URL"`
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
-	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
-	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
+	FilterDatasetControllerURL          string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
+	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
+	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
+	GeographyControllerURL              string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
+	GeographyEnabled                    bool          `envconfig:"GEOGRAPHY_ENABLED"`
+	HealthcheckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
+	HealthcheckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
+	HomepageControllerURL               string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
+	InteractivesControllerURL           string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
+	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
+	NewDatasetRoutingEnabled            bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
+	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
+	RedirectSecret                      string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	ReleaseCalendarControllerURL        string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	ReleaseCalendarEnabled              bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
 	ReleaseCalendarRoutePrefix          string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
-	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
-	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
-	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
-	AreaProfilesRoutesEnabled           bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
-	InteractivesControllerURL           string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
-	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
-	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
-	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
-	CensusAtlasURL                      string        `envconfig:"CENSUS_ATLAS_URL"`
-	CensusAtlasRoutesEnabled            bool          `envconfig:"CENSUS_ATLAS_ROUTES_ENABLED"`
-	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
-	SiteDomain                          string        `envconfig:"SITE_DOMAIN"`
-	RedirectSecret                      string        `envconfig:"REDIRECT_SECRET" json:"-"`
-	SQSAnalyticsURL                     string        `envconfig:"SQS_ANALYTICS_URL"`
-	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
-	HealthcheckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
-	HealthcheckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
-	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
-	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
-	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
+	RendererURL                         string        `envconfig:"RENDERER_URL"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
-	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
-	NewDatasetRoutingEnabled            bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
+	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
+	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
+	SiteDomain                          string        `envconfig:"SITE_DOMAIN"`
+	SQSAnalyticsURL                     string        `envconfig:"SQS_ANALYTICS_URL"`
+	ZebedeeRequestMaximumRetries        int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
+	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 }
 
 var cfg *Config
