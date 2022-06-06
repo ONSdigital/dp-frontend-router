@@ -98,7 +98,7 @@ func Test_extractIntParam(t *testing.T) {
 	})
 
 	Convey("Given a valid redirect URL, with bad secret", t, func() {
-// Create a new token object, specifying signing method and the claims
+		// Create a new token object, specifying signing method and the claims
 		// you would like it to contain.
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 			"index": 1,

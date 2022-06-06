@@ -9,6 +9,7 @@ import (
 
 // Config represents service configuration for dp-frontend-router
 type Config struct {
+	AWS                                 AWS
 	APIRouterURL                        string        `envconfig:"API_ROUTER_URL"`
 	AreaProfilesControllerURL           string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
 	AreaProfilesRoutesEnabled           bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
@@ -50,6 +51,12 @@ type Config struct {
 	ZebedeeRequestMaximumTimeoutSeconds time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 }
 
+type AWS struct {
+	AccessKeyID     string `envconfig:"AWS_ACCESS_KEY_ID"`
+	Region          string `envconfig:"AWS_REGION"`
+	SecretAccessKey string `envconfig:"AWS_SECRET_ACCESS_KEY"`
+}
+
 var cfg *Config
 
 // Get returns the default config with any modifications made through environment variables
@@ -59,43 +66,50 @@ func Get() (*Config, error) {
 	}
 
 	cfg := &Config{
-		BindAddr:                            ":20000",
-		BabbageURL:                          "http://localhost:8080",
-		RendererURL:                         "http://localhost:20010",
-		CookiesControllerURL:                "http://localhost:24100",
-		HomepageControllerURL:               "http://localhost:24400",
-		DatasetControllerURL:                "http://localhost:20200",
-		FilterDatasetControllerURL:          "http://localhost:20001",
-		GeographyControllerURL:              "http://localhost:23700",
-		GeographyEnabled:                    false,
-		FeedbackControllerURL:               "http://localhost:25200",
-		SearchControllerURL:                 "http://localhost:25000",
-		SearchRoutesEnabled:                 false,
-		ReleaseCalendarControllerURL:        "http://localhost:27700",
-		ReleaseCalendarEnabled:              false,
 		APIRouterURL:                        "http://localhost:23200/v1",
-		DownloaderURL:                       "http://localhost:23400",
 		AreaProfilesControllerURL:           "http://localhost:26600",
 		AreaProfilesRoutesEnabled:           false,
-		InteractivesControllerURL:           "http://localhost:27300",
-		InteractivesRoutesEnabled:           false,
+		BabbageURL:                          "http://localhost:8080",
+		BindAddr:                            ":20000",
+		CensusAtlasRoutesEnabled:            false,
+		CensusAtlasURL:                      "http://localhost:28100",
+		ContentTypeByteLimit:                5000000,
+		CookiesControllerURL:                "http://localhost:24100",
+		DatasetControllerURL:                "http://localhost:20200",
+		DownloaderURL:                       "http://localhost:23400",
+		EnableSearchABTest:                  false,
+		FeedbackControllerURL:               "http://localhost:25200",
+		FeedbackEnabled:                     false,
+		FilterDatasetControllerURL:          "http://localhost:20001",
 		FilterFlexDatasetServiceURL:         "http://localhost:20100",
 		FilterFlexRoutesEnabled:             false,
-		CensusAtlasURL:                      "http://localhost:28100",
-		CensusAtlasRoutesEnabled:            false,
-		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
-		SiteDomain:                          "ons.gov.uk",
-		RedirectSecret:                      "secret",
-		SQSAnalyticsURL:                     "",
-		ContentTypeByteLimit:                5000000,
+		GeographyControllerURL:              "http://localhost:23700",
+		GeographyEnabled:                    false,
 		HealthcheckCriticalTimeout:          90 * time.Second,
 		HealthcheckInterval:                 30 * time.Second,
-		ZebedeeRequestMaximumTimeoutSeconds: 5 * time.Second,
-		ZebedeeRequestMaximumRetries:        0,
-		EnableSearchABTest:                  false,
-		SearchABTestPercentage:              10,
-		ProxyTimeout:                        5 * time.Second,
+		HomepageControllerURL:               "http://localhost:24400",
+		InteractivesControllerURL:           "http://localhost:27300",
+		InteractivesRoutesEnabled:           false,
 		NewDatasetRoutingEnabled:            false,
+		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
+		ProxyTimeout:                        5 * time.Second,
+		RedirectSecret:                      "secret",
+		ReleaseCalendarControllerURL:        "http://localhost:27700",
+		ReleaseCalendarEnabled:              false,
+		RendererURL:                         "http://localhost:20010",
+		SearchABTestPercentage:              10,
+		SearchControllerURL:                 "http://localhost:25000",
+		SearchRoutesEnabled:                 false,
+		SiteDomain:                          "ons.gov.uk",
+		SQSAnalyticsURL:                     "",
+		ZebedeeRequestMaximumRetries:        0,
+		ZebedeeRequestMaximumTimeoutSeconds: 5 * time.Second,
+	}
+
+	cfg.AWS = AWS{
+		AccessKeyID:     "",
+		Region:          "eu-west-2",
+		SecretAccessKey: "",
 	}
 
 	if err := envconfig.Process("", cfg); err != nil {
