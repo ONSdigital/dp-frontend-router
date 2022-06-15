@@ -84,12 +84,15 @@ func Handler(h http.Handler) http.Handler {
 	})
 }
 
-// DynamicRedirectHandler redirects requests to the provide 'to' base path
+// DynamicRedirectHandler redirects requests to the provide 'to' base path whilst keeping all the other information of the request url
 func DynamicRedirectHandler(redirectFrom, redirectTo string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		redirect := strings.Replace(req.URL.Path, redirectFrom, redirectTo, 1)
-		log.Info(req.Context(), "redirect found", log.Data{"location": redirect}, log.HTTP(req, 0, 0, nil, nil))
-		http.Redirect(w, req, redirect, http.StatusMovedPermanently)
+		redirect := *req.URL
+		redirect.Path = strings.Replace(req.URL.Path, redirectFrom, redirectTo, 1)
+		redirectURL := redirect.String()
+
+		log.Info(req.Context(), "redirect found", log.Data{"location": redirectURL}, log.HTTP(req, 0, 0, nil, nil))
+		http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 		return
 	})
 }

@@ -77,6 +77,15 @@ func TestDynamicRedirect(t *testing.T) {
 		So(w.Header(), ShouldContainKey, "Location")
 		So(w.Header()["Location"], ShouldContain, "/redirected/extension")
 	})
+
+	Convey("Test that a redirect request with parameters is redirected to the new url with the same parameters", t, func() {
+		req, _ := http.NewRequest("GET", "/original?q=test&page=2", nil)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected?q=test&page=2")
+	})
 }
 
 func TestInit(t *testing.T) {
