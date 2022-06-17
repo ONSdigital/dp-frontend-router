@@ -96,20 +96,20 @@ func New(cfg Config) http.Handler {
 		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
 	}
 
-	if cfg.SearchRoutesEnabled {
-		if cfg.EnableSearchABTest {
-			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
-		} else {
-			router.Handle("/search", cfg.SearchHandler)
-		}
-	}
-
 	if cfg.LegacySearchRedirectsEnabled {
 		searchDataHandler := redirects.DynamicRedirectHandler("/searchdata", "/search")
 		searchPublicationHandler := redirects.DynamicRedirectHandler("/searchpublication", "/search")
 
 		router.Handle("/searchdata", searchDataHandler)
 		router.Handle("/searchpublication", searchPublicationHandler)
+	}
+
+	if cfg.SearchRoutesEnabled {
+		if cfg.EnableSearchABTest {
+			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
+		} else {
+			router.Handle("/search", cfg.SearchHandler)
+		}
 	}
 
 	if cfg.RelCalEnabled {
