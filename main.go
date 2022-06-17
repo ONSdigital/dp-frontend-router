@@ -175,10 +175,6 @@ func main() {
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
-	if cfg.LegacySearchRedirectsEnabled {
-		searchHandler = redirects.DynamicRedirectHandler("/searchdata", "/search")
-		searchHandler = redirects.DynamicRedirectHandler("/searchpublication", "/search")
-	}
 	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
@@ -194,39 +190,40 @@ func main() {
 	}
 
 	routerConfig := router.Config{
-		AnalyticsHandler:         analyticsHandler,
-		AreaProfileEnabled:       cfg.AreaProfilesRoutesEnabled,
-		AreaProfileHandler:       areaProfileHandler,
-		DownloadHandler:          downloadHandler,
-		CookieHandler:            cookieHandler,
-		DatasetHandler:           datasetHandler,
-		NewDatasetRoutingEnabled: cfg.NewDatasetRoutingEnabled,
-		PrefixDatasetHandler:     prefixDatasetHandler,
-		DatasetClient:            datasetClient,
-		HealthCheckHandler:       hc.Handler,
-		FilterHandler:            filterHandler,
-		FilterClient:             filterClient,
-		FeedbackHandler:          feedbackHandler,
-		FilterFlexEnabled:        cfg.FilterFlexRoutesEnabled,
-		FilterFlexHandler:        filterFlexHandler,
-		GeographyEnabled:         cfg.GeographyEnabled,
-		GeographyHandler:         geographyHandler,
-		SearchRoutesEnabled:      cfg.SearchRoutesEnabled,
-		SearchHandler:            searchHandler,
-		RelCalHandler:            relcalHandler,
-		RelCalEnabled:            cfg.ReleaseCalendarEnabled,
-		RelCalRoutePrefix:        cfg.ReleaseCalendarRoutePrefix,
-		InteractivesHandler:      interactivesHandler,
-		InteractivesEnabled:      cfg.InteractivesRoutesEnabled,
-		EnableSearchABTest:       enableSearchABTest,
-		SearchABTestPercentage:   cfg.SearchABTestPercentage,
-		SiteDomain:               cfg.SiteDomain,
-		HomepageHandler:          homepageHandler,
-		BabbageHandler:           babbageHandler,
-		ZebedeeClient:            zebedeeClient,
-		ContentTypeByteLimit:     cfg.ContentTypeByteLimit,
-		CensusAtlasHandler:       censusAtlasHandler,
-		CensusAtlasEnabled:       cfg.CensusAtlasRoutesEnabled,
+		AnalyticsHandler:             analyticsHandler,
+		AreaProfileEnabled:           cfg.AreaProfilesRoutesEnabled,
+		AreaProfileHandler:           areaProfileHandler,
+		DownloadHandler:              downloadHandler,
+		CookieHandler:                cookieHandler,
+		DatasetHandler:               datasetHandler,
+		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,
+		PrefixDatasetHandler:         prefixDatasetHandler,
+		DatasetClient:                datasetClient,
+		HealthCheckHandler:           hc.Handler,
+		FilterHandler:                filterHandler,
+		FilterClient:                 filterClient,
+		FeedbackHandler:              feedbackHandler,
+		FilterFlexEnabled:            cfg.FilterFlexRoutesEnabled,
+		FilterFlexHandler:            filterFlexHandler,
+		GeographyEnabled:             cfg.GeographyEnabled,
+		GeographyHandler:             geographyHandler,
+		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
+		SearchRoutesEnabled:          cfg.SearchRoutesEnabled,
+		SearchHandler:                searchHandler,
+		RelCalHandler:                relcalHandler,
+		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
+		RelCalRoutePrefix:            cfg.ReleaseCalendarRoutePrefix,
+		InteractivesHandler:          interactivesHandler,
+		InteractivesEnabled:          cfg.InteractivesRoutesEnabled,
+		EnableSearchABTest:           enableSearchABTest,
+		SearchABTestPercentage:       cfg.SearchABTestPercentage,
+		SiteDomain:                   cfg.SiteDomain,
+		HomepageHandler:              homepageHandler,
+		BabbageHandler:               babbageHandler,
+		ZebedeeClient:                zebedeeClient,
+		ContentTypeByteLimit:         cfg.ContentTypeByteLimit,
+		CensusAtlasHandler:           censusAtlasHandler,
+		CensusAtlasEnabled:           cfg.CensusAtlasRoutesEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)
