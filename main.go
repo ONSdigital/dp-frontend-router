@@ -175,6 +175,10 @@ func main() {
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
+	if cfg.LegacySearchRedirectsEnabled {
+		searchHandler = redirects.DynamicRedirectHandler("/searchdata", "/search")
+		searchHandler = redirects.DynamicRedirectHandler("/searchpublication", "/search")
+	}
 	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)

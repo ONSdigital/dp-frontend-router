@@ -34,6 +34,7 @@ type Config struct {
 	HomepageControllerURL               string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	InteractivesControllerURL           string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
 	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
+	LegacySearchRedirectsEnabled        bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
 	NewDatasetRoutingEnabled            bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
 	PatternLibraryAssetsPath            string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ProxyTimeout                        time.Duration `envconfig:"PROXY_TIMEOUT"`
@@ -90,6 +91,7 @@ func Get() (*Config, error) {
 		HomepageControllerURL:               "http://localhost:24400",
 		InteractivesControllerURL:           "http://localhost:27300",
 		InteractivesRoutesEnabled:           false,
+		LegacySearchRedirectsEnabled:        false,
 		NewDatasetRoutingEnabled:            false,
 		PatternLibraryAssetsPath:            "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		ProxyTimeout:                        5 * time.Second,
