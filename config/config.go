@@ -71,7 +71,7 @@ func Get() (*Config, error) {
 		AreaProfilesRoutesEnabled:           false,
 		BabbageURL:                          "http://localhost:8080",
 		BindAddr:                            ":20000",
-		CensusAtlasRoutesEnabled:            true,
+		CensusAtlasRoutesEnabled:            false,
 		CensusAtlasURL:                      "http://localhost:28100",
 		ContentTypeByteLimit:                5000000,
 		CookiesControllerURL:                "http://localhost:24100",
