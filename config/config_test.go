@@ -35,6 +35,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
 				So(cfg.InteractivesControllerURL, ShouldEqual, "http://localhost:27300")
 				So(cfg.InteractivesRoutesEnabled, ShouldBeFalse)
+				So(cfg.LegacySearchRedirectsEnabled, ShouldBeFalse)
 				So(cfg.APIRouterURL, ShouldEqual, "http://localhost:23200/v1")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
 				So(cfg.AreaProfilesControllerURL, ShouldEqual, "http://localhost:26600")
