@@ -233,7 +233,7 @@ func main() {
 	s := &http.Server{
 		Addr:         cfg.BindAddr,
 		Handler:      httpHandler,
-		ReadTimeout:  5 * time.Second,
+		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
 	}
@@ -313,7 +313,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
 		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
+		IdleConnTimeout:       180 * time.Second,
 		TLSHandshakeTimeout:   5 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
