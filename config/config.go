@@ -53,9 +53,9 @@ type Config struct {
 }
 
 type AWS struct {
-	AccessKeyID     string `envconfig:"AWS_ACCESS_KEY_ID"`
+	AccessKeyID     string `envconfig:"AWS_ACCESS_KEY_ID"      json:"-"`
 	Region          string `envconfig:"AWS_REGION"`
-	SecretAccessKey string `envconfig:"AWS_SECRET_ACCESS_KEY"`
+	SecretAccessKey string `envconfig:"AWS_SECRET_ACCESS_KEY"  json:"-"`
 }
 
 var cfg *Config
