@@ -75,6 +75,11 @@ func New(cfg Config) http.Handler {
 	alice := alice.New(middleware...).Then(router)
 
 	router.Handle("/", cfg.HomepageHandler)
+
+	if cfg.CensusAtlasEnabled {
+		router.Handle("/census/maps{uri:.*}", cfg.CensusAtlasHandler)
+	}
+
 	router.Handle("/census", cfg.HomepageHandler)
 
 	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
@@ -120,10 +125,6 @@ func New(cfg Config) http.Handler {
 
 	if cfg.InteractivesEnabled {
 		router.Handle("/interactives/{uri:.*}", cfg.InteractivesHandler)
-	}
-
-	if cfg.CensusAtlasEnabled {
-		router.Handle("/census-atlas{uri:.*}", cfg.CensusAtlasHandler)
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
