@@ -50,6 +50,7 @@ func TestSecurityHandler(t *testing.T) {
 				"/embed",
 				"/visualisations/path",
 				"/interactives/path",
+				"/census/maps/path",
 			}
 			for i, url := range urls {
 				req := httptest.NewRequest(http.MethodGet, url, nil)
