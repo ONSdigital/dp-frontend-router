@@ -33,6 +33,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.ReleaseCalendarEnabled, ShouldBeFalse)
 				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
+				So(cfg.EnableReleaseCalendarABTest, ShouldBeFalse)
+				So(cfg.ReleaseCalendarABTestPercentage, ShouldEqual, 0)
 				So(cfg.InteractivesControllerURL, ShouldEqual, "http://localhost:27300")
 				So(cfg.InteractivesRoutesEnabled, ShouldBeFalse)
 				So(cfg.LegacySearchRedirectsEnabled, ShouldBeFalse)
