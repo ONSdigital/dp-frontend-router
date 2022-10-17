@@ -53,6 +53,8 @@ type Config struct {
 	RelCalHandler                http.Handler
 	RelCalEnabled                bool
 	RelCalRoutePrefix            string
+	RelCalEnableABTest           bool
+	RelCalABTestPercentage       int
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
 	CensusAtlasHandler           http.Handler
@@ -111,14 +113,18 @@ func New(cfg Config) http.Handler {
 
 	if cfg.SearchRoutesEnabled {
 		if cfg.EnableSearchABTest {
-			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
+			router.Handle("/search", abtest.ABTestHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, abtest.SearchTestCookieAspect, cfg.SiteDomain, abtest.SearchNewExit))
 		} else {
-			router.Handle("/search", cfg.SearchHandler)
+			router.Handle("/search", abtest.ABTestPurgeHandler(cfg.SearchHandler, abtest.SearchTestCookieAspect, cfg.SiteDomain))
 		}
 	}
 
 	if cfg.RelCalEnabled {
-		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", cfg.RelCalHandler)
+		if cfg.RelCalEnableABTest {
+			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.ABTestHandler(cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
+		} else {
+			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.ABTestPurgeHandler(cfg.RelCalHandler, abtest.RelcalTestCookieAspect, cfg.SiteDomain))
+		}
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
 		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}

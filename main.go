@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -136,6 +135,7 @@ func main() {
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
+	enableRelCalABTest := config.IsEnabledRelCalABTest(*cfg)
 
 	redirects.Init(assets.Asset)
 
@@ -213,6 +213,8 @@ func main() {
 		RelCalHandler:                relcalHandler,
 		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
 		RelCalRoutePrefix:            cfg.ReleaseCalendarRoutePrefix,
+		RelCalEnableABTest:           enableRelCalABTest,
+		RelCalABTestPercentage:       cfg.ReleaseCalendarABTestPercentage,
 		InteractivesHandler:          interactivesHandler,
 		InteractivesEnabled:          cfg.InteractivesRoutesEnabled,
 		EnableSearchABTest:           enableSearchABTest,
@@ -247,60 +249,6 @@ func main() {
 		hc.Stop()
 		os.Exit(2)
 	}
-}
-
-// abHandler ... percentA is the percentage of request that handler 'a' is used
-//
-// FIXME this isn't used anymore, it could be removed, but seems like it might be useful?
-func abHandler(a, b http.Handler, percentA int) http.Handler {
-	if percentA == 0 {
-		log.Info(context.Background(), "abHandler decision", log.Data{"percentA": percentA, "destination": "b"})
-		return b
-	} else if percentA == 100 {
-		log.Info(context.Background(), "abHandler decision", log.Data{"percentA": percentA, "destination": "a"})
-		return a
-	}
-
-	if percentA < 0 || percentA > 100 {
-		panic("Percent 'a' must be between 0 and 100")
-	}
-	rand.Seed(time.Now().UnixNano())
-
-	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		// Detect cookie
-		cookie, _ := req.Cookie("homepage-version")
-
-	RETRY:
-		if cookie == nil {
-			var cookieValue string
-			sel := rand.Intn(100)
-			if sel < percentA {
-				cookieValue = "A"
-			} else {
-				cookieValue = "B"
-			}
-
-			log.Info(req.Context(), "abHandler decision", log.Data{"sel": sel, "handler": cookieValue})
-
-			expiration := time.Now().Add(365 * 24 * time.Hour)
-			cookie = &http.Cookie{Name: "homepage-version", Value: cookieValue, Expires: expiration}
-			http.SetCookie(w, cookie)
-		}
-
-		// Use cookie value to direct to a or b handler
-		switch cookie.Value {
-		case "A":
-			log.Info(req.Context(), "abHandler decision", log.Data{"cookie": "A", "destination": "a"})
-			a.ServeHTTP(w, req)
-		case "B":
-			log.Info(req.Context(), "abHandler decision", log.Data{"cookie": "B", "destination": "b"})
-			b.ServeHTTP(w, req)
-		default:
-			log.Info(req.Context(), "abHandler invalid cookie value, reselecting")
-			cookie = nil
-			goto RETRY
-		}
-	})
 }
 
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
