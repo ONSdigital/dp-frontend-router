@@ -112,19 +112,11 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
-		if cfg.EnableSearchABTest {
-			router.Handle("/search", abtest.ABTestHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, abtest.SearchTestCookieAspect, cfg.SiteDomain, abtest.SearchNewExit))
-		} else {
-			router.Handle("/search", abtest.ABTestPurgeHandler(cfg.SearchHandler, abtest.SearchTestCookieAspect, cfg.SiteDomain))
-		}
+		router.Handle("/search", abtest.Handler(cfg.EnableSearchABTest, cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, abtest.SearchTestCookieAspect, cfg.SiteDomain, abtest.SearchNewExit))
 	}
 
 	if cfg.RelCalEnabled {
-		if cfg.RelCalEnableABTest {
-			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.ABTestHandler(cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
-		} else {
-			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.ABTestPurgeHandler(cfg.RelCalHandler, abtest.RelcalTestCookieAspect, cfg.SiteDomain))
-		}
+		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.Handler(cfg.RelCalEnableABTest, cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
 		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
