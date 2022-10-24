@@ -24,8 +24,8 @@ func TestABTestHandler(t *testing.T) {
 			percentage := 40
 			numberRequests := 500
 
-			Convey("When the requests are made to the ABTestHandler", func() {
-				handler := ABTestHandler(newHandler, oldHandler, percentage, "test-aspect", "my-domain", "exit-new-test")
+			Convey("When the requests are made to the abTestHandler", func() {
+				handler := abTestHandler(newHandler, oldHandler, percentage, "test-aspect", "my-domain", "exit-new-test")
 				users = make([]user, numberRequests)
 				nh := 0
 				for i := 0; i < numberRequests; i++ {
@@ -99,11 +99,11 @@ func TestABTestPurgeHandler(t *testing.T) {
 				Value: url.QueryEscape(`{"test-aspect":{"new":"2020-06-16T17:28:45","old":"2020-06-15T17:28:45"},"second-aspect":{"new":"2021-12-31T09:30:00","old":"2022-01-01T09:30:00"}}`),
 			}
 
-			Convey("When a request with the cookie is made to the ABTestPurgeHandler", func() {
+			Convey("When a request with the cookie is made to the abTestPurgeHandler", func() {
 				req := httptest.NewRequest("GET", "/", nil)
 				req.AddCookie(c)
 				w := httptest.NewRecorder()
-				ABTestPurgeHandler(newHandler, "test-aspect", "my-domain").ServeHTTP(w, req)
+				abTestPurgeHandler(newHandler, "test-aspect", "my-domain").ServeHTTP(w, req)
 
 				Convey("The relevant aspect is removed from the ab_test cookie, and the request has been handled by the new handler", func() {
 					So(w.Result().Cookies(), ShouldHaveLength, 1)
