@@ -43,4 +43,5 @@ require (
 	github.com/smartystreets/assertions v1.13.0 // indirect
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
+	golang.org/x/text v0.4.0 // indirect
 )
