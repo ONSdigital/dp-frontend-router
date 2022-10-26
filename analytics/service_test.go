@@ -2,12 +2,12 @@ package analytics
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	jwt "github.com/form3tech-oss/jwt-go"
+	"github.com/gorilla/mux"
 	. "github.com/smartystreets/goconvey/convey"
 )
 

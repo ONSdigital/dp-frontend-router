@@ -42,7 +42,7 @@ func Init(asset func(name string) ([]byte, error)) {
 
 	for line, record := range records {
 		if len(record) > 0 {
-			if len(record[0]) == 0 {
+			if record[0] == "" {
 				log.Warn(context.Background(), "redirect 'from' URL empty", log.Data{"line": line})
 				if PanicOnInitError {
 					panic("redirect 'from' URL empty, check logs")
@@ -50,7 +50,7 @@ func Init(asset func(name string) ([]byte, error)) {
 				continue
 			}
 			if len(record) > 1 {
-				if len(record[1]) == 0 {
+				if record[1] == "" {
 					log.Warn(context.Background(), "redirect 'to' URL empty", log.Data{"line": line})
 					if PanicOnInitError {
 						panic("redirect 'to' URL empty, check logs")
@@ -70,16 +70,14 @@ func Init(asset func(name string) ([]byte, error)) {
 	}
 }
 
-// Handler ...
+// Handler with temporary redirect
 func Handler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-
 		if redirect, ok := redirects[req.URL.Path]; ok {
 			log.Info(req.Context(), "redirect found", log.Data{"location": redirect}, log.HTTP(req, 0, 0, nil, nil))
 			http.Redirect(w, req, redirect, http.StatusTemporaryRedirect)
 			return
 		}
-
 		h.ServeHTTP(w, req)
 	})
 }

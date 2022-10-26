@@ -3,23 +3,21 @@ package analytics
 import (
 	"context"
 	"encoding/json"
-	"github.com/ONSdigital/dp-frontend-router/analytics/analyticstest"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"net/http"
 	"testing"
 	"time"
 
+	"github.com/ONSdigital/dp-frontend-router/analytics/analyticstest"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestSQSBackend(t *testing.T) {
-
 	Convey("SQS backend initialise without error", t, func() {
 		backend, err := NewSQSBackend(context.Background(), "https://fake.url")
 		So(err, ShouldBeNil)
 		So(backend, ShouldNotBeNil)
 	})
-
 	Convey("SQS backend should capture the right data", t, func() {
 		mockSQSClient := &analyticstest.SQSClientMock{
 			SendMessageFunc: func(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error) {

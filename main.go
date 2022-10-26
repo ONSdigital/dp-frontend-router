@@ -9,10 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/ONSdigital/dp-frontend-router/router"
-
-	dphttp "github.com/ONSdigital/dp-net/http"
-
 	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
 	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
 	"github.com/ONSdigital/dp-api-clients-go/v2/health"
@@ -21,7 +17,9 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
+	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
+	dphttp "github.com/ONSdigital/dp-net/http"
 	"github.com/ONSdigital/log.go/v2/log"
 )
 
