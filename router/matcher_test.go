@@ -1,13 +1,13 @@
 package router_test
 
 import (
+	"testing"
+
 	"github.com/ONSdigital/dp-frontend-router/router"
 	. "github.com/smartystreets/goconvey/convey"
-	"testing"
 )
 
 func TestHasFileExt(t *testing.T) {
-
 	Convey("Given a URL that has a file extension", t, func() {
 		Convey("When the HasFileExt function is called", func() {
 			Convey("Then true is returned", func() {
@@ -17,7 +17,6 @@ func TestHasFileExt(t *testing.T) {
 			})
 		})
 	})
-
 	Convey("Given a URL that has no file extension", t, func() {
 		Convey("When the HasFileExt function is called", func() {
 			Convey("Then false is returned", func() {
@@ -30,7 +29,6 @@ func TestHasFileExt(t *testing.T) {
 }
 
 func TestIsKnownBabbageEndpoint(t *testing.T) {
-
 	Convey("Given a URL that is for a known babbage endpoint", t, func() {
 		Convey("When the IsKnownBabbageEndpoint function is called", func() {
 			Convey("Then true is returned", func() {
@@ -48,7 +46,6 @@ func TestIsKnownBabbageEndpoint(t *testing.T) {
 			})
 		})
 	})
-
 	Convey("Given a URL that is not for a known babbage endpoint", t, func() {
 		Convey("When the IsKnownBabbageEndpoint function is called", func() {
 			Convey("Then false is returned", func() {

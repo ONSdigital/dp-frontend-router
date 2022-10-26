@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/ONSdigital/dp-cookies/cookies"
@@ -92,7 +92,7 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 		return fmt.Errorf("unexpected status code: %d", res.StatusCode)
 	}
 
-	b, err = ioutil.ReadAll(res.Body)
+	b, err = io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("error reading response body: %s", err)
 	}

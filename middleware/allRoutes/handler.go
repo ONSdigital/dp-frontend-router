@@ -83,12 +83,11 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 				return
 			}
 
-			if h, ok := routesHandler[pageType]; ok {
+			if routesH, ok := routesHandler[pageType]; ok {
 				log.Info(req.Context(), "Using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
-				h.ServeHTTP(w, req)
+				routesH.ServeHTTP(w, req)
 				return
 			}
-
 			h.ServeHTTP(w, req)
 		})
 	}

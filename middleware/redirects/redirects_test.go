@@ -15,7 +15,6 @@ import (
 )
 
 func TestRedirect(t *testing.T) {
-
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		Handler,
@@ -46,11 +45,9 @@ func TestRedirect(t *testing.T) {
 		So(handled, ShouldBeFalse)
 		So(w.Header(), ShouldContainKey, "Location")
 	})
-
 }
 
 func TestDynamicRedirect(t *testing.T) {
-
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		Handler,
@@ -98,7 +95,6 @@ func TestInit(t *testing.T) {
 			return nil, errors.New("error")
 		}
 		return returnBytes, nil
-
 	}
 
 	Convey("Init calls asset function and panics on error", t, func() {
@@ -148,11 +144,9 @@ c,d`)
 		returnBytes = []byte(`a,`)
 		So(func() { Init(asset) }, ShouldPanicWith, "redirect 'to' URL empty, check logs")
 	})
-
 }
 
 func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
-
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
@@ -169,7 +163,6 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 }
 
 func BenchmarkWithoutRedirects(b *testing.B) {
-
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),

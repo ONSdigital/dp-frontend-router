@@ -48,9 +48,7 @@ func (m *MockHttpRedir) mockRedirector(w http.ResponseWriter, r *http.Request, u
 
 func TestHandleSearch(t *testing.T) {
 	requestedURL, _ := url.Parse(validURL)
-
 	Convey("Given valid input parameters", t, func() {
-
 		serviceMock := &mockAnalyticsService{
 			args:          make([]url.Values, 0),
 			mockBehaviour: successBehavior,

@@ -16,19 +16,19 @@ type searchHandler struct {
 }
 
 // NewSearchHandler creates a new search handler
-func NewSearchHandler(ctx context.Context, SQSanalyticsURL, RedirectSecret string) (http.Handler, error) {
+func NewSearchHandler(ctx context.Context, sqSanalyticsURL, redirectSecret string) (http.Handler, error) {
 	var b analytics.ServiceBackend
 	var err error
 
-	if len(SQSanalyticsURL) > 0 {
-		b, err = analytics.NewSQSBackend(ctx, SQSanalyticsURL)
+	if len(sqSanalyticsURL) > 0 {
+		b, err = analytics.NewSQSBackend(ctx, sqSanalyticsURL)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	sh := &searchHandler{
-		service:    analytics.NewServiceImpl(b, RedirectSecret),
+		service:    analytics.NewServiceImpl(b, redirectSecret),
 		redirector: http.Redirect,
 	}
 	return sh, nil

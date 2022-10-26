@@ -37,7 +37,7 @@ func NewSQSBackend(ctx context.Context, queueURL string) (ServiceBackend, error)
 	}, nil
 }
 
-func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, gID string, pageIndex, linkIndex, pageSize float64) {
+func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID, gID string, pageIndex, linkIndex, pageSize float64) {
 	var data = map[string]interface{}{
 		"created":   time.Now().Format(time.RFC3339),
 		"url":       url,
@@ -56,9 +56,9 @@ func (b *sqsBackend) Store(req *http.Request, url, term, listType, gaID string, 
 		return
 	}
 
-	json := string(jb)
+	strJSON := string(jb)
 	smi := &sqs.SendMessageInput{
-		MessageBody: &json,
+		MessageBody: &strJSON,
 		QueueUrl:    &b.queueURL,
 	}
 

@@ -2,13 +2,12 @@ package analytics
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
-
-	"github.com/pkg/errors"
 
 	"github.com/ONSdigital/log.go/v2/log"
 	jwt "github.com/form3tech-oss/jwt-go"
+	"github.com/gorilla/mux"
+	"github.com/pkg/errors"
 )
 
 const pageIndexParam = "pageIndex"
@@ -96,7 +95,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		gID = c.Value
 	}
 
-	if len(url) == 0 {
+	if url == "" {
 		return "", errors.New("url is a mandatory parameter")
 	}
 

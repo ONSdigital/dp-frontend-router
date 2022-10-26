@@ -11,11 +11,11 @@ import (
 
 	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
 	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes/allroutestest"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType/mocks"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
-
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -37,7 +37,7 @@ func TestSecurityHandler(t *testing.T) {
 			securityHandler.ServeHTTP(res, req)
 
 			Convey("Then xframe-options header is SAMEORIGIN", func() {
-				So(res.Header().Get(router.HttpHeaderKeyXFrameOptions), ShouldEqual, "SAMEORIGIN")
+				So(res.Header().Get(router.HTTPHeaderKeyXFrameOptions), ShouldEqual, "SAMEORIGIN")
 			})
 
 			Convey("And the request is sent to the underlying handler", func() {
@@ -58,7 +58,7 @@ func TestSecurityHandler(t *testing.T) {
 				securityHandler.ServeHTTP(res, req)
 
 				Convey("Then no xframe-options header is set: "+url, func() {
-					So(res.Header().Get(router.HttpHeaderKeyXFrameOptions), ShouldBeEmpty)
+					So(res.Header().Get(router.HTTPHeaderKeyXFrameOptions), ShouldBeEmpty)
 				})
 
 				Convey("And the request is sent to the underlying handler: "+url, func() {
@@ -71,9 +71,7 @@ func TestSecurityHandler(t *testing.T) {
 }
 
 func TestRouter(t *testing.T) {
-
 	Convey("Given a configured router", t, func() {
-
 		healthCheckHandler := NewHandlerMock()
 		analyticsHandler := NewHandlerMock()
 		searchHandler := NewHandlerMock()
@@ -132,7 +130,6 @@ func TestRouter(t *testing.T) {
 		}
 
 		Convey("When a analytics request is made", func() {
-
 			url := "/redir/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -149,9 +146,7 @@ func TestRouter(t *testing.T) {
 				So(analyticsHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a download request is made", func() {
-
 			url := "/download/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -168,28 +163,22 @@ func TestRouter(t *testing.T) {
 				So(downloadHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a cookie request is made", func() {
-
 			url := "/cookies/123/345"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the cookie handler", func() {
 				So(len(cookieHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(cookieHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a dataset request is made", func() {
-
 			url := "/datasets/cpih"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -206,9 +195,7 @@ func TestRouter(t *testing.T) {
 				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a filter request is made, but the filter/flex handler is not enabled", func() {
-
 			url := "/filters/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -229,9 +216,7 @@ func TestRouter(t *testing.T) {
 				So(len(filterFlexHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
-
 		Convey("When a filter request is made and the filter/flex route is enabled", func() {
-
 			url := "/filters/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -248,23 +233,18 @@ func TestRouter(t *testing.T) {
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the filter handler", func() {
 				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
-
 			Convey("Then no requests are sent to the filter/flex handler", func() {
 				So(len(filterFlexHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
-
 		Convey("When a filter request is made for a valid flexible dataset", func() {
-
 			url := "/filters/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -297,18 +277,15 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a filter-output request is made", func() {
-
 			url := "/filter-outputs/321"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the filter handler", func() {
 				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -316,26 +293,21 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a feedback request is made", func() {
-
 			url := "/feedback/homepage"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
-
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the feedback handler", func() {
 				So(len(feedbackHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(feedbackHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a geography request is made, but the geography handler is not enabled", func() {
-
 			url := "/geography/newport"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -347,19 +319,15 @@ func TestRouter(t *testing.T) {
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then no request is sent to the geography handler", func() {
 				So(len(geographyHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a geography request is made, and the geography handler is enabled", func() {
-
 			url := "/geography/newport"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -367,23 +335,18 @@ func TestRouter(t *testing.T) {
 			config.GeographyEnabled = true
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the geography handler", func() {
 				So(len(geographyHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(geographyHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
-
 			Convey("Then no request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
-
 		Convey("When a search request is made, but the search handler is not enabled", func() {
-
 			url := "/search"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -391,19 +354,15 @@ func TestRouter(t *testing.T) {
 			config.SearchRoutesEnabled = false
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no request is sent to the search handler", func() {
 				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a search request is made, and the search handler is enabled", func() {
-
 			url := "/search"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -411,34 +370,27 @@ func TestRouter(t *testing.T) {
 			config.SearchRoutesEnabled = true
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the search handler", func() {
 				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(searchHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
-
 			Convey("Then no request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
-
 		Convey("When a homepage request is made", func() {
-
 			url := "/"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the homepage handler", func() {
 				So(len(homepageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(homepageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -446,7 +398,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy page request is made", func() {
-
 			url := "/economy"
 			expectedZebedeeURL := "/data?uri=" + url
 			req := httptest.NewRequest("GET", url, nil)
@@ -454,31 +405,25 @@ func TestRouter(t *testing.T) {
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
 				So(zebedeeClient.GetWithHeadersCalls()[0].Path, ShouldEqual, expectedZebedeeURL)
 			})
-
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-
 		Convey("When a data.json request is made", func() {
-
 			url := "/somepage/data.json"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -486,18 +431,15 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request with a file extension is made", func() {
-
 			url := "/website/main.css"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -505,18 +447,15 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request for a visualisation endpoint is made", func() {
-
 			url := "/visualisations/dvc1119"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -524,7 +463,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request for a interactives endpoint is made, but the interactives handler is not enabled", func() {
-
 			url := "/interactives/an_identifier"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -535,11 +473,9 @@ func TestRouter(t *testing.T) {
 			Convey("Then no request is sent to the interactive visualisation handler", func() {
 				So(len(interactivesHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -547,7 +483,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request for a interactives endpoint is made, and the interactives handler is enabled", func() {
-
 			url := "/interactives/an_identifier"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -571,18 +506,15 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request for a legacy ons redirect endpoint is made", func() {
-
 			url := "/ons/some/old/page"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -590,7 +522,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a request for a known babbage endpoint is made", func() {
-
 			url := "/file"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -601,7 +532,6 @@ func TestRouter(t *testing.T) {
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to the babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -609,7 +539,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a /data request is made", func() {
-
 			url := "/somepage/data"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -620,7 +549,6 @@ func TestRouter(t *testing.T) {
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -628,18 +556,15 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a /latest request is made", func() {
-
 			url := "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/latest"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then a request is not sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
 			Convey("Then the request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
@@ -647,7 +572,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a census atlas request is made, but the census atlas handler is not enabled", func() {
-
 			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -655,15 +579,13 @@ func TestRouter(t *testing.T) {
 			config.CensusAtlasEnabled = false
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
 			Convey("Then no request is sent to the census atlas handler", func() {
 				So(len(censusAtlasHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
 
 		Convey("When a census atlas request is made, and the census atlas handler is enabled", func() {
-
-			url := "/census/maps"
+			url := "/census-atlas"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
 
@@ -680,7 +602,6 @@ func TestRouter(t *testing.T) {
 		Convey("When a release calendar request is made", func() {
 			url := "/releasecalendar"
 			res := httptest.NewRecorder()
-
 			Convey("And the release calendar route is not enabled", func() {
 				config.RelCalEnabled = false
 				r := router.New(config)
@@ -723,7 +644,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a malicious URL with a redirect attempt is made", func() {
-
 			url := "//%5cexample.com"
 			req := httptest.NewRequest("GET", url, nil)
 			w := httptest.NewRecorder()
@@ -739,7 +659,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy dataset request is made, but the dataset handler is not enabled", func() {
-
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -763,7 +682,6 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy dataset request is made, and the dataset handler is enabled", func() {
-
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -801,6 +719,5 @@ func TestRouter(t *testing.T) {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
-
 	})
 }

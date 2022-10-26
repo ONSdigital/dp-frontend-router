@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	HttpHeaderKeyXFrameOptions = "X-Frame-Options"
+	HTTPHeaderKeyXFrameOptions = "X-Frame-Options"
 )
 
 //go:generate moq -out routertest/handler.go -pkg routertest . Handler
@@ -62,9 +62,7 @@ type Config struct {
 }
 
 func New(cfg Config) http.Handler {
-
 	router := mux.NewRouter()
-
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
 		log.Middleware,
@@ -74,7 +72,7 @@ func New(cfg Config) http.Handler {
 		redirects.Handler,
 	}
 
-	alice := alice.New(middleware...).Then(router)
+	newAlice := alice.New(middleware...).Then(router)
 
 	router.Handle("/", cfg.HomepageHandler)
 
@@ -144,17 +142,17 @@ func New(cfg Config) http.Handler {
 	babbageRouter.Use(allRoutesMiddleware)
 	babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
 
-	return alice
+	return newAlice
 }
 
-// SecurityHandler ...
+// SecurityHandler is the custom handler for for setting frame options
 func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" &&
 			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
 			!strings.HasPrefix(req.URL.Path, "/interactives/") &&
 			!strings.HasPrefix(req.URL.Path, "/census/maps/") {
-			w.Header().Set(HttpHeaderKeyXFrameOptions, "SAMEORIGIN")
+			w.Header().Set(HTTPHeaderKeyXFrameOptions, "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)
 	})

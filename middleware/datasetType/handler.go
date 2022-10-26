@@ -64,10 +64,8 @@ func Handler(filterClient FilterClient, datasetClient DatasetClient) func(filter
 				filterFlex.ServeHTTP(w, req)
 				return
 			}
-
 			log.Info(ctx, "using filter handler")
 			filter.ServeHTTP(w, req)
-
 		})
 	}
 }
