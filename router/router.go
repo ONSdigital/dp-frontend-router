@@ -152,7 +152,8 @@ func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" &&
 			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
-			!strings.HasPrefix(req.URL.Path, "/interactives/") {
+			!strings.HasPrefix(req.URL.Path, "/interactives/") &&
+			!strings.HasPrefix(req.URL.Path, "/census/maps/") {
 			w.Header().Set(HttpHeaderKeyXFrameOptions, "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)
