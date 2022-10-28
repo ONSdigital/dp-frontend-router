@@ -33,6 +33,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.ReleaseCalendarEnabled, ShouldBeFalse)
 				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
+				So(cfg.EnableReleaseCalendarABTest, ShouldBeFalse)
+				So(cfg.ReleaseCalendarABTestPercentage, ShouldEqual, 0)
 				So(cfg.InteractivesControllerURL, ShouldEqual, "http://localhost:27300")
 				So(cfg.InteractivesRoutesEnabled, ShouldBeFalse)
 				So(cfg.LegacySearchRedirectsEnabled, ShouldBeFalse)
@@ -78,6 +80,27 @@ func TestIsEnabledABSearch(t *testing.T) {
 			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: 10}
 			result := IsEnableSearchABTest(cfg)
 			So(result, ShouldBeTrue)
+		})
+	})
+}
+
+func TestIsEnabledRelCalABTest(t *testing.T) {
+	Convey("IsEnabledRelCalABTest returns expected value", t, func() {
+		Convey("false when EnableReleaseCalendarABTest is false", func() {
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: false, ReleaseCalendarABTestPercentage: 10}), ShouldBeFalse)
+		})
+		Convey("false when ReleaseCalendarABTestPercentage is <= 0", func() {
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 0}), ShouldBeFalse)
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: -1}), ShouldBeFalse)
+		})
+		Convey("false when ReleaseCalendarABTestPercentage is >= 100", func() {
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 100}), ShouldBeFalse)
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 101}), ShouldBeFalse)
+		})
+		Convey("true when EnableReleaseCalendarABTest is true and ReleaseCalendarABTestPercentage is >0 and <100", func() {
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 1}), ShouldBeTrue)
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 99}), ShouldBeTrue)
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 50}), ShouldBeTrue)
 		})
 	})
 }
