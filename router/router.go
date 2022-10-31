@@ -53,6 +53,8 @@ type Config struct {
 	RelCalHandler                http.Handler
 	RelCalEnabled                bool
 	RelCalRoutePrefix            string
+	RelCalEnableABTest           bool
+	RelCalABTestPercentage       int
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
 	CensusAtlasHandler           http.Handler
@@ -110,15 +112,11 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
-		if cfg.EnableSearchABTest {
-			router.Handle("/search", abtest.SearchHandler(cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, cfg.SiteDomain))
-		} else {
-			router.Handle("/search", cfg.SearchHandler)
-		}
+		router.Handle("/search", abtest.Handler(cfg.EnableSearchABTest, cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, abtest.SearchTestCookieAspect, cfg.SiteDomain, abtest.SearchNewExit))
 	}
 
 	if cfg.RelCalEnabled {
-		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", cfg.RelCalHandler)
+		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.Handler(cfg.RelCalEnableABTest, cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
 		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
@@ -154,7 +152,8 @@ func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" &&
 			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
-			!strings.HasPrefix(req.URL.Path, "/interactives/") {
+			!strings.HasPrefix(req.URL.Path, "/interactives/") &&
+			!strings.HasPrefix(req.URL.Path, "/census/maps/") {
 			w.Header().Set(HttpHeaderKeyXFrameOptions, "SAMEORIGIN")
 		}
 		h.ServeHTTP(w, req)

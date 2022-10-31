@@ -21,6 +21,7 @@ type Config struct {
 	CookiesControllerURL                string        `envconfig:"COOKIES_CONTROLLER_URL"`
 	DatasetControllerURL                string        `envconfig:"DATASET_CONTROLLER_URL"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
+	EnableReleaseCalendarABTest         bool          `envconfig:"ENABLE_RELEASE_CALENDAR_AB_TEST"`
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	FeedbackControllerURL               string        `envconfig:"FEEDBACK_CONTROLLER_URL"`
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
@@ -42,6 +43,7 @@ type Config struct {
 	ReleaseCalendarControllerURL        string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	ReleaseCalendarEnabled              bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
 	ReleaseCalendarRoutePrefix          string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
+	ReleaseCalendarABTestPercentage     int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
 	RendererURL                         string        `envconfig:"RENDERER_URL"`
 	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
@@ -127,6 +129,15 @@ func Get() (*Config, error) {
 func IsEnableSearchABTest(cfg Config) bool {
 	percentage := cfg.SearchABTestPercentage
 	if cfg.EnableSearchABTest && percentage > 0 && percentage < 100 {
+		return true
+	}
+	return false
+}
+
+// IsEnabledRelCalABTest checks whether ab test is enabled and that percentage is a sensible int value
+func IsEnabledRelCalABTest(cfg Config) bool {
+	percentage := cfg.ReleaseCalendarABTestPercentage
+	if cfg.EnableReleaseCalendarABTest && percentage > 0 && percentage < 100 {
 		return true
 	}
 	return false
