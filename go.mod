@@ -6,7 +6,7 @@ replace golang.org/x/text v0.3.7 => golang.org/x/text v0.3.8
 
 require (
 	github.com/ONSdigital/dp-api-clients-go v1.43.0
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.186.0
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.194.0
 	github.com/ONSdigital/dp-cookies v0.4.0
 	github.com/ONSdigital/dp-healthcheck v1.3.0
 	github.com/ONSdigital/dp-net v1.5.0
