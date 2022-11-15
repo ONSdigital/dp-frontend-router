@@ -59,7 +59,7 @@ func Handler(filterClient FilterClient, datasetClient DatasetClient) func(filter
 				return
 			}
 
-			if strings.Contains(d.Type, "flex") {
+			if strings.Contains(d.Type, "cantabular") {
 				log.Info(ctx, "using flex handler")
 				filterFlex.ServeHTTP(w, req)
 				return
