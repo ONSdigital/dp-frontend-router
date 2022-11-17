@@ -3,10 +3,11 @@ package router_test
 import (
 	"context"
 	"encoding/json"
-	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 
 	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
 	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
@@ -272,7 +273,7 @@ func TestRouter(t *testing.T) {
 			flexDataset := &mocks.DatasetClientMock{
 				GetFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, collectionID, datasetID string) (dataset.DatasetDetails, error) {
 					return dataset.DatasetDetails{
-						Type: "canatabular_flexible_table",
+						Type: "cantabular_flexible_table",
 					}, nil
 				},
 			}
@@ -286,12 +287,12 @@ func TestRouter(t *testing.T) {
 			})
 
 			Convey("Then the request is sent to the filter/flex handler", func() {
-				So(len(filterFlexHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(filterFlexHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 
 			Convey("Then no requests are sent to the filter handler", func() {
-				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 
