@@ -7,8 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
-
 	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
 	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"

@@ -1,12 +1,13 @@
 package abtest
 
 import (
-	. "github.com/smartystreets/goconvey/convey"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 type user struct {
