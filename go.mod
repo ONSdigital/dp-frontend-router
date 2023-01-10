@@ -1,6 +1,6 @@
 module github.com/ONSdigital/dp-frontend-router
 
-go 1.17
+go 1.19
 
 replace golang.org/x/text v0.3.7 => golang.org/x/text v0.3.8
 
