@@ -39,7 +39,7 @@ debug: assets-debug
 	HUMAN_LOG=1 DEBUG=1 $(BINPATH)/dp-frontend-router
 
 .PHONY: debug-run
-debug-run:
+debug-run: assets-debug
 	HUMAN_LOG=1 go run -ldflags "-X main.BuildTime=$(BUILD_TIME) -X main.GitCommit=$(GIT_COMMIT) -X main.Version=$(VERSION)" -race $(LDFLAGS) main.go
 	clean-assets
 
