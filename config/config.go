@@ -20,6 +20,7 @@ type Config struct {
 	ContentTypeByteLimit                int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 	CookiesControllerURL                string        `envconfig:"COOKIES_CONTROLLER_URL"`
 	DatasetControllerURL                string        `envconfig:"DATASET_CONTROLLER_URL"`
+	DatasetFinderEnabled                bool          `envconfig:"DATASET_FINDER_ENABLED"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	EnableReleaseCalendarABTest         bool          `envconfig:"ENABLE_RELEASE_CALENDAR_AB_TEST"`
 	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
@@ -79,6 +80,7 @@ func Get() (*Config, error) {
 		ContentTypeByteLimit:                5000000,
 		CookiesControllerURL:                "http://localhost:24100",
 		DatasetControllerURL:                "http://localhost:20200",
+		DatasetFinderEnabled:                false,
 		DownloaderURL:                       "http://localhost:23400",
 		EnableSearchABTest:                  false,
 		FeedbackControllerURL:               "http://localhost:25200",

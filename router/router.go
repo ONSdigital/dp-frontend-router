@@ -59,6 +59,7 @@ type Config struct {
 	BabbageHandler               http.Handler
 	CensusAtlasHandler           http.Handler
 	CensusAtlasEnabled           bool
+	DatasetFinderEnabled         bool
 }
 
 func New(cfg Config) http.Handler {
@@ -81,6 +82,10 @@ func New(cfg Config) http.Handler {
 	}
 
 	router.Handle("/census", cfg.HomepageHandler)
+
+	if cfg.DatasetFinderEnabled {
+		router.Handle("/census/find-a-dataset", cfg.SearchHandler)
+	}
 
 	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)

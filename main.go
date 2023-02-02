@@ -224,6 +224,7 @@ func main() {
 		ContentTypeByteLimit:         cfg.ContentTypeByteLimit,
 		CensusAtlasHandler:           censusAtlasHandler,
 		CensusAtlasEnabled:           cfg.CensusAtlasRoutesEnabled,
+		DatasetFinderEnabled:         cfg.DatasetFinderEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)

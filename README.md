@@ -35,6 +35,7 @@
 | SEARCH_AB_TEST_PERCENTAGE        | 10                                        | AB search percentage                                                                     |
 | PROXY_TIMEOUT                    | 5s                                        | The write timeout for proxied requests                                                   |
 | NEW_DATASET_ROUTING_ENABLED      | false                                     | Flag to enable dataset page routing to dp-frontend-dataset-controller instead of babbage |
+| DATASET_FINDER_ENABLED           | false                                     | Flag to enabled routing to dataset finder page in search                                 |
 
 ### Licence
 
