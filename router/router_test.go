@@ -193,7 +193,7 @@ func TestRouter(t *testing.T) {
 				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-		Convey("When a filter request is made, but the filter/flex handler is not enabled", func() {
+		Convey("When a filter request is made for an invalid flexible dataset", func() {
 			url := "/filters/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
@@ -202,51 +202,22 @@ func TestRouter(t *testing.T) {
 			r.ServeHTTP(res, req)
 
 			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+				So(zebedeeClient.GetWithHeadersCalls(), ShouldHaveLength, 0)
 			})
 
 			Convey("Then the request is sent to the filter handler", func() {
-				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 
 			Convey("Then no requests are sent to the filter/flex handler", func() {
-				So(len(filterFlexHandler.ServeHTTPCalls()), ShouldEqual, 0)
-			})
-		})
-		Convey("When a filter request is made and the filter/flex route is enabled", func() {
-			url := "/filters/123"
-			req := httptest.NewRequest("GET", url, nil)
-			res := httptest.NewRecorder()
-			config.FilterFlexEnabled = true
-
-			filterableDataset := &mocks.DatasetClientMock{
-				GetFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, collectionID, datasetID string) (dataset.DatasetDetails, error) {
-					return dataset.DatasetDetails{
-						Type: "filterable",
-					}, nil
-				},
-			}
-			config.DatasetClient = filterableDataset
-
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-			Convey("Then the request is sent to the filter handler", func() {
-				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-			Convey("Then no requests are sent to the filter/flex handler", func() {
-				So(len(filterFlexHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 		Convey("When a filter request is made for a valid flexible dataset", func() {
 			url := "/filters/123"
 			req := httptest.NewRequest("GET", url, nil)
 			res := httptest.NewRecorder()
-			config.FilterFlexEnabled = true
 
 			flexDataset := &mocks.DatasetClientMock{
 				GetFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, collectionID, datasetID string) (dataset.DatasetDetails, error) {
@@ -273,7 +244,6 @@ func TestRouter(t *testing.T) {
 				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
-
 		Convey("When a filter-output request is made", func() {
 			url := "/filter-outputs/321"
 			req := httptest.NewRequest("GET", url, nil)
