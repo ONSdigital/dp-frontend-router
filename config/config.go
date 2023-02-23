@@ -28,7 +28,6 @@ type Config struct {
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
 	FilterDatasetControllerURL          string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
 	FilterFlexDatasetServiceURL         string        `envconfig:"FILTER_FLEX_DATASET_SERVICE_URL"`
-	FilterFlexRoutesEnabled             bool          `envconfig:"FILTER_FLEX_ROUTES_ENABLED"`
 	GeographyControllerURL              string        `envconfig:"GEOGRAPHY_CONTROLLER_URL"`
 	GeographyEnabled                    bool          `envconfig:"GEOGRAPHY_ENABLED"`
 	HealthcheckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
@@ -87,7 +86,6 @@ func Get() (*Config, error) {
 		FeedbackEnabled:                     false,
 		FilterDatasetControllerURL:          "http://localhost:20001",
 		FilterFlexDatasetServiceURL:         "http://localhost:20100",
-		FilterFlexRoutesEnabled:             false,
 		GeographyControllerURL:              "http://localhost:23700",
 		GeographyEnabled:                    false,
 		HealthcheckCriticalTimeout:          90 * time.Second,

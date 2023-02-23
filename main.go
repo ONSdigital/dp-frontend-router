@@ -201,7 +201,6 @@ func main() {
 		FilterHandler:                filterHandler,
 		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
-		FilterFlexEnabled:            cfg.FilterFlexRoutesEnabled,
 		FilterFlexHandler:            filterFlexHandler,
 		GeographyEnabled:             cfg.GeographyEnabled,
 		GeographyHandler:             geographyHandler,

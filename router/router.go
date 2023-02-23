@@ -35,7 +35,6 @@ type Config struct {
 	CookieHandler                http.Handler
 	FilterHandler                http.Handler
 	FilterFlexHandler            http.Handler
-	FilterFlexEnabled            bool
 	FilterClient                 datasetType.FilterClient
 	FeedbackHandler              http.Handler
 	ContentTypeByteLimit         int
@@ -91,11 +90,7 @@ func New(cfg Config) http.Handler {
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
-	if cfg.FilterFlexEnabled {
-		router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
-	} else {
-		router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
-	}
+	router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
