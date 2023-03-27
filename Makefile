@@ -46,4 +46,3 @@ debug-run: assets-debug
 .PHONY: test
 test: assets
 	go test -race -cover -tags 'production' ./...
-
