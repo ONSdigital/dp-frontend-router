@@ -31,8 +31,6 @@
 | HEALTHCHECK_CRITICAL_TIMEOUT     | 90s                                       | The period of time after which failing checks will result in critical global check       |
 | ZEBEDEE_REQUEST_TIMEOUT_SECONDS  | 5s                                        | The period of time to wait before timing out when communicating with Zebedee             |
 | ZEBEDEE_REQUEST_MAXIMUM_RETRIES  | 0                                         | The number of retry attempts to make to Zebedee                                          |
-| ENABLE_SEARCH_AB_TEST            | false                                     | Enable AB search                                                                         |
-| SEARCH_AB_TEST_PERCENTAGE        | 10                                        | AB search percentage                                                                     |
 | PROXY_TIMEOUT                    | 5s                                        | The write timeout for proxied requests                                                   |
 | NEW_DATASET_ROUTING_ENABLED      | false                                     | Flag to enable dataset page routing to dp-frontend-dataset-controller instead of babbage |
 | DATASET_FINDER_ENABLED           | false                                     | Flag to enabled routing to dataset finder page in search                                 |
