@@ -132,7 +132,6 @@ func main() {
 
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
-	enableSearchABTest := config.IsEnableSearchABTest(*cfg)
 	enableRelCalABTest := config.IsEnabledRelCalABTest(*cfg)
 
 	redirects.Init(assets.Asset)
@@ -214,8 +213,6 @@ func main() {
 		RelCalABTestPercentage:       cfg.ReleaseCalendarABTestPercentage,
 		InteractivesHandler:          interactivesHandler,
 		InteractivesEnabled:          cfg.InteractivesRoutesEnabled,
-		EnableSearchABTest:           enableSearchABTest,
-		SearchABTestPercentage:       cfg.SearchABTestPercentage,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,

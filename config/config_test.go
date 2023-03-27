@@ -26,7 +26,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.FeedbackEnabled, ShouldBeFalse)
 				So(cfg.GeographyEnabled, ShouldBeFalse)
 				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
-				So(cfg.SearchRoutesEnabled, ShouldBeFalse)
+				So(cfg.SearchRoutesEnabled, ShouldBeTrue)
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.ReleaseCalendarEnabled, ShouldBeFalse)
 				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
@@ -51,31 +51,6 @@ func TestSpec(t *testing.T) {
 				So(cfg.ZebedeeRequestMaximumRetries, ShouldEqual, 0)
 				So(cfg.ProxyTimeout, ShouldEqual, 5*time.Second)
 			})
-		})
-	})
-}
-
-func TestIsEnabledABSearch(t *testing.T) {
-	Convey("IsEnabledABSearch returns expected value", t, func() {
-		Convey("false when EnableSearchABTest is false", func() {
-			cfg := Config{EnableSearchABTest: false, SearchABTestPercentage: 10}
-			result := IsEnableSearchABTest(cfg)
-			So(result, ShouldBeFalse)
-		})
-		Convey("false when SearchABTestPercentage is below 0", func() {
-			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: -10}
-			result := IsEnableSearchABTest(cfg)
-			So(result, ShouldBeFalse)
-		})
-		Convey("false when SearchABTestPercentage is over 100", func() {
-			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: 110}
-			result := IsEnableSearchABTest(cfg)
-			So(result, ShouldBeFalse)
-		})
-		Convey("true when EnableSearchABTest is set and a sensible percentage int is used", func() {
-			cfg := Config{EnableSearchABTest: true, SearchABTestPercentage: 10}
-			result := IsEnableSearchABTest(cfg)
-			So(result, ShouldBeTrue)
 		})
 	})
 }

@@ -23,7 +23,6 @@ type Config struct {
 	DatasetFinderEnabled                bool          `envconfig:"DATASET_FINDER_ENABLED"`
 	DownloaderURL                       string        `envconfig:"DOWNLOADER_URL"`
 	EnableReleaseCalendarABTest         bool          `envconfig:"ENABLE_RELEASE_CALENDAR_AB_TEST"`
-	EnableSearchABTest                  bool          `envconfig:"ENABLE_SEARCH_AB_TEST"`
 	FeedbackControllerURL               string        `envconfig:"FEEDBACK_CONTROLLER_URL"`
 	FeedbackEnabled                     bool          `envconfig:"FEEDBACK_ENABLED"`
 	FilterDatasetControllerURL          string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
@@ -45,7 +44,6 @@ type Config struct {
 	ReleaseCalendarRoutePrefix          string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	ReleaseCalendarABTestPercentage     int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
 	RendererURL                         string        `envconfig:"RENDERER_URL"`
-	SearchABTestPercentage              int           `envconfig:"SEARCH_AB_TEST_PERCENTAGE"`
 	SearchControllerURL                 string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	SearchRoutesEnabled                 bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	SiteDomain                          string        `envconfig:"SITE_DOMAIN"`
@@ -81,7 +79,6 @@ func Get() (*Config, error) {
 		DatasetControllerURL:                "http://localhost:20200",
 		DatasetFinderEnabled:                false,
 		DownloaderURL:                       "http://localhost:23400",
-		EnableSearchABTest:                  false,
 		FeedbackControllerURL:               "http://localhost:25200",
 		FeedbackEnabled:                     false,
 		FilterDatasetControllerURL:          "http://localhost:20001",
@@ -101,9 +98,8 @@ func Get() (*Config, error) {
 		ReleaseCalendarControllerURL:        "http://localhost:27700",
 		ReleaseCalendarEnabled:              false,
 		RendererURL:                         "http://localhost:20010",
-		SearchABTestPercentage:              10,
 		SearchControllerURL:                 "http://localhost:25000",
-		SearchRoutesEnabled:                 false,
+		SearchRoutesEnabled:                 true,
 		SiteDomain:                          "ons.gov.uk",
 		SQSAnalyticsURL:                     "",
 		ZebedeeRequestMaximumRetries:        0,
@@ -123,15 +119,6 @@ func Get() (*Config, error) {
 	cfg.ReleaseCalendarRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarRoutePrefix)
 
 	return cfg, nil
-}
-
-// IsEnableSearchABTest checks whether ab test is enabled and that percentage is a sensible int value
-func IsEnableSearchABTest(cfg Config) bool {
-	percentage := cfg.SearchABTestPercentage
-	if cfg.EnableSearchABTest && percentage > 0 && percentage < 100 {
-		return true
-	}
-	return false
 }
 
 // IsEnabledRelCalABTest checks whether ab test is enabled and that percentage is a sensible int value

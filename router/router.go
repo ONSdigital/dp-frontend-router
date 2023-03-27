@@ -45,8 +45,6 @@ type Config struct {
 	InteractivesHandler          http.Handler
 	LegacySearchRedirectsEnabled bool
 	SearchRoutesEnabled          bool
-	EnableSearchABTest           bool
-	SearchABTestPercentage       int
 	SiteDomain                   string
 	SearchHandler                http.Handler
 	RelCalHandler                http.Handler
@@ -110,7 +108,7 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
-		router.Handle("/search", abtest.Handler(cfg.EnableSearchABTest, cfg.SearchHandler, cfg.BabbageHandler, cfg.SearchABTestPercentage, abtest.SearchTestCookieAspect, cfg.SiteDomain, abtest.SearchNewExit))
+		router.Handle("/search", cfg.SearchHandler)
 	}
 
 	if cfg.RelCalEnabled {

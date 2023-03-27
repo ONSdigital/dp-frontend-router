@@ -8,9 +8,6 @@ import (
 )
 
 const (
-	SearchTestCookieAspect = "dsa-search"
-	SearchNewExit          = "exit-new-search"
-
 	RelcalTestCookieAspect = "dsa-release-calendar"
 	RelcalNewExit          = "exit-new-relcal"
 )
