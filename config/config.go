@@ -32,6 +32,7 @@ type Config struct {
 	HealthcheckCriticalTimeout          time.Duration `envconfig:"HEALTHCHECK_CRITICAL_TIMEOUT"`
 	HealthcheckInterval                 time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	HomepageControllerURL               string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
+	HttpMaxConnections                  int           `envconfig:"HTTP_MAX_CONNECTIONS"`
 	InteractivesControllerURL           string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
 	InteractivesRoutesEnabled           bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
 	LegacySearchRedirectsEnabled        bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
@@ -88,6 +89,7 @@ func Get() (*Config, error) {
 		HealthcheckCriticalTimeout:          90 * time.Second,
 		HealthcheckInterval:                 30 * time.Second,
 		HomepageControllerURL:               "http://localhost:24400",
+		HttpMaxConnections:                  10000,
 		InteractivesControllerURL:           "http://localhost:27300",
 		InteractivesRoutesEnabled:           false,
 		LegacySearchRedirectsEnabled:        false,

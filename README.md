@@ -5,6 +5,7 @@
 | Environment variable             | Default                                   | Description                                                                              |
 |----------------------------------|-------------------------------------------|------------------------------------------------------------------------------------------|
 | BIND_ADDR                        | :20000                                    | The host and port to bind to.                                                            |
+| HTTP_MAX_CONNECTIONS             | 10000                                     | Limit the number of concurrent http connections                                          | 
 | BABBAGE_URL                      | <https://localhost:8080>                  | The URL of the babbage instance to use                                                   |
 | RENDERER_URL                     | <http://localhost:20010>                  | The URL of dp-frontend-renderer                                                          |
 | COOKIES_CONTROLLER_URL           | <http://localhost:24100>                  | The URL of dp-frontend-cookie-controller                                                 |

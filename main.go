@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"golang.org/x/net/netutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -228,7 +229,6 @@ func main() {
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
-		Addr:         cfg.BindAddr,
 		Handler:      httpHandler,
 		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
@@ -238,8 +238,18 @@ func main() {
 	// Start health check
 	hc.Start(ctx)
 
+	// Create a LimitListener to cap concurrent http connections
+	l, err := net.Listen("tcp", cfg.BindAddr)
+	if err != nil {
+		log.Fatal(ctx, "error starting tcp listener", err)
+		hc.Stop()
+		os.Exit(2)
+	}
+	defer l.Close()
+	l = netutil.LimitListener(l, cfg.HttpMaxConnections)
+
 	// Start server
-	if err := s.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := s.Serve(l); err != nil && err != http.ErrServerClosed {
 		log.Fatal(ctx, "error starting server", err)
 		hc.Stop()
 		os.Exit(2)
