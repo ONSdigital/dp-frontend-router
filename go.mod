@@ -1,8 +1,6 @@
 module github.com/ONSdigital/dp-frontend-router
 
-go 1.19
-
-replace golang.org/x/text v0.3.7 => golang.org/x/text v0.3.8
+go 1.20
 
 require (
 	github.com/ONSdigital/dp-api-clients-go v1.43.0
@@ -43,5 +41,4 @@ require (
 	github.com/smartystreets/assertions v1.13.0 // indirect
 	golang.org/x/net v0.0.0-20220812174116-3211cb980234 // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
-	golang.org/x/text v0.4.0 // indirect
 )
