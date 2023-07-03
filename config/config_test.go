@@ -25,7 +25,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.FeedbackControllerURL, ShouldEqual, "http://localhost:25200")
 				So(cfg.FeedbackEnabled, ShouldBeFalse)
 				So(cfg.GeographyEnabled, ShouldBeFalse)
-				So(cfg.HttpMaxConnections, ShouldEqual, 10000)
+				So(cfg.HttpMaxConnections, ShouldEqual, 0)
 				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
 				So(cfg.SearchRoutesEnabled, ShouldBeTrue)
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")

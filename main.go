@@ -246,7 +246,10 @@ func main() {
 		os.Exit(2)
 	}
 	defer l.Close()
-	l = netutil.LimitListener(l, cfg.HttpMaxConnections)
+
+	if maxC := cfg.HttpMaxConnections; maxC > 0 {
+		l = netutil.LimitListener(l, maxC)
+	}
 
 	// Start server
 	if err := s.Serve(l); err != nil && err != http.ErrServerClosed {

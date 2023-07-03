@@ -89,7 +89,7 @@ func Get() (*Config, error) {
 		HealthcheckCriticalTimeout:          90 * time.Second,
 		HealthcheckInterval:                 30 * time.Second,
 		HomepageControllerURL:               "http://localhost:24400",
-		HttpMaxConnections:                  10000,
+		HttpMaxConnections:                  0,
 		InteractivesControllerURL:           "http://localhost:27300",
 		InteractivesRoutesEnabled:           false,
 		LegacySearchRedirectsEnabled:        false,
