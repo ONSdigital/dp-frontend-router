@@ -2,25 +2,25 @@ package main
 
 import (
 	"context"
-	"golang.org/x/net/netutil"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"time"
+
+	"golang.org/x/net/netutil"
 
 	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
 	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
 	"github.com/ONSdigital/dp-api-clients-go/v2/health"
-	"github.com/ONSdigital/dp-api-clients-go/zebedee"
+	"github.com/ONSdigital/dp-api-clients-go/v2/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	dphttp "github.com/ONSdigital/dp-net/http"
+	dphttp "github.com/ONSdigital/dp-net/v2/http"
 	"github.com/ONSdigital/log.go/v2/log"
 )
 
@@ -41,96 +41,25 @@ func main() {
 	cfg, err := config.Get()
 	if err != nil {
 		log.Fatal(ctx, "unable to retrieve service configuration", err)
-		os.Exit(1)
 	}
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
-	cookiesControllerURL, err := url.Parse(cfg.CookiesControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "CookiesControllerURL", "value": cfg.CookiesControllerURL})
-		os.Exit(1)
-	}
-
-	datasetControllerURL, err := url.Parse(cfg.DatasetControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL})
-		os.Exit(1)
-	}
-
-	var prefixedDatasetURL = cfg.DatasetControllerURL + "/dataset"
-	prefixDatasetControllerURL, err := url.Parse(prefixedDatasetURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DatasetControllerURL", "value": cfg.DatasetControllerURL})
-		os.Exit(1)
-	}
-
-	filterDatasetControllerURL, err := url.Parse(cfg.FilterDatasetControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FilterDatasetControllerURL", "value": cfg.FilterDatasetControllerURL})
-		os.Exit(1)
-	}
-
-	geographyControllerURL, err := url.Parse(cfg.GeographyControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "GeographyControllerURL", "value": cfg.GeographyControllerURL})
-		os.Exit(1)
-	}
-
-	homepageControllerURL, err := url.Parse(cfg.HomepageControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "HomepageControllerURL", "value": cfg.HomepageControllerURL})
-		os.Exit(1)
-	}
-
-	searchControllerURL, err := url.Parse(cfg.SearchControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "SearchControllerURL", "value": cfg.SearchControllerURL})
-		os.Exit(1)
-	}
-
-	relcalControllerURL, err := url.Parse(cfg.ReleaseCalendarControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "ReleaseCalendarControllerURL", "value": cfg.ReleaseCalendarControllerURL})
-		os.Exit(1)
-	}
-
-	babbageURL, err := url.Parse(cfg.BabbageURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "BabbageURL", "value": cfg.BabbageURL})
-		os.Exit(1)
-	}
-
-	downloaderURL, err := url.Parse(cfg.DownloaderURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "DownloaderURL", "value": cfg.DownloaderURL})
-		os.Exit(1)
-	}
-
-	feedbackControllerURL, err := url.Parse(cfg.FeedbackControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FeedbackControllerURL", "value": cfg.FeedbackControllerURL})
-		os.Exit(1)
-	}
-
-	areaProfileControllerURL, err := url.Parse(cfg.AreaProfilesControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "AreaProfileControllerURL", "value": cfg.AreaProfilesControllerURL})
-		os.Exit(1)
-	}
-
-	filterFlexDatasetServiceURL, err := url.Parse(cfg.FilterFlexDatasetServiceURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "FilterFlexDatasetServiceURL", "value": cfg.FilterFlexDatasetServiceURL})
-		os.Exit(1)
-	}
-
-	interactivesControllerURL, err := url.Parse(cfg.InteractivesControllerURL)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": "InteractivesControllerURL", "value": cfg.InteractivesControllerURL})
-		os.Exit(1)
-	}
-
+	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
+	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
+	prefixedDatasetURL := cfg.DatasetControllerURL + "/dataset"
+	prefixDatasetControllerURL, _ := parseURL(ctx, prefixedDatasetURL, "DatasetControllerURL")
+	filterDatasetControllerURL, _ := parseURL(ctx, cfg.FilterDatasetControllerURL, "FilterDatasetControllerURL")
+	geographyControllerURL, _ := parseURL(ctx, cfg.GeographyControllerURL, "GeographyControllerURL")
+	homepageControllerURL, _ := parseURL(ctx, cfg.HomepageControllerURL, "HomepageControllerURL")
+	searchControllerURL, _ := parseURL(ctx, cfg.SearchControllerURL, "SearchControllerURL")
+	relcalControllerURL, _ := parseURL(ctx, cfg.ReleaseCalendarControllerURL, "ReleaseCalendarControllerURL")
+	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
+	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
+	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
+	areaProfileControllerURL, _ := parseURL(ctx, cfg.AreaProfilesControllerURL, "AreaProfileControllerURL")
+	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
+	interactivesControllerURL, _ := parseURL(ctx, cfg.InteractivesControllerURL, "InteractivesControllerURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	enableRelCalABTest := config.IsEnabledRelCalABTest(*cfg)
@@ -140,7 +69,7 @@ func main() {
 	// create ZebedeeClient proxying calls through the API Router
 	hcClienter := dphttp.NewClient()
 	hcClienter.SetMaxRetries(cfg.ZebedeeRequestMaximumRetries)
-	hcClienter.SetTimeout(cfg.ZebedeeRequestMaximumTimeoutSeconds)
+	hcClienter.SetTimeout(cfg.ZebedeeRequestMaximumTimeout)
 
 	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
 
@@ -152,18 +81,15 @@ func main() {
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
 		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
-		os.Exit(1)
 	}
 	hc := healthcheck.New(versionInfo, cfg.HealthcheckCriticalTimeout, cfg.HealthcheckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
 		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
-		os.Exit(1)
 	}
 
 	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
 	if err != nil {
 		log.Fatal(ctx, "error creating search analytics handler", err)
-		os.Exit(1)
 	}
 
 	downloadHandler := createReverseProxy("download", downloaderURL)
@@ -242,21 +168,26 @@ func main() {
 	l, err := net.Listen("tcp", cfg.BindAddr)
 	if err != nil {
 		log.Fatal(ctx, "error starting tcp listener", err)
-		hc.Stop()
-		os.Exit(2)
 	}
-	defer l.Close()
 
-	if maxC := cfg.HttpMaxConnections; maxC > 0 {
+	if maxC := cfg.HTTPMaxConnections; maxC > 0 {
 		l = netutil.LimitListener(l, maxC)
 	}
 
 	// Start server
 	if err := s.Serve(l); err != nil && err != http.ErrServerClosed {
 		log.Fatal(ctx, "error starting server", err)
-		hc.Stop()
-		os.Exit(2)
 	}
+	l.Close()
+}
+
+func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
+	parsedURL, err := url.Parse(cfgValue)
+	if err != nil {
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": configName, "value": cfgValue})
+		return nil, err
+	}
+	return parsedURL, nil
 }
 
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
@@ -287,7 +218,6 @@ func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL
 	configuredServiceURL, err := url.Parse(serviceURL)
 	if err != nil {
 		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": serviceName, "value": serviceURL})
-		os.Exit(1)
 	}
 	return configuredServiceURL
 }

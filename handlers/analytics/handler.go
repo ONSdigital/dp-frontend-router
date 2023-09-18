@@ -44,7 +44,9 @@ func (sh searchHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Error(r.Context(), "error capturing analytics data", err)
 		w.WriteHeader(400)
 		// FIXME probably want to display a better error page than this
-		w.Write([]byte(err.Error()))
+		if _, err := w.Write([]byte(err.Error())); err != nil {
+			log.Error(r.Context(), "error writing response", err)
+		}
 		return
 	}
 

@@ -33,7 +33,7 @@ func TestSQSBackend(t *testing.T) {
 			"https://fake.url",
 		}
 
-		fakeReq, err := http.NewRequest("GET", "/", nil)
+		fakeReq, err := http.NewRequest("GET", "/", http.NoBody)
 		So(err, ShouldBeNil)
 
 		sqsBackend.Store(fakeReq, "/some/url", "some term", "list type", "gaID", "gID", 10, 20, 30)

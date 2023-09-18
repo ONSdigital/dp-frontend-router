@@ -1,3 +1,4 @@
+// nolint:revive,stylecheck // ignore, Package name "allRoutes" is kept for compatibility.
 package allRoutes
 
 import (
@@ -6,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	dprequest "github.com/ONSdigital/dp-net/request"
+	dprequest "github.com/ONSdigital/dp-net/v2/request"
 	"github.com/ONSdigital/log.go/v2/log"
 )
 
@@ -29,13 +30,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			req = dprequest.SetLocaleCode(req)
 
 			// Construct contentPath with any collection if present in cookie
-			contentPath := "/data"
-			if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
-				contentPath += "/" + c.Value + "?uri=" + path
-				log.Info(req.Context(), "generated from 'collection' cookie", log.Data{"contentPath": contentPath})
-			} else {
-				contentPath += "?uri=" + path
-			}
+			contentPath := constructContentPath(req, path)
 
 			// FIXME We should be doing a HEAD request but Restolino doesn't allow it - either wait for the
 			// new Content API (https://github.com/ONSdigital/dp-content-api) to be in prod or update Restolino
@@ -43,8 +38,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 
 			// Obtain access_token from cookie
 			userAccessToken := ""
-			c, err := req.Cookie(`access_token`)
-			if err == nil && len(c.Value) > 0 {
+			if c, err := req.Cookie(`access_token`); err == nil && len(c.Value) > 0 {
 				userAccessToken = c.Value
 				log.Info(req.Context(), "Obtained access_token Cookie")
 			}
@@ -64,10 +58,11 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 				return
 			}
 
-			zebResp := struct {
+			var zebResp struct {
 				Type      string `json:"type"`
 				DatasetID string `json:"apiDatasetId"`
-			}{}
+			}
+
 			if err := json.Unmarshal(b, &zebResp); err != nil {
 				log.Error(req.Context(), "json unmarshal error", err)
 				h.ServeHTTP(w, req)
@@ -88,7 +83,19 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 				routesH.ServeHTTP(w, req)
 				return
 			}
+
 			h.ServeHTTP(w, req)
 		})
 	}
+}
+
+func constructContentPath(req *http.Request, path string) string {
+	contentPath := "/data"
+	if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
+		contentPath += "/" + c.Value + "?uri=" + path
+		log.Info(req.Context(), "generated from 'collection' cookie", log.Data{"contentPath": contentPath})
+	} else {
+		contentPath += "?uri=" + path
+	}
+	return contentPath
 }

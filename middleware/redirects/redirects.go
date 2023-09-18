@@ -40,6 +40,10 @@ func Init(asset func(name string) ([]byte, error)) {
 		return
 	}
 
+	handleRecords(records)
+}
+
+func handleRecords(records [][]string) {
 	for line, record := range records {
 		if len(record) > 0 {
 			if record[0] == "" {
@@ -91,6 +95,5 @@ func DynamicRedirectHandler(redirectFrom, redirectTo string) http.Handler {
 
 		log.Info(req.Context(), "redirect found", log.Data{"location": redirectURL}, log.HTTP(req, 0, 0, nil, nil))
 		http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
-		return
 	})
 }

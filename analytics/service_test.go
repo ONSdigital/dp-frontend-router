@@ -14,8 +14,8 @@ import (
 // For HMAC signing method, the key can be any []byte. It is recommended to generate
 // a key using crypto/rand or something equivalent. You need the same key for signing
 // and validating.
-var hmacSampleSecret []byte = []byte("secret")
-var hmacBadSampleSecret []byte = []byte("bad")
+var hmacSampleSecret = []byte("secret")
+var hmacBadSampleSecret = []byte("bad")
 
 func Test_extractIntParam(t *testing.T) {
 	s := &ServiceImpl{
@@ -23,7 +23,7 @@ func Test_extractIntParam(t *testing.T) {
 	}
 	Convey("Given a valid redirect URL", t, func() {
 		data := "eyJhbGciOiJIUzI1NiJ9.eyJpbmRleCI6MSwicGFnZVNpemUiOjEwLCJ0ZXJtIjoiSW50ZWdyYXRlZCIsInBhZ2UiOjEsInVyaSI6Ii9wZW9wbGVwb3B1bGF0aW9uYW5kY29tbXVuaXR5L2hvdXNpbmcvYnVsbGV0aW5zL2ludGVncmF0ZWRob3VzZWhvbGRzdXJ2ZXlleHBlcmltZW50YWxzdGF0aXN0aWNzLzIwMTQtMTAtMDciLCJsaXN0VHlwZSI6InNlYXJjaCJ9.MQnW73Zca_7DZbYXjQC9FMIbCiJjNe--AKcCpLU2azw"
-		r, err := http.NewRequest("GET", "/redir/"+data, nil)
+		r, err := http.NewRequest("GET", "/redir/"+data, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -53,7 +53,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -82,7 +82,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -92,7 +92,7 @@ func Test_extractIntParam(t *testing.T) {
 			_, err = s.CaptureAnalyticsData(request)
 			So(err, ShouldNotBeNil)
 			es := fmt.Sprintf("%s", err)
-			So(es, ShouldEqual, "url is a mandatory parameter")
+			So(es, ShouldEqual, "URL is a mandatory parameter")
 		})
 		router.ServeHTTP(rr, r)
 	})
@@ -108,7 +108,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacBadSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -138,7 +138,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -165,7 +165,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -192,7 +192,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -219,7 +219,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -246,7 +246,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 
@@ -273,7 +273,7 @@ func Test_extractIntParam(t *testing.T) {
 		tokenString, err := token.SignedString(hmacSampleSecret)
 		So(err, ShouldBeNil)
 
-		r, err := http.NewRequest("GET", "/redir/"+tokenString, nil)
+		r, err := http.NewRequest("GET", "/redir/"+tokenString, http.NoBody)
 		So(r, ShouldNotBeNil)
 		So(err, ShouldBeNil)
 

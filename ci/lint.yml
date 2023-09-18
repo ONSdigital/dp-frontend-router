@@ -10,7 +10,6 @@ image_resource:
 
 inputs:
   - name: dp-frontend-router
-    path: dp-frontend-router
 
 run:
-  path: dp-frontend-router/ci/scripts/unit.sh
+  path: dp-frontend-router/ci/scripts/lint.sh

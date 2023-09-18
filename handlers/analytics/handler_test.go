@@ -23,12 +23,12 @@ func (m *mockAnalyticsService) CaptureAnalyticsData(r *http.Request) (string, er
 	return m.mockBehaviour(r, m)
 }
 
-func successBehavior(r *http.Request, m *mockAnalyticsService) (string, error) {
+func successBehavior(r *http.Request, _ *mockAnalyticsService) (string, error) {
 	return r.URL.Query().Get("url"), nil
 }
 
-func errorBehavior(r *http.Request, m *mockAnalyticsService) (string, error) {
-	return "", errors.New("Error!")
+func errorBehavior(_ *http.Request, _ *mockAnalyticsService) (string, error) {
+	return "", errors.New("error")
 }
 
 type MockRedirArgs struct {
@@ -38,11 +38,11 @@ type MockRedirArgs struct {
 	code     int
 }
 
-type MockHttpRedir struct {
+type MockHTTPRedir struct {
 	args []*MockRedirArgs
 }
 
-func (m *MockHttpRedir) mockRedirector(w http.ResponseWriter, r *http.Request, urlStr string, code int) {
+func (m *MockHTTPRedir) mockRedirector(w http.ResponseWriter, r *http.Request, urlStr string, code int) {
 	m.args = append(m.args, &MockRedirArgs{w, r, urlStr, code})
 }
 
@@ -54,14 +54,14 @@ func TestHandleSearch(t *testing.T) {
 			mockBehaviour: successBehavior,
 		}
 
-		mockRedir := &MockHttpRedir{args: make([]*MockRedirArgs, 0)}
+		mockRedir := &MockHTTPRedir{args: make([]*MockRedirArgs, 0)}
 		sh := &searchHandler{
 			service:    serviceMock,
 			redirector: mockRedir.mockRedirector,
 		}
 
 		resp := httptest.NewRecorder()
-		req := httptest.NewRequest("GET", requestedURL.RequestURI(), nil)
+		req := httptest.NewRequest("GET", requestedURL.RequestURI(), http.NoBody)
 
 		Convey("When the search redirect handler is invoked", func() {
 			sh.ServeHTTP(resp, req)
@@ -89,7 +89,7 @@ func TestHandleSearch(t *testing.T) {
 			}
 			sh.service = serviceMock
 			resp := httptest.NewRecorder()
-			req := httptest.NewRequest("GET", requestedURL.RequestURI(), nil)
+			req := httptest.NewRequest("GET", requestedURL.RequestURI(), http.NoBody)
 
 			sh.ServeHTTP(resp, req)
 

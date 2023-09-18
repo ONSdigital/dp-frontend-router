@@ -47,7 +47,7 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 
 	token, err := jwt.Parse(data, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(s.redirectSecret), nil
@@ -57,50 +57,27 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		return "", errors.Wrap(err, "Invalid redirect data")
 	}
 
-	var url, term, listType, gaID, gID string
-	var pageIndex, linkIndex, pageSize float64
-
 	var claims jwt.MapClaims
 	var ok bool
 	if claims, ok = token.Claims.(jwt.MapClaims); !ok || !token.Valid {
 		return "", errors.New("error validating token")
 	}
 
-	if s, ok := claims["uri"].(string); ok {
-		url = s
-	}
-	if s, ok := claims["term"].(string); ok {
-		term = s
-	}
-	if s, ok := claims["listType"].(string); ok {
-		listType = s
-	}
-	if s, ok := claims["page"].(float64); ok {
-		pageIndex = s
-	}
-	if s, ok := claims["index"].(float64); ok {
-		linkIndex = s
-	}
-	if s, ok := claims["pageSize"].(float64); ok {
-		pageSize = s
-	}
+	url := getStringClaim(claims, "uri")
+	term := getStringClaim(claims, "term")
+	listType := getStringClaim(claims, "listType")
+	pageIndex := getFloat64Claim(claims, "page")
+	linkIndex := getFloat64Claim(claims, "index")
+	pageSize := getFloat64Claim(claims, "pageSize")
 
-	if c, err := r.Cookie("_ga"); err == nil && c != nil {
-		// 2 year expiration cookie (_ga)
-		gaID = c.Value
-	}
-
-	if c, err := r.Cookie("_gid"); err == nil && c != nil {
-		// 24 hour expiration cookie (_gid)
-		gID = c.Value
-	}
+	gaID := getCookieValue(r, "_ga")
+	gID := getCookieValue(r, "_gid")
 
 	if url == "" {
-		return "", errors.New("url is a mandatory parameter")
+		return "", errors.New("URL is a mandatory parameter")
 	}
 
-	// FIXME do we want to log as well as store in backend?
-	log.Info(r.Context(), "search analytics data", log.Data{
+	logData := log.Data{
 		urlParam:        url,
 		termParam:       term,
 		searchTypeParam: listType,
@@ -109,11 +86,33 @@ func (s *ServiceImpl) CaptureAnalyticsData(r *http.Request) (string, error) {
 		pageSizeParam:   pageSize,
 		gaIDParam:       gaID,
 		gIDParam:        gID,
-	})
+	}
+	log.Info(r.Context(), "search analytics data", logData)
 
 	if s.backend != nil {
 		s.backend.Store(r, url, term, listType, gaID, gID, pageIndex, linkIndex, pageSize)
 	}
 
 	return url, nil
+}
+
+func getStringClaim(claims jwt.MapClaims, key string) string {
+	if val, ok := claims[key].(string); ok {
+		return val
+	}
+	return ""
+}
+
+func getFloat64Claim(claims jwt.MapClaims, key string) float64 {
+	if val, ok := claims[key].(float64); ok {
+		return val
+	}
+	return 0
+}
+
+func getCookieValue(r *http.Request, cookieName string) string {
+	if c, err := r.Cookie(cookieName); err == nil && c != nil {
+		return c.Value
+	}
+	return ""
 }

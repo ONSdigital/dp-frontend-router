@@ -31,7 +31,7 @@ func TestSecurityHandler(t *testing.T) {
 
 		Convey("When a default request is made", func() {
 			url := "/"
-			req := httptest.NewRequest(http.MethodGet, url, nil)
+			req := httptest.NewRequest(http.MethodGet, url, http.NoBody)
 			securityHandler.ServeHTTP(res, req)
 
 			Convey("Then xframe-options header is SAMEORIGIN", func() {
@@ -52,7 +52,7 @@ func TestSecurityHandler(t *testing.T) {
 				"/census/maps/path",
 			}
 			for i, url := range urls {
-				req := httptest.NewRequest(http.MethodGet, url, nil)
+				req := httptest.NewRequest(http.MethodGet, url, http.NoBody)
 				securityHandler.ServeHTTP(res, req)
 
 				Convey("Then no xframe-options header is set: "+url, func() {
@@ -129,7 +129,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a analytics request is made", func() {
 			url := "/redir/123"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -146,7 +146,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a download request is made", func() {
 			url := "/download/123"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -163,7 +163,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a cookie request is made", func() {
 			url := "/cookies/123/345"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -178,7 +178,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a dataset request is made", func() {
 			url := "/datasets/cpih"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -195,7 +195,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a filter request is made for an invalid flexible dataset", func() {
 			url := "/filters/123"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -216,7 +216,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a filter request is made for a valid flexible dataset", func() {
 			url := "/filters/123"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			flexDataset := &mocks.DatasetClientMock{
@@ -246,7 +246,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a filter-output request is made", func() {
 			url := "/filter-outputs/321"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -262,7 +262,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a feedback request is made", func() {
 			url := "/feedback/homepage"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 			r := router.New(config)
 			r.ServeHTTP(res, req)
@@ -277,7 +277,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a geography request is made, but the geography handler is not enabled", func() {
 			url := "/geography/newport"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.GeographyEnabled = false
@@ -297,7 +297,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a geography request is made, and the geography handler is enabled", func() {
 			url := "/geography/newport"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.GeographyEnabled = true
@@ -316,7 +316,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a search request is made, but the search handler is not enabled", func() {
 			url := "/search"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.SearchRoutesEnabled = false
@@ -332,7 +332,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a search request is made, and the search handler is enabled", func() {
 			url := "/search"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.SearchRoutesEnabled = true
@@ -351,7 +351,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a dataset finder request is made, but the Dataset Finder is not enabled", func() {
 			url := "/census/find-a-dataset"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.DatasetFinderEnabled = false
@@ -367,7 +367,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a dataset finder request is made, and the Dataset Finder is enabled", func() {
 			url := "/census/find-a-dataset"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.DatasetFinderEnabled = true
@@ -386,7 +386,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a homepage request is made", func() {
 			url := "/"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -403,7 +403,7 @@ func TestRouter(t *testing.T) {
 		Convey("When a legacy page request is made", func() {
 			url := "/economy"
 			expectedZebedeeURL := "/data?uri=" + url
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -419,7 +419,7 @@ func TestRouter(t *testing.T) {
 		})
 		Convey("When a data.json request is made", func() {
 			url := "/somepage/data.json"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -435,7 +435,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request with a file extension is made", func() {
 			url := "/website/main.css"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -451,7 +451,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request for a visualisation endpoint is made", func() {
 			url := "/visualisations/dvc1119"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -467,7 +467,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request for a interactives endpoint is made, but the interactives handler is not enabled", func() {
 			url := "/interactives/an_identifier"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -487,7 +487,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request for a interactives endpoint is made, and the interactives handler is enabled", func() {
 			url := "/interactives/an_identifier"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.InteractivesEnabled = true
@@ -510,7 +510,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request for a legacy ons redirect endpoint is made", func() {
 			url := "/ons/some/old/page"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -526,7 +526,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a request for a known babbage endpoint is made", func() {
 			url := "/file"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -543,7 +543,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a /data request is made", func() {
 			url := "/somepage/data"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -560,7 +560,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a /latest request is made", func() {
 			url := "/economy/environmentalaccounts/bulletins/ukenvironmentalaccounts/latest"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -576,7 +576,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, but the census atlas handler is not enabled", func() {
 			url := "/census-atlas"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.CensusAtlasEnabled = false
@@ -589,7 +589,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a census atlas request is made, and the census atlas handler is enabled", func() {
 			url := "/census/maps"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.CensusAtlasEnabled = true
@@ -608,7 +608,7 @@ func TestRouter(t *testing.T) {
 			Convey("And the release calendar route is not enabled", func() {
 				config.RelCalEnabled = false
 				r := router.New(config)
-				req := httptest.NewRequest("GET", url, nil)
+				req := httptest.NewRequest("GET", url, http.NoBody)
 				r.ServeHTTP(res, req)
 
 				Convey("Then no request is sent to the release calendar handler", func() {
@@ -622,7 +622,7 @@ func TestRouter(t *testing.T) {
 				Convey("And the route prefix is not set", func() {
 					config.RelCalRoutePrefix = ""
 					r := router.New(config)
-					req := httptest.NewRequest("GET", url, nil)
+					req := httptest.NewRequest("GET", url, http.NoBody)
 					r.ServeHTTP(res, req)
 
 					Convey("Then the request is sent to the release calendar handler", func() {
@@ -635,7 +635,7 @@ func TestRouter(t *testing.T) {
 					prefix := "/test"
 					config.RelCalRoutePrefix = prefix
 					r := router.New(config)
-					req := httptest.NewRequest("GET", prefix+url, nil)
+					req := httptest.NewRequest("GET", prefix+url, http.NoBody)
 					r.ServeHTTP(res, req)
 
 					Convey("Then the request is sent to the release calendar handler", func() {
@@ -648,7 +648,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a malicious URL with a redirect attempt is made", func() {
 			url := "//%5cexample.com"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			w := httptest.NewRecorder()
 
 			r := router.New(config)
@@ -663,12 +663,12 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a legacy dataset request is made, but the dataset handler is not enabled", func() {
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			config.NewDatasetRoutingEnabled = false
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			newRouter := router.New(config)
+			newRouter.ServeHTTP(res, req)
 
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
@@ -686,7 +686,7 @@ func TestRouter(t *testing.T) {
 
 		Convey("When a legacy dataset request is made, and the dataset handler is enabled", func() {
 			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
-			req := httptest.NewRequest("GET", url, nil)
+			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			expectedZebedeeURL := "/data?uri=" + url
@@ -705,8 +705,8 @@ func TestRouter(t *testing.T) {
 			config.NewDatasetRoutingEnabled = true
 			config.ContentTypeByteLimit = 5 * 1000 * 1000
 
-			router := router.New(config)
-			router.ServeHTTP(res, req)
+			newRouter := router.New(config)
+			newRouter.ServeHTTP(res, req)
 
 			Convey("Then a request is sent to Zebedee to check the page type", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
