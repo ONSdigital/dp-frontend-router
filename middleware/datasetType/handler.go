@@ -1,4 +1,4 @@
-// nolint:revive,stylecheck // ignore var-naming Package name "datasetType" is kept for compatibility.
+//nolint:revive,stylecheck // ignore var-naming Package name "datasetType" is kept for compatibility.
 package datasetType
 
 import (

@@ -1,4 +1,4 @@
-// nolint:revive,stylecheck // ignore, Package name "allRoutes" is kept for compatibility.
+//nolint:revive,stylecheck // ignore, Package name "allRoutes" is kept for compatibility.
 package allRoutes
 
 import (

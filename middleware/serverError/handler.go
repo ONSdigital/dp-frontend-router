@@ -1,4 +1,4 @@
-// nolint:revive,stylecheck // ignore, Package name "serverError" is kept for compatibility.
+//nolint:revive,stylecheck // ignore, Package name "serverError" is kept for compatibility.
 package serverError
 
 // This whole package and process needs a refactor. Re-added file - take very little responsibility for anything in here
