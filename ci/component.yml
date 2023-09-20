@@ -9,7 +9,7 @@ image_resource:
     tag: 1.20.5
 
 inputs:
-  - name: dp-frontend-rouer
+  - name: dp-frontend-router
 
 run:
   path: dp-frontend-router/ci/scripts/component.sh
