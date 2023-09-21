@@ -55,7 +55,7 @@ func IsKnownBabbageEndpoint(path string) bool {
 }
 
 // isKnownBabbageEndpointMatcher is a mux MatcherFunc implementation, allowing routes to be matched on known babbage endpoints
-func isKnownBabbageEndpointMatcher(request *http.Request, match *mux.RouteMatch) bool {
+func isKnownBabbageEndpointMatcher(request *http.Request, _ *mux.RouteMatch) bool {
 	return IsKnownBabbageEndpoint(request.URL.Path)
 }
 
@@ -65,6 +65,6 @@ func HasFileExt(path string) bool {
 }
 
 // hasFileExtMatcher is a mux MatcherFunc implementation, allowing routes to be matched on having a file extension
-func hasFileExtMatcher(request *http.Request, match *mux.RouteMatch) bool {
+func hasFileExtMatcher(request *http.Request, _ *mux.RouteMatch) bool {
 	return HasFileExt(request.URL.Path)
 }

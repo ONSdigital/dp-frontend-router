@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	dprequest "github.com/ONSdigital/dp-net/request"
+	dprequest "github.com/ONSdigital/dp-net/v2/request"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -29,7 +29,7 @@ func TestRedirect(t *testing.T) {
 
 	Convey("Test that a non redirect request reaches the handler", t, func() {
 		handled = false
-		req, _ := http.NewRequest("GET", "/", nil)
+		req, _ := http.NewRequest("GET", "/", http.NoBody)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 200)
@@ -38,7 +38,7 @@ func TestRedirect(t *testing.T) {
 
 	Convey("Test that a redirect request returns a redirect", t, func() {
 		handled = false
-		req, _ := http.NewRequest("GET", "/redirect", nil)
+		req, _ := http.NewRequest("GET", "/redirect", http.NoBody)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 307)
@@ -58,7 +58,7 @@ func TestDynamicRedirect(t *testing.T) {
 	})
 
 	Convey("Test that a redirect request is redirected to the new url", t, func() {
-		req, _ := http.NewRequest("GET", "/original", nil)
+		req, _ := http.NewRequest("GET", "/original", http.NoBody)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 301)
@@ -67,7 +67,7 @@ func TestDynamicRedirect(t *testing.T) {
 	})
 
 	Convey("Test that a redirect request with a path extension is redirected to the new url with the same path extension", t, func() {
-		req, _ := http.NewRequest("GET", "/original/extension", nil)
+		req, _ := http.NewRequest("GET", "/original/extension", http.NoBody)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 301)
@@ -76,7 +76,7 @@ func TestDynamicRedirect(t *testing.T) {
 	})
 
 	Convey("Test that a redirect request with parameters is redirected to the new url with the same parameters", t, func() {
-		req, _ := http.NewRequest("GET", "/original?q=test&page=2", nil)
+		req, _ := http.NewRequest("GET", "/original?q=test&page=2", http.NoBody)
 		w := httptest.NewRecorder()
 		testAlice.ServeHTTP(w, req)
 		So(w.Code, ShouldEqual, 301)
@@ -155,7 +155,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
 		testAlice.ServeHTTP(nil, req)
@@ -172,7 +172,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
 		testAlice.ServeHTTP(nil, req)
@@ -195,7 +195,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
 		testAlice.ServeHTTP(nil, req)
@@ -218,7 +218,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
 		testAlice.ServeHTTP(nil, req)
@@ -241,7 +241,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
-	req, _ := http.NewRequest("GET", "/", nil)
+	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
 		testAlice.ServeHTTP(nil, req)

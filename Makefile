@@ -29,8 +29,9 @@ clean-assets:
 build: assets
 	go build -tags 'production' -o $(BINPATH)/dp-frontend-router -ldflags="-X 'main.BuildTime=$(BUILD_TIME)' -X 'main.GitCommit=$(GIT_COMMIT)' -X 'main.Version=$(VERSION)'"
 
+.PHONY: lint
 lint:
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.2
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.53.3
 	golangci-lint run ./...
 
 .PHONY: debug
@@ -46,3 +47,8 @@ debug-run: assets-debug
 .PHONY: test
 test: assets
 	go test -race -cover -tags 'production' ./...
+
+.PHONY: test-component
+test-component: ## does not run component test. Added as part of nomad pipeline
+	exit
+

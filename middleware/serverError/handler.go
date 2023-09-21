@@ -1,3 +1,4 @@
+//nolint:revive,stylecheck // ignore, Package name "serverError" is kept for compatibility.
 package serverError
 
 // This whole package and process needs a refactor. Re-added file - take very little responsibility for anything in here
@@ -105,7 +106,10 @@ func (rI *responseInterceptor) callRenderer(code int, title, description string)
 
 	log.Info(rI.req.Context(), "returning error page")
 	rI.ResponseWriter.WriteHeader(code)
-	rI.ResponseWriter.Write(b)
+	_, err = rI.ResponseWriter.Write(b)
+	if err != nil {
+		return fmt.Errorf("write error: %s", err)
+	}
 
 	return nil
 }
