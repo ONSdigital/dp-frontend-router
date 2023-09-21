@@ -13,6 +13,4 @@ inputs:
     path: dp-frontend-router
 
 run:
-  path: /bin/sh
-  args: [dp-frontend-router/ci/scripts/component.sh]
-  
+  path: dp-frontend-router/ci/scripts/component.sh
