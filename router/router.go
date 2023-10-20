@@ -106,6 +106,15 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
+		router.Handle("/alladhocs", cfg.SearchHandler)
+		router.Handle("/datalist", cfg.SearchHandler)
+		router.Handle("/allmethodologies", cfg.SearchHandler)
+		router.Handle("/publishedrequests", cfg.SearchHandler)
+		router.Handle("/staticlist", cfg.SearchHandler)
+		router.Handle("/publications", cfg.SearchHandler)
+		router.Handle("/topicspecificmethodology", cfg.SearchHandler)
+		router.Handle("/timeseriestool", cfg.SearchHandler)
+
 		router.Handle("/search", cfg.SearchHandler)
 	}
 
