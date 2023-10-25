@@ -41,8 +41,6 @@ type Config struct {
 	ZebedeeClient                allRoutes.ZebedeeClient
 	GeographyEnabled             bool
 	GeographyHandler             http.Handler
-	InteractivesEnabled          bool
-	InteractivesHandler          http.Handler
 	LegacySearchRedirectsEnabled bool
 	SearchRoutesEnabled          bool
 	SiteDomain                   string
@@ -117,10 +115,6 @@ func New(cfg Config) http.Handler {
 		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 
-	if cfg.InteractivesEnabled {
-		router.Handle("/interactives/{uri:.*}", cfg.InteractivesHandler)
-	}
-
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
 	router.MatcherFunc(hasFileExtMatcher).Handler(cfg.BabbageHandler)
 
@@ -148,7 +142,6 @@ func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		if req.URL.Path != "/embed" &&
 			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
-			!strings.HasPrefix(req.URL.Path, "/interactives/") &&
 			!strings.HasPrefix(req.URL.Path, "/census/maps/") {
 			w.Header().Set(HTTPHeaderKeyXFrameOptions, "SAMEORIGIN")
 		}
