@@ -7,6 +7,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
+	"errors"
 
 	"golang.org/x/net/netutil"
 
@@ -22,6 +23,10 @@ import (
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	dphttp "github.com/ONSdigital/dp-net/v2/http"
 	"github.com/ONSdigital/log.go/v2/log"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
+	"github.com/ONSdigital/dp-otel-go"
 )
 
 var (
@@ -44,6 +49,18 @@ func main() {
 	}
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
+
+	//Set up OpenTelemetry
+
+	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx)
+	if oErr != nil {
+		log.Fatal(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+		return
+	}
+	// Handle shutdown properly so nothing leaks.
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
 	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
@@ -80,11 +97,11 @@ func main() {
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
-		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
+	log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
 	}
 	hc := healthcheck.New(versionInfo, cfg.HealthcheckCriticalTimeout, cfg.HealthcheckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
-		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
+	log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 	}
 
 	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
@@ -123,7 +140,7 @@ func main() {
 		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,
 		PrefixDatasetHandler:         prefixDatasetHandler,
 		DatasetClient:                datasetClient,
-		HealthCheckHandler:           hc.Handler,
+		// HealthCheckHandler:           hc.Handler,
 		FilterHandler:                filterHandler,
 		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
@@ -151,17 +168,18 @@ func main() {
 	}
 
 	httpHandler := router.New(routerConfig)
+	otelHandler := otelhttp.NewHandler(httpHandler,"/")
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
-		Handler:      httpHandler,
+		Handler:      otelHandler,
 		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
 	}
-
-	// Start health check
+	
+    // Start health check
 	hc.Start(ctx)
 
 	// Create a LimitListener to cap concurrent http connections
@@ -209,6 +227,9 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
+
+		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
+
 		director(req)
 	}
 	return proxy
