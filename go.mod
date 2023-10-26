@@ -2,14 +2,13 @@ module github.com/ONSdigital/dp-frontend-router
 
 go 1.20
 
-replace github.com/ONSdigital/dp-otel-go => ../dp-otel-go/
-
 require (
 	github.com/ONSdigital/dp-api-clients-go/v2 v2.254.1
 	github.com/ONSdigital/dp-cookies v0.4.0
 	github.com/ONSdigital/dp-healthcheck v1.6.1
 	github.com/ONSdigital/dp-net/v2 v2.11.0
 	github.com/ONSdigital/log.go/v2 v2.4.1
+	github.com/ONSdigital/dp-otel-go v0.0.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.24.5
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
@@ -22,7 +21,6 @@ require (
 )
 
 require (
-	github.com/ONSdigital/dp-otel-go v0.0.0-00010101000000-000000000000 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.21.0 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.37 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.13.11 // indirect
