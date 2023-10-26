@@ -7,7 +7,6 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"time"
-	"os"
 	"errors"
 
 	"golang.org/x/net/netutil"
@@ -52,11 +51,11 @@ func main() {
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
 	//Set up OpenTelemetry
-	serviceName := os.Getenv("OTEL_SERVICE_NAME")
-	serviceVersion := Version
-	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, serviceName, serviceVersion)
+
+	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx)
 	if oErr != nil {
 		log.Fatal(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+		return
 	}
 	// Handle shutdown properly so nothing leaks.
 	defer func() {
