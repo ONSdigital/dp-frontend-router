@@ -8,7 +8,7 @@ require (
 	github.com/ONSdigital/dp-healthcheck v1.6.1
 	github.com/ONSdigital/dp-net/v2 v2.11.0
 	github.com/ONSdigital/log.go/v2 v2.4.1
-	github.com/ONSdigital/dp-otel-go v0.0.1
+	github.com/ONSdigital/dp-otel-go v0.0.2
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.24.5
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible

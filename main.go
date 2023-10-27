@@ -27,6 +27,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"github.com/ONSdigital/dp-otel-go"
+	"go.opentelemetry.io/otel/trace"
+	"github.com/ONSdigital/dp-net/v2/request"
 )
 
 var (
@@ -51,11 +53,9 @@ func main() {
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
 	//Set up OpenTelemetry
-
 	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx)
 	if oErr != nil {
 		log.Fatal(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
-		return
 	}
 	// Handle shutdown properly so nothing leaks.
 	defer func() {
@@ -209,6 +209,9 @@ func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error
 }
 
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
+	
+	
+	// the http server needs to be instrumented for tracing
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{
@@ -223,14 +226,19 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		log.Info(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
+		//add OTEL traceid into context
+		traceId := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
+		ctx := context.WithValue(req.Context(), request.RequestIdKey, traceId)
+		newReq := req.WithContext(ctx)
+
+		log.Info(newReq.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
 
-		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
+		otel.GetTextMapPropagator().Inject(newReq.Context(), propagation.HeaderCarrier(newReq.Header))
 
-		director(req)
+		director(newReq)
 	}
 	return proxy
 }
