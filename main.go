@@ -97,11 +97,11 @@ func main() {
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
 	if err != nil {
-	log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
+		log.Fatal(ctx, "Failed to obtain VersionInfo for healthcheck", err)
 	}
 	hc := healthcheck.New(versionInfo, cfg.HealthcheckCriticalTimeout, cfg.HealthcheckInterval)
 	if err = hc.AddCheck("API router", zebedeeClient.Checker); err != nil {
-	log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
+		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 	}
 
 	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
@@ -140,7 +140,7 @@ func main() {
 		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,
 		PrefixDatasetHandler:         prefixDatasetHandler,
 		DatasetClient:                datasetClient,
-		// HealthCheckHandler:           hc.Handler,
+		HealthCheckHandler:           hc.Handler,
 		FilterHandler:                filterHandler,
 		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
