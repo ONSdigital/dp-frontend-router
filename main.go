@@ -207,9 +207,6 @@ func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error
 }
 
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
-	
-	
-	// the http server needs to be instrumented for tracing
 	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
 	director := proxy.Director
 	proxy.Transport = &http.Transport{

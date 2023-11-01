@@ -15,7 +15,6 @@ import (
 	"github.com/justinas/alice"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"github.com/ONSdigital/dp-otel-go"
-
 )
 
 const (
