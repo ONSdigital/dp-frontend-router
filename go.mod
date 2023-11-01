@@ -7,8 +7,8 @@ require (
 	github.com/ONSdigital/dp-cookies v0.4.0
 	github.com/ONSdigital/dp-healthcheck v1.6.1
 	github.com/ONSdigital/dp-net/v2 v2.11.0
-	github.com/ONSdigital/log.go/v2 v2.4.1
 	github.com/ONSdigital/dp-otel-go v0.0.2
+	github.com/ONSdigital/log.go/v2 v2.4.1
 	github.com/aws/aws-sdk-go-v2/config v1.18.39
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.24.5
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
@@ -17,6 +17,9 @@ require (
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/smartystreets/goconvey v1.8.1
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0
+	go.opentelemetry.io/otel v1.19.0
+	go.opentelemetry.io/otel/trace v1.19.0
 	golang.org/x/net v0.15.0
 )
 
@@ -46,18 +49,15 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/smarty/assertions v1.15.1 // indirect
-	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.45.0 // indirect
 	go.opentelemetry.io/contrib/propagators/autoprop v0.45.0 // indirect
 	go.opentelemetry.io/contrib/propagators/aws v1.20.0 // indirect
 	go.opentelemetry.io/contrib/propagators/b3 v1.20.0 // indirect
 	go.opentelemetry.io/contrib/propagators/jaeger v1.20.0 // indirect
 	go.opentelemetry.io/contrib/propagators/ot v1.20.0 // indirect
-	go.opentelemetry.io/otel v1.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.19.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.19.0 // indirect
 	go.opentelemetry.io/otel/metric v1.19.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.19.0 // indirect
-	go.opentelemetry.io/otel/trace v1.19.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/sys v0.12.0 // indirect

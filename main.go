@@ -27,8 +27,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
 	"github.com/ONSdigital/dp-otel-go"
-	"go.opentelemetry.io/otel/trace"
-	"github.com/ONSdigital/dp-net/v2/request"
 )
 
 var (
@@ -226,19 +224,12 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	proxy.Director = func(req *http.Request) {
-		//add OTEL traceid into context
-		traceId := trace.SpanFromContext(req.Context()).SpanContext().TraceID().String()
-		ctx := context.WithValue(req.Context(), request.RequestIdKey, traceId)
-		newReq := req.WithContext(ctx)
-
-		log.Info(newReq.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
+		log.Info(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
-
-		otel.GetTextMapPropagator().Inject(newReq.Context(), propagation.HeaderCarrier(newReq.Header))
-
-		director(newReq)
+		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
+		director(req)
 	}
 	return proxy
 }

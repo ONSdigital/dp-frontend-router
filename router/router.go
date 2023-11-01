@@ -13,6 +13,9 @@ import (
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"github.com/ONSdigital/dp-otel-go"
+
 )
 
 const (
@@ -63,6 +66,8 @@ func New(cfg Config) http.Handler {
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
+		dpotelgo.OtelLoggingMiddleware,
+		otelhttp.NewMiddleware("dp-frontend-router"),
 		log.Middleware,
 		SecurityHandler,
 		healthcheckHandler(cfg.HealthCheckHandler),
