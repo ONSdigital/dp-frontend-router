@@ -33,8 +33,6 @@ type Config struct {
 	HealthcheckInterval             time.Duration `envconfig:"HEALTHCHECK_INTERVAL"`
 	HomepageControllerURL           string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	HTTPMaxConnections              int           `envconfig:"HTTP_MAX_CONNECTIONS"`
-	InteractivesControllerURL       string        `envconfig:"INTERACTIVES_CONTROLLER_URL"`
-	InteractivesRoutesEnabled       bool          `envconfig:"INTERACTIVES_ROUTES_ENABLED"`
 	LegacySearchRedirectsEnabled    bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
 	NewDatasetRoutingEnabled        bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
 	PatternLibraryAssetsPath        string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
@@ -90,8 +88,6 @@ func Get() (*Config, error) {
 		HealthcheckInterval:          30 * time.Second,
 		HomepageControllerURL:        "http://localhost:24400",
 		HTTPMaxConnections:           0,
-		InteractivesControllerURL:    "http://localhost:27300",
-		InteractivesRoutesEnabled:    false,
 		LegacySearchRedirectsEnabled: false,
 		NewDatasetRoutingEnabled:     false,
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
