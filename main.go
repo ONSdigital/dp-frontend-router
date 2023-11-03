@@ -195,6 +195,7 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 	}
 	l.Close()
+	otelShutdown(ctx)
 }
 
 func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
