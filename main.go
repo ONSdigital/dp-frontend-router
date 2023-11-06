@@ -172,8 +172,8 @@ func main() {
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
 	}
-	
-    // Start health check
+
+	// Start health check
 	hc.Start(ctx)
 
 	// Create a LimitListener to cap concurrent http connections

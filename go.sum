@@ -7,10 +7,16 @@ github.com/ONSdigital/dp-healthcheck v1.6.1/go.mod h1:FURB2RUJHw3lssamKtsGsrbu31
 github.com/ONSdigital/dp-mocking v0.10.1 h1:yEEglJ458kUztHlnGxhMiKhIr13gMYWYOBKFbCbp89M=
 github.com/ONSdigital/dp-net/v2 v2.11.0 h1:XXst84GpXhBiyKoqLuohR7CvzrCBfSkq6YsveTarlt4=
 github.com/ONSdigital/dp-net/v2 v2.11.0/go.mod h1:4T3GgoonNt2nZZJJer9cx7j/3XGJ1UhTp16flx+uDeA=
+github.com/ONSdigital/dp-net/v2 v2.11.1 h1:9/G1MnofoqHaFtugOd6DJVsKfQumsYeDkMHnz66gOig=
+github.com/ONSdigital/dp-net/v2 v2.11.1/go.mod h1:DMWNEpS/HE42rZMDOMNBZF/iNuEMk/y4Ohejq8DHkNM=
 github.com/ONSdigital/dp-otel-go v0.0.1 h1:L9+lFx4hmdmPssc/jBcwkESf9ljGEnsNnMhwkGkTMPM=
 github.com/ONSdigital/dp-otel-go v0.0.1/go.mod h1:/9D6JxcOjPQ19EVLYkyGpU6IFtODXRBMRQUg+GNE7FU=
 github.com/ONSdigital/dp-otel-go v0.0.2 h1:pBxJ3LXucXNLnBDOmBRw56ES8FAV0wa48dWQiSEdhR8=
 github.com/ONSdigital/dp-otel-go v0.0.2/go.mod h1:/9D6JxcOjPQ19EVLYkyGpU6IFtODXRBMRQUg+GNE7FU=
+github.com/ONSdigital/dp-otel-go v0.0.3 h1:M35nZ+9+cbLf/uIg2WM6c4yB+Eju4EHJ2Hgv7P6srhQ=
+github.com/ONSdigital/dp-otel-go v0.0.3/go.mod h1:/9D6JxcOjPQ19EVLYkyGpU6IFtODXRBMRQUg+GNE7FU=
+github.com/ONSdigital/dp-otel-go v0.0.4 h1:I+DvOKv+2MAjR6zeqtuEpC4sl0eY7rpie39R6XIOH9k=
+github.com/ONSdigital/dp-otel-go v0.0.4/go.mod h1:cjWXtz5kAw4ZiZDAQDfUXcoccD09i/ovoiS5oATLfpE=
 github.com/ONSdigital/log.go/v2 v2.4.1 h1:QAHQqtXgXx43OUTSebNAocVfN21RwrHzagN6zDAzwdo=
 github.com/ONSdigital/log.go/v2 v2.4.1/go.mod h1:hJTjxs9r8k49maNelGpL4SBWv8NG45vCKp15+6ce9bw=
 github.com/aws/aws-sdk-go-v2 v1.21.2 h1:+LXZ0sgo8quN9UOKXXzAWRT3FWd4NxeXWOZom9pE7GA=
