@@ -42,7 +42,6 @@ type Config struct {
 	ReleaseCalendarEnabled          bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
 	ReleaseCalendarRoutePrefix      string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	ReleaseCalendarABTestPercentage int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
-	RendererURL                     string        `envconfig:"RENDERER_URL"`
 	SearchControllerURL             string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	DataAggregationPagesEnabled     bool          `envconfig:"DATA_AGGREGATION_PAGES_ENABLED"`
 	SearchRoutesEnabled             bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
@@ -96,7 +95,6 @@ func Get() (*Config, error) {
 		RedirectSecret:               "secret",
 		ReleaseCalendarControllerURL: "http://localhost:27700",
 		ReleaseCalendarEnabled:       false,
-		RendererURL:                  "http://localhost:20010",
 		SearchControllerURL:          "http://localhost:25000",
 		DataAggregationPagesEnabled:  true,
 		SearchRoutesEnabled:          true,
