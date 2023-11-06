@@ -74,7 +74,6 @@ func main() {
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
 	areaProfileControllerURL, _ := parseURL(ctx, cfg.AreaProfilesControllerURL, "AreaProfileControllerURL")
 	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
-	interactivesControllerURL, _ := parseURL(ctx, cfg.InteractivesControllerURL, "InteractivesControllerURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	enableRelCalABTest := config.IsEnabledRelCalABTest(*cfg)
@@ -119,7 +118,6 @@ func main() {
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
-	interactivesHandler := createReverseProxy("interactives", interactivesControllerURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 	var geographyHandler http.Handler
 	if cfg.AreaProfilesRoutesEnabled {
@@ -153,8 +151,6 @@ func main() {
 		RelCalRoutePrefix:            cfg.ReleaseCalendarRoutePrefix,
 		RelCalEnableABTest:           enableRelCalABTest,
 		RelCalABTestPercentage:       cfg.ReleaseCalendarABTestPercentage,
-		InteractivesHandler:          interactivesHandler,
-		InteractivesEnabled:          cfg.InteractivesRoutesEnabled,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,
