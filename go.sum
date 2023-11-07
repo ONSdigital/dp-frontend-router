@@ -17,6 +17,8 @@ github.com/ONSdigital/dp-otel-go v0.0.3 h1:M35nZ+9+cbLf/uIg2WM6c4yB+Eju4EHJ2Hgv7
 github.com/ONSdigital/dp-otel-go v0.0.3/go.mod h1:/9D6JxcOjPQ19EVLYkyGpU6IFtODXRBMRQUg+GNE7FU=
 github.com/ONSdigital/dp-otel-go v0.0.4 h1:I+DvOKv+2MAjR6zeqtuEpC4sl0eY7rpie39R6XIOH9k=
 github.com/ONSdigital/dp-otel-go v0.0.4/go.mod h1:cjWXtz5kAw4ZiZDAQDfUXcoccD09i/ovoiS5oATLfpE=
+github.com/ONSdigital/dp-otel-go v0.0.5 h1:xhhlWasvrhWCVOLcxhf1fMyPETxHofSWXLaniOr5UVg=
+github.com/ONSdigital/dp-otel-go v0.0.5/go.mod h1:cjWXtz5kAw4ZiZDAQDfUXcoccD09i/ovoiS5oATLfpE=
 github.com/ONSdigital/log.go/v2 v2.4.1 h1:QAHQqtXgXx43OUTSebNAocVfN21RwrHzagN6zDAzwdo=
 github.com/ONSdigital/log.go/v2 v2.4.1/go.mod h1:hJTjxs9r8k49maNelGpL4SBWv8NG45vCKp15+6ce9bw=
 github.com/aws/aws-sdk-go-v2 v1.21.2 h1:+LXZ0sgo8quN9UOKXXzAWRT3FWd4NxeXWOZom9pE7GA=
