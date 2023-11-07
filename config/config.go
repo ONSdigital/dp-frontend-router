@@ -35,6 +35,9 @@ type Config struct {
 	HTTPMaxConnections              int           `envconfig:"HTTP_MAX_CONNECTIONS"`
 	LegacySearchRedirectsEnabled    bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
 	NewDatasetRoutingEnabled        bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
+	OTExporterOTLPEndpoint          string        `encconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	OTServiceName                   string        `encconfig:"OTEL_SERVICE_NAME"`
+	OTBatchTimeout                  time.Duration `encconfig:"OTEL_BATCH_TIMEOUT"`
 	PatternLibraryAssetsPath        string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ProxyTimeout                    time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RedirectSecret                  string        `envconfig:"REDIRECT_SECRET" json:"-"`

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -21,7 +22,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	dphttp "github.com/ONSdigital/dp-net/v2/http"
+	"github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 var (
@@ -44,6 +49,22 @@ func main() {
 	}
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
+
+	// Set up OpenTelemetry
+	otelConfig := dpotelgo.Config{
+		OtelServiceName:          cfg.OTServiceName,
+		OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
+		OtelBatchTimeout:         cfg.OTBatchTimeout,
+	}
+
+	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+	if oErr != nil {
+		log.Fatal(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+	}
+	// Handle shutdown properly so nothing leaks.
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
 	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
@@ -147,11 +168,12 @@ func main() {
 	}
 
 	httpHandler := router.New(routerConfig)
+	otelHandler := otelhttp.NewHandler(httpHandler, "/")
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
-		Handler:      httpHandler,
+		Handler:      otelHandler,
 		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
@@ -175,6 +197,10 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 	}
 	l.Close()
+	err = otelShutdown(ctx)
+	if err != nil {
+		log.Fatal(ctx, "error shutting down opentelemettry", err)
+	}
 }
 
 func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
@@ -205,6 +231,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 			"destination": proxyURL,
 			"proxy_name":  proxyName,
 		})
+		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
 		director(req)
 	}
 	return proxy
