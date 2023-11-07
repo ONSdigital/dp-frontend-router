@@ -2,12 +2,12 @@ package main
 
 import (
 	"context"
+	"errors"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"time"
-	"errors"
 
 	"golang.org/x/net/netutil"
 
@@ -22,11 +22,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
 	dphttp "github.com/ONSdigital/dp-net/v2/http"
+	"github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/propagation"
-	"github.com/ONSdigital/dp-otel-go"
 )
 
 var (
@@ -50,11 +50,11 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
-	//Set up OpenTelemetry
+	// Set up OpenTelemetry
 	otelConfig := dpotelgo.Config{
-		OtelServiceName: cfg.OTServiceName,
+		OtelServiceName:          cfg.OTServiceName,
 		OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
-		OtelBatchTimeout: cfg.OTBatchTimeout,
+		OtelBatchTimeout:         cfg.OTBatchTimeout,
 	}
 
 	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
@@ -168,7 +168,7 @@ func main() {
 	}
 
 	httpHandler := router.New(routerConfig)
-	otelHandler := otelhttp.NewHandler(httpHandler,"/")
+	otelHandler := otelhttp.NewHandler(httpHandler, "/")
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
@@ -197,7 +197,10 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 	}
 	l.Close()
-	otelShutdown(ctx)
+	err = otelShutdown(ctx)
+	if err != nil {
+		log.Fatal(ctx, "error shutting down opentelemettry", err)
+	}
 }
 
 func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
