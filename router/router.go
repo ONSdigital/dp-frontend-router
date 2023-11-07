@@ -10,11 +10,11 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/v2/request"
+	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"github.com/ONSdigital/dp-otel-go"
 )
 
 const (
