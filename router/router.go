@@ -8,7 +8,6 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
-	"github.com/ONSdigital/dp-frontend-router/middleware/serverError"
 	dprequest "github.com/ONSdigital/dp-net/v2/request"
 	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -68,7 +67,6 @@ func New(cfg Config) http.Handler {
 		log.Middleware,
 		SecurityHandler,
 		healthcheckHandler(cfg.HealthCheckHandler),
-		serverError.Handler,
 		redirects.Handler,
 	}
 
