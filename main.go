@@ -59,7 +59,7 @@ func main() {
 
 	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
 	if oErr != nil {
-		log.Fatal(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+		log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
 	}
 	// Handle shutdown properly so nothing leaks.
 	defer func() {
