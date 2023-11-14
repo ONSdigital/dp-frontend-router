@@ -35,9 +35,9 @@ type Config struct {
 	HTTPMaxConnections              int           `envconfig:"HTTP_MAX_CONNECTIONS"`
 	LegacySearchRedirectsEnabled    bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
 	NewDatasetRoutingEnabled        bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
-	OTExporterOTLPEndpoint          string        `encconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
-	OTServiceName                   string        `encconfig:"OTEL_SERVICE_NAME"`
-	OTBatchTimeout                  time.Duration `encconfig:"OTEL_BATCH_TIMEOUT"`
+	OTExporterOTLPEndpoint          string        `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	OTServiceName                   string        `envconfig:"OTEL_SERVICE_NAME"`
+	OTBatchTimeout                  time.Duration `envconfig:"OTEL_BATCH_TIMEOUT"`
 	PatternLibraryAssetsPath        string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ProxyTimeout                    time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RedirectSecret                  string        `envconfig:"REDIRECT_SECRET" json:"-"`
@@ -92,6 +92,9 @@ func Get() (*Config, error) {
 		HTTPMaxConnections:           0,
 		LegacySearchRedirectsEnabled: false,
 		NewDatasetRoutingEnabled:     false,
+		OTExporterOTLPEndpoint:       "localhost:4317",
+		OTServiceName:                "dp-frontend-router",
+		OTBatchTimeout:               5 * time.Second,
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		ProxyTimeout:                 5 * time.Second,
 		RedirectSecret:               "secret",
