@@ -9,7 +9,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	dprequest "github.com/ONSdigital/dp-net/v2/request"
-	// dpotelgo "github.com/ONSdigital/dp-otel-go"
+
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"

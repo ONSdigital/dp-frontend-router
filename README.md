@@ -32,6 +32,9 @@
 | PROXY_TIMEOUT                    | 5s                                        | The write timeout for proxied requests                                                   |
 | NEW_DATASET_ROUTING_ENABLED      | false                                     | Flag to enable dataset page routing to dp-frontend-dataset-controller instead of babbage |
 | DATASET_FINDER_ENABLED           | false                                     | Flag to enabled routing to dataset finder page in search                                 |
+| OTEL_EXPORTER_OTLP_ENDPOINT      | localhost:4317                            | Host and port for the OpenTelemetry endpoint                                             |
+| OTEL_SERVICE_NAME                | dp-frontend-router                        | Service name to report to telemetry tools                                                |
+| OTEL_BATCH_TIMEOUT               | 5s                                        | Interval between pushes to OT Collector                                                  |
 
 ### Licence
 
