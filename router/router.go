@@ -23,38 +23,39 @@ const (
 type Handler http.Handler
 
 type Config struct {
-	HealthCheckHandler           func(w http.ResponseWriter, req *http.Request)
-	AnalyticsHandler             http.Handler
-	AreaProfileEnabled           bool
-	AreaProfileHandler           http.Handler
-	DownloadHandler              http.Handler
-	DatasetHandler               http.Handler
-	DatasetClient                datasetType.DatasetClient
-	NewDatasetRoutingEnabled     bool
-	PrefixDatasetHandler         http.Handler
-	CookieHandler                http.Handler
-	FilterHandler                http.Handler
-	FilterFlexHandler            http.Handler
-	FilterClient                 datasetType.FilterClient
-	FeedbackHandler              http.Handler
-	ContentTypeByteLimit         int
-	ZebedeeClient                allRoutes.ZebedeeClient
-	GeographyEnabled             bool
-	GeographyHandler             http.Handler
-	LegacySearchRedirectsEnabled bool
-	SearchRoutesEnabled          bool
-	SiteDomain                   string
-	SearchHandler                http.Handler
-	RelCalHandler                http.Handler
-	RelCalEnabled                bool
-	RelCalRoutePrefix            string
-	RelCalEnableABTest           bool
-	RelCalABTestPercentage       int
-	HomepageHandler              http.Handler
-	BabbageHandler               http.Handler
-	CensusAtlasHandler           http.Handler
-	CensusAtlasEnabled           bool
-	DatasetFinderEnabled         bool
+	HealthCheckHandler             func(w http.ResponseWriter, req *http.Request)
+	AnalyticsHandler               http.Handler
+	AreaProfileEnabled             bool
+	AreaProfileHandler             http.Handler
+	DownloadHandler                http.Handler
+	DatasetHandler                 http.Handler
+	DatasetClient                  datasetType.DatasetClient
+	NewDatasetRoutingEnabled       bool
+	PrefixDatasetHandler           http.Handler
+	CookieHandler                  http.Handler
+	FilterHandler                  http.Handler
+	FilterFlexHandler              http.Handler
+	FilterClient                   datasetType.FilterClient
+	FeedbackHandler                http.Handler
+	ContentTypeByteLimit           int
+	ZebedeeClient                  allRoutes.ZebedeeClient
+	GeographyEnabled               bool
+	GeographyHandler               http.Handler
+	LegacySearchRedirectsEnabled   bool
+	NewDataAggregationPagesEnabled bool
+	SearchRoutesEnabled            bool
+	SiteDomain                     string
+	SearchHandler                  http.Handler
+	RelCalHandler                  http.Handler
+	RelCalEnabled                  bool
+	RelCalRoutePrefix              string
+	RelCalEnableABTest             bool
+	RelCalABTestPercentage         int
+	HomepageHandler                http.Handler
+	BabbageHandler                 http.Handler
+	CensusAtlasHandler             http.Handler
+	CensusAtlasEnabled             bool
+	DatasetFinderEnabled           bool
 }
 
 func New(cfg Config) http.Handler {
@@ -106,15 +107,17 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
-		router.Handle("/alladhocs", cfg.SearchHandler)
-		router.Handle("/datalist", cfg.SearchHandler)
-		router.Handle("/allmethodologies", cfg.SearchHandler)
-		router.Handle("/publishedrequests", cfg.SearchHandler)
-		router.Handle("/staticlist", cfg.SearchHandler)
-		router.Handle("/publications", cfg.SearchHandler)
-		router.Handle("/topicspecificmethodology", cfg.SearchHandler)
-		router.Handle("/timeseriestool", cfg.SearchHandler)
-
+		//needs both the SearchRoutesEnabled and NewDataAggregationPagesEnabled since it relies on the SearchHandler
+		if cfg.NewDataAggregationPagesEnabled {
+			router.Handle("/alladhocs", cfg.SearchHandler)
+			router.Handle("/datalist", cfg.SearchHandler)
+			router.Handle("/allmethodologies", cfg.SearchHandler)
+			router.Handle("/publishedrequests", cfg.SearchHandler)
+			router.Handle("/staticlist", cfg.SearchHandler)
+			router.Handle("/publications", cfg.SearchHandler)
+			router.Handle("/topicspecificmethodology", cfg.SearchHandler)
+			router.Handle("/timeseriestool", cfg.SearchHandler)
+		}
 		router.Handle("/search", cfg.SearchHandler)
 	}
 
