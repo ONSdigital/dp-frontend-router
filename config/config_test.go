@@ -62,14 +62,14 @@ func TestIsEnabledRelCalABTest(t *testing.T) {
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 0}), ShouldBeFalse)
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: -1}), ShouldBeFalse)
 		})
-		Convey("false when ReleaseCalendarABTestPercentage is >= 100", func() {
-			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 100}), ShouldBeFalse)
+		Convey("false when ReleaseCalendarABTestPercentage is > 100", func() {
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 101}), ShouldBeFalse)
 		})
-		Convey("true when EnableReleaseCalendarABTest is true and ReleaseCalendarABTestPercentage is >0 and <100", func() {
+		Convey("true when EnableReleaseCalendarABTest is true and ReleaseCalendarABTestPercentage is >0 and <=100", func() {
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 1}), ShouldBeTrue)
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 99}), ShouldBeTrue)
 			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 50}), ShouldBeTrue)
+			So(IsEnabledRelCalABTest(Config{EnableReleaseCalendarABTest: true, ReleaseCalendarABTestPercentage: 100}), ShouldBeTrue)
 		})
 	})
 }
