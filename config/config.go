@@ -42,7 +42,6 @@ type Config struct {
 	ReleaseCalendarEnabled          bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
 	ReleaseCalendarRoutePrefix      string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	ReleaseCalendarABTestPercentage int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
-	RendererURL                     string        `envconfig:"RENDERER_URL"`
 	SearchControllerURL             string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	NewDataAggregationPagesEnabled  bool          `envconfig:"NEW_DATA_AGGREGATION_PAGES_ENABLED"`
 	SearchRoutesEnabled             bool          `envconfig:"SEARCH_ROUTES_ENABLED"`

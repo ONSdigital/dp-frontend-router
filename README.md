@@ -7,7 +7,6 @@
 | BIND_ADDR                        | :20000                                    | The host and port to bind to.                                                            |
 | HTTP_MAX_CONNECTIONS             | 0                                         | Limit the number of concurrent http connections (0 = unlimited)                          | 
 | BABBAGE_URL                      | <https://localhost:8080>                  | The URL of the babbage instance to use                                                   |
-| RENDERER_URL                     | <http://localhost:20010>                  | The URL of dp-frontend-renderer                                                          |
 | COOKIES_CONTROLLER_URL           | <http://localhost:24100>                  | The URL of dp-frontend-cookie-controller                                                 |
 | HOMEPAGE_CONTROLLER_URL          | <http://localhost:24400>                  | The URL of dp-frontend-dataset-controller                                                |
 | DATASET_CONTROLLER_URL           | <http://localhost:20200>                  | The URL of dp-frontend-dataset-controller                                                |
