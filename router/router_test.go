@@ -351,7 +351,7 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
-			config.NewDataAggregationPagesEnabled = false
+			config.DataAggregationPagesEnabled = false
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then no request is sent to the search handler", func() {
@@ -367,7 +367,7 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
-			config.NewDataAggregationPagesEnabled = true
+			config.DataAggregationPagesEnabled = true
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then no requests are sent to Zebedee", func() {
