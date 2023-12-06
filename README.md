@@ -15,7 +15,7 @@
 | GEOGRAPHY_ENABLED                | false                                     | Geography feature toggle                                                                 |
 | FEEDBACK_CONTROLLER_URL          | <http://localhost:25200>                  | The URL of dp-frontend-feedback-controller                                               |
 | SEARCH_CONTROLLER_URL            | <http://localhost:25000>                  | The URL of dp-frontend-search-controller                                                 |
-| NEW_DATA_AGGREGATION_PAGES_ENABLED   | true                                     | Enables the new data aggregation pages                                                             |
+| DATA_AGGREGATION_PAGES_ENABLED   | true                                     | Enables the new data aggregation pages                                                             |
 | SEARCH_ROUTES_ENABLED            | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                   | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                   | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
