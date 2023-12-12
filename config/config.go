@@ -103,7 +103,7 @@ func Get() (*Config, error) {
 		ReleaseCalendarEnabled:       false,
 		SearchControllerURL:          "http://localhost:25000",
 		SearchRoutesEnabled:          true,
-		DataAggregationPagesEnabled:  true,
+		DataAggregationPagesEnabled:  false,
 		SiteDomain:                   "ons.gov.uk",
 		SQSAnalyticsURL:              "",
 		ZebedeeRequestMaximumRetries: 0,

@@ -351,6 +351,7 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
+			config.SearchRoutesEnabled = true
 			config.DataAggregationPagesEnabled = false
 			r := router.New(config)
 			r.ServeHTTP(res, req)
@@ -367,6 +368,7 @@ func TestRouter(t *testing.T) {
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
+			config.SearchRoutesEnabled = true
 			config.DataAggregationPagesEnabled = true
 			r := router.New(config)
 			r.ServeHTTP(res, req)
