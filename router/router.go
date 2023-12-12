@@ -42,6 +42,7 @@ type Config struct {
 	GeographyEnabled             bool
 	GeographyHandler             http.Handler
 	LegacySearchRedirectsEnabled bool
+	DataAggregationPagesEnabled  bool
 	SearchRoutesEnabled          bool
 	SiteDomain                   string
 	SearchHandler                http.Handler
@@ -106,6 +107,17 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.SearchRoutesEnabled {
+		//needs both the SearchRoutesEnabled and DataAggregationPagesEnabled since it relies on the SearchHandler
+		if cfg.DataAggregationPagesEnabled {
+			router.Handle("/alladhocs", cfg.SearchHandler)
+			router.Handle("/datalist", cfg.SearchHandler)
+			router.Handle("/allmethodologies", cfg.SearchHandler)
+			router.Handle("/publishedrequests", cfg.SearchHandler)
+			router.Handle("/staticlist", cfg.SearchHandler)
+			router.Handle("/publications", cfg.SearchHandler)
+			router.Handle("/topicspecificmethodology", cfg.SearchHandler)
+			router.Handle("/timeseriestool", cfg.SearchHandler)
+		}
 		router.Handle("/search", cfg.SearchHandler)
 	}
 

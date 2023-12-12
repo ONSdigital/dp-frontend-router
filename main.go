@@ -150,6 +150,7 @@ func main() {
 		GeographyEnabled:             cfg.GeographyEnabled,
 		GeographyHandler:             geographyHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
+		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
 		SearchRoutesEnabled:          cfg.SearchRoutesEnabled,
 		SearchHandler:                searchHandler,
 		RelCalHandler:                relcalHandler,

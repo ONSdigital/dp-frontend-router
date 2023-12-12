@@ -46,6 +46,7 @@ type Config struct {
 	ReleaseCalendarRoutePrefix      string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	ReleaseCalendarABTestPercentage int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
 	SearchControllerURL             string        `envconfig:"SEARCH_CONTROLLER_URL"`
+	DataAggregationPagesEnabled     bool          `envconfig:"DATA_AGGREGATION_PAGES_ENABLED"`
 	SearchRoutesEnabled             bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	SiteDomain                      string        `envconfig:"SITE_DOMAIN"`
 	SQSAnalyticsURL                 string        `envconfig:"SQS_ANALYTICS_URL"`
@@ -101,6 +102,7 @@ func Get() (*Config, error) {
 		ReleaseCalendarControllerURL: "http://localhost:27700",
 		ReleaseCalendarEnabled:       false,
 		SearchControllerURL:          "http://localhost:25000",
+		DataAggregationPagesEnabled:  true,
 		SearchRoutesEnabled:          true,
 		SiteDomain:                   "ons.gov.uk",
 		SQSAnalyticsURL:              "",
