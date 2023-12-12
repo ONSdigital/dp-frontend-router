@@ -40,7 +40,6 @@ type Config struct {
 	RedirectSecret                  string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	ReleaseCalendarControllerURL    string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	ReleaseCalendarEnabled          bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
-	RendererURL                     string        `envconfig:"RENDERER_URL"`
 	ReleaseCalendarRoutePrefix      string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	ReleaseCalendarABTestPercentage int           `envconfig:"RELEASE_CALENDAR_AB_TEST_PERCENTAGE"`
 	SearchControllerURL             string        `envconfig:"SEARCH_CONTROLLER_URL"`
@@ -96,7 +95,6 @@ func Get() (*Config, error) {
 		RedirectSecret:               "secret",
 		ReleaseCalendarControllerURL: "http://localhost:27700",
 		ReleaseCalendarEnabled:       false,
-		RendererURL:                  "http://localhost:20010",
 		SearchControllerURL:          "http://localhost:25000",
 		DataAggregationPagesEnabled:  true,
 		SearchRoutesEnabled:          true,
