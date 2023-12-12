@@ -126,7 +126,7 @@ func Get() (*Config, error) {
 // IsEnabledRelCalABTest checks whether ab test is enabled and that percentage is a sensible int value
 func IsEnabledRelCalABTest(cfg Config) bool {
 	percentage := cfg.ReleaseCalendarABTestPercentage
-	if cfg.EnableReleaseCalendarABTest && percentage > 0 && percentage < 100 {
+	if cfg.EnableReleaseCalendarABTest && percentage > 0 && percentage <= 100 {
 		return true
 	}
 	return false
