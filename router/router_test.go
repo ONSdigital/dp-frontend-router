@@ -79,7 +79,6 @@ func TestRouter(t *testing.T) {
 		filterFlexHandler := NewHandlerMock()
 		feedbackHandler := NewHandlerMock()
 		babbageHandler := NewHandlerMock()
-		geographyHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
 		censusAtlasHandler := NewHandlerMock()
 		releaseCalendarHandler := NewHandlerMock()
@@ -118,7 +117,6 @@ func TestRouter(t *testing.T) {
 			FeedbackHandler:      feedbackHandler,
 			ZebedeeClient:        zebedeeClient,
 			BabbageHandler:       babbageHandler,
-			GeographyHandler:     geographyHandler,
 			HomepageHandler:      homepageHandler,
 			CensusAtlasHandler:   censusAtlasHandler,
 			RelCalHandler:        releaseCalendarHandler,
@@ -270,45 +268,6 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to the feedback handler", func() {
 				So(len(feedbackHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(feedbackHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-		})
-		Convey("When a geography request is made, but the geography handler is not enabled", func() {
-			url := "/geography/newport"
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
-
-			config.GeographyEnabled = false
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-
-			Convey("Then a request is sent to Zebedee to check the page type", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 1)
-			})
-			Convey("Then no request is sent to the geography handler", func() {
-				So(len(geographyHandler.ServeHTTPCalls()), ShouldEqual, 0)
-			})
-			Convey("Then the request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-		})
-		Convey("When a geography request is made, and the geography handler is enabled", func() {
-			url := "/geography/newport"
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
-
-			config.GeographyEnabled = true
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-			Convey("Then the request is sent to the geography handler", func() {
-				So(len(geographyHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(geographyHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-			Convey("Then no request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
 		Convey("When a search request is made, but the search handler is not enabled", func() {

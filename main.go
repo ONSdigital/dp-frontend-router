@@ -71,7 +71,6 @@ func main() {
 	prefixedDatasetURL := cfg.DatasetControllerURL + "/dataset"
 	prefixDatasetControllerURL, _ := parseURL(ctx, prefixedDatasetURL, "DatasetControllerURL")
 	filterDatasetControllerURL, _ := parseURL(ctx, cfg.FilterDatasetControllerURL, "FilterDatasetControllerURL")
-	geographyControllerURL, _ := parseURL(ctx, cfg.GeographyControllerURL, "GeographyControllerURL")
 	homepageControllerURL, _ := parseURL(ctx, cfg.HomepageControllerURL, "HomepageControllerURL")
 	searchControllerURL, _ := parseURL(ctx, cfg.SearchControllerURL, "SearchControllerURL")
 	relcalControllerURL, _ := parseURL(ctx, cfg.ReleaseCalendarControllerURL, "ReleaseCalendarControllerURL")
@@ -125,12 +124,6 @@ func main() {
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
-	var geographyHandler http.Handler
-	if cfg.AreaProfilesRoutesEnabled {
-		geographyHandler = redirects.DynamicRedirectHandler("/geography", "/areas")
-	} else {
-		geographyHandler = createReverseProxy("geography", geographyControllerURL)
-	}
 
 	routerConfig := router.Config{
 		AnalyticsHandler:             analyticsHandler,
@@ -147,8 +140,6 @@ func main() {
 		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
 		FilterFlexHandler:            filterFlexHandler,
-		GeographyEnabled:             cfg.GeographyEnabled,
-		GeographyHandler:             geographyHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
 		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
 		SearchRoutesEnabled:          cfg.SearchRoutesEnabled,

@@ -39,8 +39,6 @@ type Config struct {
 	FeedbackHandler              http.Handler
 	ContentTypeByteLimit         int
 	ZebedeeClient                allRoutes.ZebedeeClient
-	GeographyEnabled             bool
-	GeographyHandler             http.Handler
 	LegacySearchRedirectsEnabled bool
 	DataAggregationPagesEnabled  bool
 	SearchRoutesEnabled          bool
@@ -90,13 +88,6 @@ func New(cfg Config) http.Handler {
 	router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
-
-	if cfg.AreaProfileEnabled {
-		router.Handle("/areas{uri:.*}", cfg.AreaProfileHandler)
-		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
-	} else if cfg.GeographyEnabled {
-		router.Handle("/geography{uri:.*}", cfg.GeographyHandler)
-	}
 
 	if cfg.LegacySearchRedirectsEnabled {
 		searchDataHandler := redirects.DynamicRedirectHandler("/searchdata", "/search")
