@@ -10,7 +10,7 @@
 | COOKIES_CONTROLLER_URL           | <http://localhost:24100>                  | The URL of dp-frontend-cookie-controller                                                 |
 | HOMEPAGE_CONTROLLER_URL          | <http://localhost:24400>                  | The URL of dp-frontend-dataset-controller                                                |
 | DATASET_CONTROLLER_URL           | <http://localhost:20200>                  | The URL of dp-frontend-dataset-controller                                                |
-| FILTER_DATASET_CONTROLLER_URL    | <http://localhost:20001>                  | The URL of dp-frontend-filter-dataset-controller                                         |                                                               |
+| FILTER_DATASET_CONTROLLER_URL    | <http://localhost:20001>                  | The URL of dp-frontend-filter-dataset-controller                                         |
 | FEEDBACK_CONTROLLER_URL          | <http://localhost:25200>                  | The URL of dp-frontend-feedback-controller                                               |
 | SEARCH_CONTROLLER_URL            | <http://localhost:25000>                  | The URL of dp-frontend-search-controller                                                 |
 | DATA_AGGREGATION_PAGES_ENABLED   | false                                     | Enables the new data aggregation pages                                                             |
