@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -74,7 +75,9 @@ func New(cfg Config) http.Handler {
 	}
 
 	if appConfig.OtelEnabled {
+		fmt.Println("ADDING EXTRA MIDDLEWARE")
 		middleware = append(middleware, otelhttp.NewMiddleware("dp-frontend-router"))
+		fmt.Println(middleware[len(middleware)-1])
 	}
 
 	newAlice := alice.New(middleware...).Then(router)

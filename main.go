@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -52,6 +53,7 @@ func main() {
 
 	if cfg.OtelEnabled {
 		// Set up OpenTelemetry
+		fmt.Println("SETTING UP OTEL")
 		otelConfig := dpotelgo.Config{
 			OtelServiceName:          cfg.OTServiceName,
 			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
@@ -169,6 +171,7 @@ func main() {
 	httpHandler := router.New(routerConfig)
 
 	if cfg.OtelEnabled {
+		fmt.Println("ADDING HANDLER")
 		httpHandler = otelhttp.NewHandler(httpHandler, "/")
 	}
 
