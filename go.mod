@@ -2,8 +2,6 @@ module github.com/ONSdigital/dp-frontend-router
 
 go 1.21
 
-replace github.com/ONSdigital/dp-otel-go => /Users/francesmoore/src/github.com/ONSdigital/dp-otel-go
-
 
 require (
 	github.com/ONSdigital/dp-api-clients-go/v2 v2.256.0

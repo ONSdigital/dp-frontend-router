@@ -93,7 +93,7 @@ func Get() (*Config, error) {
 		OTExporterOTLPEndpoint:       "localhost:4317",
 		OTServiceName:                "dp-frontend-router",
 		OTBatchTimeout:               5 * time.Second,
-		OtelEnabled:                  true,
+		OtelEnabled:                  false,
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		ProxyTimeout:                 5 * time.Second,
 		RedirectSecret:               "secret",

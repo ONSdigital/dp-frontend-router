@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -51,9 +50,9 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
+	var otelShutdown func(context.Context) error
 	if cfg.OtelEnabled {
 		// Set up OpenTelemetry
-		fmt.Println("SETTING UP OTEL")
 		otelConfig := dpotelgo.Config{
 			OtelServiceName:          cfg.OTServiceName,
 			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
@@ -69,10 +68,6 @@ func main() {
 			err = errors.Join(err, otelShutdown(context.Background()))
 		}()
 
-		err = otelShutdown(ctx)
-		if err != nil {
-			log.Fatal(ctx, "error shutting down opentelemettry", err)
-		}
 	}
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
@@ -171,7 +166,6 @@ func main() {
 	httpHandler := router.New(routerConfig)
 
 	if cfg.OtelEnabled {
-		fmt.Println("ADDING HANDLER")
 		httpHandler = otelhttp.NewHandler(httpHandler, "/")
 	}
 
@@ -203,6 +197,12 @@ func main() {
 	}
 	l.Close()
 
+	if cfg.OtelEnabled {
+		err = otelShutdown(ctx)
+		if err != nil {
+			log.Fatal(ctx, "error shutting down opentelemettry", err)
+		}
+	}
 }
 
 func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
