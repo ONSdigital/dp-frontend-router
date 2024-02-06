@@ -32,6 +32,8 @@ type Config struct {
 	HomepageControllerURL           string        `envconfig:"HOMEPAGE_CONTROLLER_URL"`
 	HTTPMaxConnections              int           `envconfig:"HTTP_MAX_CONNECTIONS"`
 	LegacySearchRedirectsEnabled    bool          `envconfig:"LEGACY_SEARCH_REDIRECTS_ENABLED"`
+	LegacyCacheProxyEnabled         bool          `envconfig:"LEGACY_CACHE_PROXY_ENABLED"`
+	LegacyCacheProxyURL             string        `envconfig:"LEGACY_CACHE_PROXY_URL"`
 	NewDatasetRoutingEnabled        bool          `envconfig:"NEW_DATASET_ROUTING_ENABLED"`
 	OTExporterOTLPEndpoint          string        `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 	OTServiceName                   string        `envconfig:"OTEL_SERVICE_NAME"`
@@ -89,6 +91,8 @@ func Get() (*Config, error) {
 		HomepageControllerURL:        "http://localhost:24400",
 		HTTPMaxConnections:           0,
 		LegacySearchRedirectsEnabled: false,
+		LegacyCacheProxyEnabled:      false,
+		LegacyCacheProxyURL:          "http://localhost:29200",
 		NewDatasetRoutingEnabled:     false,
 		OTExporterOTLPEndpoint:       "localhost:4317",
 		OTServiceName:                "dp-frontend-router",
