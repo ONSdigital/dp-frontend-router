@@ -67,7 +67,7 @@ func Get() (*Config, error) {
 		return cfg, nil
 	}
 
-	cfg := &Config{
+	cfg = &Config{
 		APIRouterURL:                 "http://localhost:23200/v1",
 		AreaProfilesControllerURL:    "http://localhost:26600",
 		AreaProfilesRoutesEnabled:    false,

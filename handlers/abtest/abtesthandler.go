@@ -41,10 +41,12 @@ func abTestHandler(newHandler, old http.Handler, percentage int, aspectID, domai
 		aspect := cookies.GetABTestCookieAspect(req, aspectID)
 
 		if (aspect.New.IsZero() && aspect.Old.IsZero()) || (aspect.New.Before(now) && aspect.Old.Before(now)) {
+			// not used AB-test before OR (AB) cookie has expired
 			cookies.HandleCookieAndServ(w, req, newHandler, old, aspectID, domain, cookies.DefaultABTestRandomiser(percentage))
 			return
 		}
 
+		// cookie exists and is recent, so serve A or B
 		cookies.ServABTest(w, req, newHandler, old, aspect)
 	})
 }
