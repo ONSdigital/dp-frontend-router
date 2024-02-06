@@ -50,21 +50,25 @@ func main() {
 
 	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
 
-	// Set up OpenTelemetry
-	otelConfig := dpotelgo.Config{
-		OtelServiceName:          cfg.OTServiceName,
-		OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
-		OtelBatchTimeout:         cfg.OTBatchTimeout,
-	}
+	var otelShutdown func(context.Context) error
+	if cfg.OtelEnabled {
+		// Set up OpenTelemetry
+		otelConfig := dpotelgo.Config{
+			OtelServiceName:          cfg.OTServiceName,
+			OtelExporterOtlpEndpoint: cfg.OTExporterOTLPEndpoint,
+			OtelBatchTimeout:         cfg.OTBatchTimeout,
+		}
 
-	otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
-	if oErr != nil {
-		log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+		otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+		if oErr != nil {
+			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
+		}
+		// Handle shutdown properly so nothing leaks.
+		defer func() {
+			err = errors.Join(err, otelShutdown(context.Background()))
+		}()
+
 	}
-	// Handle shutdown properly so nothing leaks.
-	defer func() {
-		err = errors.Join(err, otelShutdown(context.Background()))
-	}()
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
 	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
@@ -160,12 +164,15 @@ func main() {
 	}
 
 	httpHandler := router.New(routerConfig)
-	otelHandler := otelhttp.NewHandler(httpHandler, "/")
+
+	if cfg.OtelEnabled {
+		httpHandler = otelhttp.NewHandler(httpHandler, "/")
+	}
 
 	log.Info(ctx, "Starting server", log.Data{"config": cfg})
 
 	s := &http.Server{
-		Handler:      otelHandler,
+		Handler:      httpHandler,
 		ReadTimeout:  cfg.ProxyTimeout,
 		WriteTimeout: cfg.ProxyTimeout,
 		IdleTimeout:  120 * time.Second,
@@ -189,9 +196,12 @@ func main() {
 		log.Fatal(ctx, "error starting server", err)
 	}
 	l.Close()
-	err = otelShutdown(ctx)
-	if err != nil {
-		log.Fatal(ctx, "error shutting down opentelemettry", err)
+
+	if cfg.OtelEnabled {
+		err = otelShutdown(ctx)
+		if err != nil {
+			log.Fatal(ctx, "error shutting down opentelemettry", err)
+		}
 	}
 }
 
