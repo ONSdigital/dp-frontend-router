@@ -1,9 +1,11 @@
 package router
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
+	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
@@ -60,11 +62,19 @@ func New(cfg Config) http.Handler {
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
 		dprequest.HandlerRequestID(16),
-		otelhttp.NewMiddleware("dp-frontend-router"),
 		log.Middleware,
 		SecurityHandler,
 		healthcheckHandler(cfg.HealthCheckHandler),
 		redirects.Handler,
+	}
+
+	appConfig, err := config.Get()
+	if err != nil {
+		log.Error(context.Background(), "error getting config", err)
+	}
+
+	if appConfig.OtelEnabled {
+		middleware = append(middleware, otelhttp.NewMiddleware("dp-frontend-router"))
 	}
 
 	newAlice := alice.New(middleware...).Then(router)
