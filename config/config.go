@@ -36,6 +36,7 @@ type Config struct {
 	OTExporterOTLPEndpoint          string        `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
 	OTServiceName                   string        `envconfig:"OTEL_SERVICE_NAME"`
 	OTBatchTimeout                  time.Duration `envconfig:"OTEL_BATCH_TIMEOUT"`
+	OtelEnabled                     bool          `envconfig:"OTEL_ENABLED"`
 	PatternLibraryAssetsPath        string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	ProxyTimeout                    time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RedirectSecret                  string        `envconfig:"REDIRECT_SECRET" json:"-"`
@@ -92,6 +93,7 @@ func Get() (*Config, error) {
 		OTExporterOTLPEndpoint:       "localhost:4317",
 		OTServiceName:                "dp-frontend-router",
 		OTBatchTimeout:               5 * time.Second,
+		OtelEnabled:                  false,
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		ProxyTimeout:                 5 * time.Second,
 		RedirectSecret:               "secret",
