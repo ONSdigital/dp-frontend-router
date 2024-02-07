@@ -2,11 +2,11 @@ package router
 
 import (
 	"context"
+	"github.com/ONSdigital/dp-frontend-router/handlers/relcal"
 	"net/http"
 	"strings"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/dp-frontend-router/handlers/abtest"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
@@ -51,6 +51,7 @@ type Config struct {
 	RelCalRoutePrefix            string
 	RelCalEnableABTest           bool
 	RelCalABTestPercentage       int
+	UseNewReleaseCalendar        bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
 	CensusAtlasHandler           http.Handler
@@ -123,9 +124,9 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.RelCalEnabled {
-		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", abtest.Handler(cfg.RelCalEnableABTest, cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
+		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.UseNewReleaseCalendar, cfg.RelCalHandler, cfg.BabbageHandler))
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", abtest.Handler(cfg.RelCalEnableABTest, cfg.RelCalHandler, cfg.BabbageHandler, cfg.RelCalABTestPercentage, abtest.RelcalTestCookieAspect, cfg.SiteDomain, abtest.RelcalNewExit))
+		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.UseNewReleaseCalendar, cfg.RelCalHandler, cfg.BabbageHandler))
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
