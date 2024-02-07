@@ -14,8 +14,8 @@ func serve(w http.ResponseWriter, req *http.Request, n, o http.Handler, useNewRe
 	if useNewReleaseCalendar {
 		n.ServeHTTP(w, req)
 		return
-	} else {
-		o.ServeHTTP(w, req)
-		return
 	}
+
+	o.ServeHTTP(w, req)
+	return
 }

@@ -1,11 +1,12 @@
 package relcal
 
 import (
-	"github.com/ONSdigital/dp-frontend-router/config"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/ONSdigital/dp-frontend-router/config"
 
 	. "github.com/smartystreets/goconvey/convey"
 )

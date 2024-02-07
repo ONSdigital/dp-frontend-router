@@ -2,11 +2,11 @@ package router
 
 import (
 	"context"
-	"github.com/ONSdigital/dp-frontend-router/handlers/relcal"
 	"net/http"
 	"strings"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/dp-frontend-router/handlers/relcal"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
