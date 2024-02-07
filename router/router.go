@@ -49,8 +49,6 @@ type Config struct {
 	RelCalHandler                http.Handler
 	RelCalEnabled                bool
 	RelCalRoutePrefix            string
-	RelCalEnableABTest           bool
-	RelCalABTestPercentage       int
 	UseNewReleaseCalendar        bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
