@@ -17,5 +17,4 @@ func serve(w http.ResponseWriter, req *http.Request, n, o http.Handler, useNewRe
 	}
 
 	o.ServeHTTP(w, req)
-	return
 }
