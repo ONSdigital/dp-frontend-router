@@ -22,7 +22,6 @@ type Config struct {
 	DatasetControllerURL            string        `envconfig:"DATASET_CONTROLLER_URL"`
 	DatasetFinderEnabled            bool          `envconfig:"DATASET_FINDER_ENABLED"`
 	DownloaderURL                   string        `envconfig:"DOWNLOADER_URL"`
-	EnableReleaseCalendarABTest     bool          `envconfig:"ENABLE_RELEASE_CALENDAR_AB_TEST"`
 	FeedbackControllerURL           string        `envconfig:"FEEDBACK_CONTROLLER_URL"`
 	FeedbackEnabled                 bool          `envconfig:"FEEDBACK_ENABLED"`
 	FilterDatasetControllerURL      string        `envconfig:"FILTER_DATASET_CONTROLLER_URL"`
@@ -123,15 +122,6 @@ func Get() (*Config, error) {
 	cfg.ReleaseCalendarRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarRoutePrefix)
 
 	return cfg, nil
-}
-
-// IsEnabledRelCalABTest checks whether ab test is enabled and that percentage is a sensible int value
-func IsEnabledRelCalABTest(cfg Config) bool {
-	percentage := cfg.ReleaseCalendarABTestPercentage
-	if cfg.EnableReleaseCalendarABTest && percentage > 0 && percentage <= 100 {
-		return true
-	}
-	return false
 }
 
 // validatePrivatePrefix ensures that a non-empty private path prefix starts with a '/'
