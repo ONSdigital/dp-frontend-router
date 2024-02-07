@@ -149,7 +149,6 @@ func main() {
 		RelCalHandler:                relcalHandler,
 		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
 		RelCalRoutePrefix:            cfg.ReleaseCalendarRoutePrefix,
-		RelCalABTestPercentage:       cfg.ReleaseCalendarABTestPercentage,
 		UseNewReleaseCalendar:        cfg.UseNewReleaseCalendar,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
