@@ -34,6 +34,7 @@
 | OTEL_EXPORTER_OTLP_ENDPOINT      | localhost:4317                            | Host and port for the OpenTelemetry endpoint                                             |
 | OTEL_SERVICE_NAME                | dp-frontend-router                        | Service name to report to telemetry tools                                                |
 | OTEL_BATCH_TIMEOUT               | 5s                                        | Interval between pushes to OT Collector                                                  |
+| OTEL_ENABLED                     | false                                     | Feature flag to enable OpenTelemetry
 | LEGACY_CACHE_PROXY_ENABLED       | false                                     | Flag to enable requests to Babbage to go through the dp-legacy-cache-proxy instead.      |
 | LEGACY_CACHE_PROXY_URL           | <http://localhost:29200>                  | The URL of dp-legacy-cache-proxy                                                         |
 
