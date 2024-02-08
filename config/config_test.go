@@ -47,6 +47,8 @@ func TestSpec(t *testing.T) {
 				So(cfg.ZebedeeRequestMaximumTimeout, ShouldEqual, 5*time.Second)
 				So(cfg.ZebedeeRequestMaximumRetries, ShouldEqual, 0)
 				So(cfg.ProxyTimeout, ShouldEqual, 5*time.Second)
+				So(cfg.LegacyCacheProxyEnabled, ShouldBeFalse)
+				So(cfg.LegacyCacheProxyURL, ShouldEqual, "http://localhost:29200")
 			})
 		})
 	})

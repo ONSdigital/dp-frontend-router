@@ -78,6 +78,7 @@ func main() {
 	homepageControllerURL, _ := parseURL(ctx, cfg.HomepageControllerURL, "HomepageControllerURL")
 	searchControllerURL, _ := parseURL(ctx, cfg.SearchControllerURL, "SearchControllerURL")
 	relcalControllerURL, _ := parseURL(ctx, cfg.ReleaseCalendarControllerURL, "ReleaseCalendarControllerURL")
+	legacyCacheProxyURL, _ := parseURL(ctx, cfg.LegacyCacheProxyURL, "LegacyCacheProxyURL")
 	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
 	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
@@ -124,7 +125,12 @@ func main() {
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
-	babbageHandler := createReverseProxy("babbage", babbageURL)
+	var babbageHandler http.Handler
+	if cfg.LegacyCacheProxyEnabled {
+		babbageHandler = createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
+	} else {
+		babbageHandler = createReverseProxy("babbage", babbageURL)
+	}
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
