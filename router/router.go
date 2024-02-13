@@ -122,9 +122,14 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.RelCalEnabled {
-		router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.UseNewReleaseCalendar, cfg.RelCalHandler, cfg.BabbageHandler))
+		if cfg.UseNewReleaseCalendar {
+			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.RelCalHandler))
+			router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
+		} else {
+			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.BabbageHandler))
+			router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
+		}
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.UseNewReleaseCalendar, cfg.RelCalHandler, cfg.BabbageHandler))
 	}
 
 	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
