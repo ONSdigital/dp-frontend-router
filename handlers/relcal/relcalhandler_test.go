@@ -25,7 +25,7 @@ func TestRelcalHandler(t *testing.T) {
 			_, _ = w.Write([]byte(newServed))
 		})
 
-		numberRequests := 10
+		totalRequests := 10
 		cfg, _ := config.Get()
 
 		Convey("And the config  to use the new release calendar is set to false", func() {
@@ -35,7 +35,7 @@ func TestRelcalHandler(t *testing.T) {
 				handler := Handler(cfg.UseNewReleaseCalendar, newHandler, oldHandler)
 
 				nh := 0
-				for i := 0; i < numberRequests; i++ {
+				for i := 0; i < totalRequests; i++ {
 					req := httptest.NewRequest("GET", "/", http.NoBody)
 					resp := httptest.NewRecorder()
 					handler.ServeHTTP(resp, req)
@@ -46,7 +46,7 @@ func TestRelcalHandler(t *testing.T) {
 				}
 
 				Convey("All the requests should be to the old handler", func() {
-					So(nh, ShouldEqual, numberRequests)
+					So(nh, ShouldEqual, totalRequests)
 				})
 			})
 		})
@@ -58,7 +58,7 @@ func TestRelcalHandler(t *testing.T) {
 				handler := Handler(cfg.UseNewReleaseCalendar, newHandler, oldHandler)
 
 				nh := 0
-				for i := 0; i < numberRequests; i++ {
+				for i := 0; i < totalRequests; i++ {
 					req := httptest.NewRequest("GET", "/", http.NoBody)
 					resp := httptest.NewRecorder()
 					handler.ServeHTTP(resp, req)
@@ -69,7 +69,7 @@ func TestRelcalHandler(t *testing.T) {
 				}
 
 				Convey("All the requests should be to the new handler", func() {
-					So(nh, ShouldEqual, numberRequests)
+					So(nh, ShouldEqual, totalRequests)
 				})
 			})
 		})
