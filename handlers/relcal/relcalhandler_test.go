@@ -32,7 +32,7 @@ func TestRelcalHandler(t *testing.T) {
 			cfg.UseNewReleaseCalendar = false
 
 			Convey("When the requests are made to the relcalHandler", func() {
-				handler := Handler(cfg.UseNewReleaseCalendar, newHandler, oldHandler)
+				handler := Handler(oldHandler)
 
 				nh := 0
 				for i := 0; i < totalRequests; i++ {
@@ -55,7 +55,7 @@ func TestRelcalHandler(t *testing.T) {
 			cfg.UseNewReleaseCalendar = true
 
 			Convey("When the requests are made to the relcalHandler", func() {
-				handler := Handler(cfg.UseNewReleaseCalendar, newHandler, oldHandler)
+				handler := Handler(newHandler)
 
 				nh := 0
 				for i := 0; i < totalRequests; i++ {
