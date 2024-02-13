@@ -10,11 +10,11 @@ func Handler(useNewReleaseCalendar bool, newHandler, oldHandler http.Handler) ht
 	})
 }
 
-func serve(w http.ResponseWriter, req *http.Request, n, o http.Handler, useNewReleaseCalendar bool) {
+func serve(w http.ResponseWriter, req *http.Request, newHandler, oldHandler http.Handler, useNewReleaseCalendar bool) {
 	if useNewReleaseCalendar {
-		n.ServeHTTP(w, req)
+		newHandler.ServeHTTP(w, req)
 		return
 	}
 
-	o.ServeHTTP(w, req)
+	oldHandler.ServeHTTP(w, req)
 }
