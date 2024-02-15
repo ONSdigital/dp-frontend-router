@@ -117,6 +117,15 @@ func New(cfg Config) http.Handler {
 			router.Handle("/publications", cfg.SearchHandler)
 			router.Handle("/topicspecificmethodology", cfg.SearchHandler)
 			router.Handle("/timeseriestool", cfg.SearchHandler)
+
+			router.Handle("/{topic}/datalist", cfg.SearchHandler)
+			router.Handle("/{topic}/{subTopic}/datalist", cfg.SearchHandler)
+			router.Handle("/{topic}/publications", cfg.SearchHandler)
+			router.Handle("/{topic}/{subTopic}/publications", cfg.SearchHandler)
+			router.Handle("/{topic}/staticlist", cfg.SearchHandler)
+			router.Handle("/{topic}/{subTopic}/staticlist", cfg.SearchHandler)
+			router.Handle("/{topic}/topicspecificmethodology", cfg.SearchHandler)
+			router.Handle("/{topic}/{subTopic}/topicspecificmethodology", cfg.SearchHandler)
 		}
 		router.Handle("/search", cfg.SearchHandler)
 	}
