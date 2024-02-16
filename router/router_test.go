@@ -575,9 +575,9 @@ func TestRouter(t *testing.T) {
 					req := httptest.NewRequest("GET", url, http.NoBody)
 					r.ServeHTTP(res, req)
 
-					Convey("Then the request is sent to the release calendar handler", func() {
-						So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-						So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+					Convey("Then the request is sent to the babbage handler (the default)", func() {
+						So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+						So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 					})
 				})
 
@@ -588,9 +588,9 @@ func TestRouter(t *testing.T) {
 					req := httptest.NewRequest("GET", prefix+url, http.NoBody)
 					r.ServeHTTP(res, req)
 
-					Convey("Then the request is sent to the release calendar handler", func() {
-						So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-						So(releaseCalendarHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, prefix+url)
+					Convey("Then the request is sent to the babbage handler (the default)", func() {
+						So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+						So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, prefix+url)
 					})
 				})
 			})

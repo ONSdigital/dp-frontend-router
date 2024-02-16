@@ -86,8 +86,6 @@ func main() {
 	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
-	enableRelCalABTest := config.IsEnabledRelCalABTest(*cfg)
-
 	redirects.Init(assets.Asset)
 
 	// create ZebedeeClient proxying calls through the API Router
@@ -157,8 +155,7 @@ func main() {
 		RelCalHandler:                relcalHandler,
 		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
 		RelCalRoutePrefix:            cfg.ReleaseCalendarRoutePrefix,
-		RelCalEnableABTest:           enableRelCalABTest,
-		RelCalABTestPercentage:       cfg.ReleaseCalendarABTestPercentage,
+		UseNewReleaseCalendar:        cfg.UseNewReleaseCalendar,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,
