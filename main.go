@@ -59,7 +59,8 @@ func main() {
 			OtelBatchTimeout:         cfg.OTBatchTimeout,
 		}
 
-		otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+		var oErr error
+		otelShutdown, oErr = dpotelgo.SetupOTelSDK(ctx, otelConfig)
 		if oErr != nil {
 			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
 		}
@@ -67,7 +68,6 @@ func main() {
 		defer func() {
 			err = errors.Join(err, otelShutdown(context.Background()))
 		}()
-
 	}
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
