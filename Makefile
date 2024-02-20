@@ -15,11 +15,11 @@ audit:
 
 .PHONY: assets
 assets:
-	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
+	# cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -o redirects.go -pkg assets redirects/...
 
 .PHONY: assets-debug
 assets-debug:
-	cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -debug -o redirects.go -pkg assets redirects/...
+	# cd assets; go run github.com/jteeuwen/go-bindata/go-bindata -debug -o redirects.go -pkg assets redirects/...
 
 .PHONY: clean-assets
 clean-assets:
