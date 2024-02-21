@@ -3,6 +3,5 @@ build
 .tags*
 *.iml
 .idea
-assets/redirects.go
 .go/
 .vscode
