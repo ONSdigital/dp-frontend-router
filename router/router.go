@@ -52,9 +52,11 @@ type Config struct {
 	UseNewReleaseCalendar        bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
+	ProxyHandler                 http.Handler
 	CensusAtlasHandler           http.Handler
 	CensusAtlasEnabled           bool
 	DatasetFinderEnabled         bool
+	LegacyCacheProxyEnabled      bool
 }
 
 func New(cfg Config) http.Handler {
@@ -124,19 +126,33 @@ func New(cfg Config) http.Handler {
 	if cfg.RelCalEnabled {
 		if cfg.UseNewReleaseCalendar {
 			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.RelCalHandler))
-			router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
+			if cfg.LegacyCacheProxyEnabled {
+				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
+			} else {
+				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
+			}
 		} else {
 			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.BabbageHandler))
-			router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
+			if cfg.LegacyCacheProxyEnabled {
+				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
+			} else {
+				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
+			}
 		}
 		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
 	}
 
-	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
-	router.MatcherFunc(hasFileExtMatcher).Handler(cfg.BabbageHandler)
+	var handler http.Handler
+	if cfg.LegacyCacheProxyEnabled {
+		handler = cfg.ProxyHandler
+	} else {
+		handler = cfg.BabbageHandler
+	}
 
+	// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
+	router.MatcherFunc(hasFileExtMatcher).Handler(handler)
 	// If it is a known babbage endpoint go directly to babbage instead of using the allRoutesMiddleware
-	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(cfg.BabbageHandler)
+	router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(handler)
 
 	// all other requests go through the allRoutesMiddleware to check the page type first
 	handlers := map[string]http.Handler{
@@ -149,7 +165,11 @@ func New(cfg Config) http.Handler {
 
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)
-	babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
+	if cfg.LegacyCacheProxyEnabled {
+		babbageRouter.PathPrefix("/").Handler(cfg.ProxyHandler)
+	} else {
+		babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
+	}
 
 	return newAlice
 }

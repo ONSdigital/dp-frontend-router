@@ -16,19 +16,19 @@ var _ allRoutes.ZebedeeClient = &ZebedeeClientMock{}
 
 // ZebedeeClientMock is a mock implementation of allRoutes.ZebedeeClient.
 //
-//     func TestSomethingThatUsesZebedeeClient(t *testing.T) {
+//	    func TestSomethingThatUsesZebedeeClient(t *testing.T) {
 //
-//         // make and configure a mocked allRoutes.ZebedeeClient
-//         mockedZebedeeClient := &ZebedeeClientMock{
-//             GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
-// 	               panic("mock out the GetWithHeaders method")
-//             },
-//         }
+//	        // make and configure a mocked allRoutes.ZebedeeClient
+//	        mockedZebedeeClient := &ZebedeeClientMock{
+//	            GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
+//		               panic("mock out the GetWithHeaders method")
+//	            },
+//	        }
 //
-//         // use mockedZebedeeClient in code that requires allRoutes.ZebedeeClient
-//         // and then make assertions.
+//	        // use mockedZebedeeClient in code that requires allRoutes.ZebedeeClient
+//	        // and then make assertions.
 //
-//     }
+//	    }
 type ZebedeeClientMock struct {
 	// GetWithHeadersFunc mocks the GetWithHeaders method.
 	GetWithHeadersFunc func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error)
@@ -70,7 +70,8 @@ func (mock *ZebedeeClientMock) GetWithHeaders(ctx context.Context, userAccessTok
 
 // GetWithHeadersCalls gets all the calls that were made to GetWithHeaders.
 // Check the length with:
-//     len(mockedZebedeeClient.GetWithHeadersCalls())
+//
+//	len(mockedZebedeeClient.GetWithHeadersCalls())
 func (mock *ZebedeeClientMock) GetWithHeadersCalls() []struct {
 	Ctx             context.Context
 	UserAccessToken string

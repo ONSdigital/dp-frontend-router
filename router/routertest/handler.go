@@ -15,19 +15,19 @@ var _ router.Handler = &HandlerMock{}
 
 // HandlerMock is a mock implementation of router.Handler.
 //
-//     func TestSomethingThatUsesHandler(t *testing.T) {
+//	    func TestSomethingThatUsesHandler(t *testing.T) {
 //
-//         // make and configure a mocked router.Handler
-//         mockedHandler := &HandlerMock{
-//             ServeHTTPFunc: func(in1 http.ResponseWriter, in2 *http.Request)  {
-// 	               panic("mock out the ServeHTTP method")
-//             },
-//         }
+//	        // make and configure a mocked router.Handler
+//	        mockedHandler := &HandlerMock{
+//	            ServeHTTPFunc: func(in1 http.ResponseWriter, in2 *http.Request)  {
+//		               panic("mock out the ServeHTTP method")
+//	            },
+//	        }
 //
-//         // use mockedHandler in code that requires router.Handler
-//         // and then make assertions.
+//	        // use mockedHandler in code that requires router.Handler
+//	        // and then make assertions.
 //
-//     }
+//	    }
 type HandlerMock struct {
 	// ServeHTTPFunc mocks the ServeHTTP method.
 	ServeHTTPFunc func(in1 http.ResponseWriter, in2 *http.Request)
@@ -65,7 +65,8 @@ func (mock *HandlerMock) ServeHTTP(in1 http.ResponseWriter, in2 *http.Request) {
 
 // ServeHTTPCalls gets all the calls that were made to ServeHTTP.
 // Check the length with:
-//     len(mockedHandler.ServeHTTPCalls())
+//
+//	len(mockedHandler.ServeHTTPCalls())
 func (mock *HandlerMock) ServeHTTPCalls() []struct {
 	In1 http.ResponseWriter
 	In2 *http.Request
