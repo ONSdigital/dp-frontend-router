@@ -59,7 +59,8 @@ func main() {
 			OtelBatchTimeout:         cfg.OTBatchTimeout,
 		}
 
-		otelShutdown, oErr := dpotelgo.SetupOTelSDK(ctx, otelConfig)
+		var oErr error
+		otelShutdown, oErr = dpotelgo.SetupOTelSDK(ctx, otelConfig)
 		if oErr != nil {
 			log.Error(ctx, "error setting up OpenTelemetry - hint: ensure OTEL_EXPORTER_OTLP_ENDPOINT is set", oErr)
 		}
@@ -67,7 +68,6 @@ func main() {
 		defer func() {
 			err = errors.Join(err, otelShutdown(context.Background()))
 		}()
-
 	}
 
 	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
@@ -123,12 +123,8 @@ func main() {
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
-	var babbageHandler http.Handler
-	if cfg.LegacyCacheProxyEnabled {
-		babbageHandler = createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	} else {
-		babbageHandler = createReverseProxy("babbage", babbageURL)
-	}
+	babbageHandler := createReverseProxy("babbage", babbageURL)
+	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
 	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
@@ -159,11 +155,13 @@ func main() {
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,
+		ProxyHandler:                 proxyHandler,
 		ZebedeeClient:                zebedeeClient,
 		ContentTypeByteLimit:         cfg.ContentTypeByteLimit,
 		CensusAtlasHandler:           censusAtlasHandler,
 		CensusAtlasEnabled:           cfg.CensusAtlasRoutesEnabled,
 		DatasetFinderEnabled:         cfg.DatasetFinderEnabled,
+		LegacyCacheProxyEnabled:      cfg.LegacyCacheProxyEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)

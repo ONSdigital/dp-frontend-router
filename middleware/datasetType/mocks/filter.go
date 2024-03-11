@@ -16,19 +16,19 @@ var _ datasetType.FilterClient = &FilterClientMock{}
 
 // FilterClientMock is a mock implementation of datasetType.FilterClient.
 //
-// 	func TestSomethingThatUsesFilterClient(t *testing.T) {
+//	func TestSomethingThatUsesFilterClient(t *testing.T) {
 //
-// 		// make and configure a mocked datasetType.FilterClient
-// 		mockedFilterClient := &FilterClientMock{
-// 			GetJobStateFunc: func(ctx context.Context, userAuthToken string, serviceAuthToken string, downloadServiceToken string, collectionID string, filterID string) (filter.Model, string, error) {
-// 				panic("mock out the GetJobState method")
-// 			},
-// 		}
+//		// make and configure a mocked datasetType.FilterClient
+//		mockedFilterClient := &FilterClientMock{
+//			GetJobStateFunc: func(ctx context.Context, userAuthToken string, serviceAuthToken string, downloadServiceToken string, collectionID string, filterID string) (filter.Model, string, error) {
+//				panic("mock out the GetJobState method")
+//			},
+//		}
 //
-// 		// use mockedFilterClient in code that requires datasetType.FilterClient
-// 		// and then make assertions.
+//		// use mockedFilterClient in code that requires datasetType.FilterClient
+//		// and then make assertions.
 //
-// 	}
+//	}
 type FilterClientMock struct {
 	// GetJobStateFunc mocks the GetJobState method.
 	GetJobStateFunc func(ctx context.Context, userAuthToken string, serviceAuthToken string, downloadServiceToken string, collectionID string, filterID string) (filter.Model, string, error)
@@ -82,7 +82,8 @@ func (mock *FilterClientMock) GetJobState(ctx context.Context, userAuthToken str
 
 // GetJobStateCalls gets all the calls that were made to GetJobState.
 // Check the length with:
-//     len(mockedFilterClient.GetJobStateCalls())
+//
+//	len(mockedFilterClient.GetJobStateCalls())
 func (mock *FilterClientMock) GetJobStateCalls() []struct {
 	Ctx                  context.Context
 	UserAuthToken        string

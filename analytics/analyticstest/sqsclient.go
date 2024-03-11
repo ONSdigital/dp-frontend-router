@@ -11,19 +11,19 @@ import (
 
 // SQSClientMock is a mock implementation of analytics.SQSClient.
 //
-//     func TestSomethingThatUsesSQSClient(t *testing.T) {
+//	    func TestSomethingThatUsesSQSClient(t *testing.T) {
 //
-//         // make and configure a mocked analytics.SQSClient
-//         mockedSQSClient := &SQSClientMock{
-//             SendMessageFunc: func(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error) {
-// 	               panic("mock out the SendMessage method")
-//             },
-//         }
+//	        // make and configure a mocked analytics.SQSClient
+//	        mockedSQSClient := &SQSClientMock{
+//	            SendMessageFunc: func(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error) {
+//		               panic("mock out the SendMessage method")
+//	            },
+//	        }
 //
-//         // use mockedSQSClient in code that requires analytics.SQSClient
-//         // and then make assertions.
+//	        // use mockedSQSClient in code that requires analytics.SQSClient
+//	        // and then make assertions.
 //
-//     }
+//	    }
 type SQSClientMock struct {
 	// SendMessageFunc mocks the SendMessage method.
 	SendMessageFunc func(ctx context.Context, params *sqs.SendMessageInput, optFns ...func(*sqs.Options)) (*sqs.SendMessageOutput, error)
@@ -65,7 +65,8 @@ func (mock *SQSClientMock) SendMessage(ctx context.Context, params *sqs.SendMess
 
 // SendMessageCalls gets all the calls that were made to SendMessage.
 // Check the length with:
-//     len(mockedSQSClient.SendMessageCalls())
+//
+//	len(mockedSQSClient.SendMessageCalls())
 func (mock *SQSClientMock) SendMessageCalls() []struct {
 	Ctx    context.Context
 	Params *sqs.SendMessageInput

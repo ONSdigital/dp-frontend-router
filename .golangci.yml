@@ -79,18 +79,17 @@ issues:
         - errcheck
         - dupl
         - gosec
-    - path: assets/redirects\.go
-      linters:
-        - gocyclo
-        - errcheck
-        - dupl
-        - gosec
     - path: service/service.go
       linters:
         - typecheck
     - linters:
       - govet
       text: 'declaration of "(err|ctx)" shadows declaration at'
+    # Allow log.Fatal in main.go (log.go library continues after calling this, unlike std library log.Fatal)
+    - path: main.go
+      linters:
+        - gocritic
+      source: "log.Fatal"
   new: false
 
 # golangci.com configuration

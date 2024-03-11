@@ -16,19 +16,19 @@ var _ datasetType.DatasetClient = &DatasetClientMock{}
 
 // DatasetClientMock is a mock implementation of datasetType.DatasetClient.
 //
-// 	func TestSomethingThatUsesDatasetClient(t *testing.T) {
+//	func TestSomethingThatUsesDatasetClient(t *testing.T) {
 //
-// 		// make and configure a mocked datasetType.DatasetClient
-// 		mockedDatasetClient := &DatasetClientMock{
-// 			GetFunc: func(ctx context.Context, userAuthToken string, serviceAuthToken string, collectionID string, datasetID string) (dataset.DatasetDetails, error) {
-// 				panic("mock out the Get method")
-// 			},
-// 		}
+//		// make and configure a mocked datasetType.DatasetClient
+//		mockedDatasetClient := &DatasetClientMock{
+//			GetFunc: func(ctx context.Context, userAuthToken string, serviceAuthToken string, collectionID string, datasetID string) (dataset.DatasetDetails, error) {
+//				panic("mock out the Get method")
+//			},
+//		}
 //
-// 		// use mockedDatasetClient in code that requires datasetType.DatasetClient
-// 		// and then make assertions.
+//		// use mockedDatasetClient in code that requires datasetType.DatasetClient
+//		// and then make assertions.
 //
-// 	}
+//	}
 type DatasetClientMock struct {
 	// GetFunc mocks the Get method.
 	GetFunc func(ctx context.Context, userAuthToken string, serviceAuthToken string, collectionID string, datasetID string) (dataset.DatasetDetails, error)
@@ -78,7 +78,8 @@ func (mock *DatasetClientMock) Get(ctx context.Context, userAuthToken string, se
 
 // GetCalls gets all the calls that were made to Get.
 // Check the length with:
-//     len(mockedDatasetClient.GetCalls())
+//
+//	len(mockedDatasetClient.GetCalls())
 func (mock *DatasetClientMock) GetCalls() []struct {
 	Ctx              context.Context
 	UserAuthToken    string
