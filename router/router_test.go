@@ -568,30 +568,13 @@ func TestRouter(t *testing.T) {
 
 			Convey("And the release calendar route is enabled", func() {
 				config.RelCalEnabled = true
+				r := router.New(config)
+				req := httptest.NewRequest("GET", url, http.NoBody)
+				r.ServeHTTP(res, req)
 
-				Convey("And the route prefix is not set", func() {
-					config.RelCalRoutePrefix = ""
-					r := router.New(config)
-					req := httptest.NewRequest("GET", url, http.NoBody)
-					r.ServeHTTP(res, req)
-
-					Convey("Then the request is sent to the babbage handler (the default)", func() {
-						So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
-						So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-					})
-				})
-
-				Convey("And the route prefix is set", func() {
-					prefix := "/test"
-					config.RelCalRoutePrefix = prefix
-					r := router.New(config)
-					req := httptest.NewRequest("GET", prefix+url, http.NoBody)
-					r.ServeHTTP(res, req)
-
-					Convey("Then the request is sent to the babbage handler (the default)", func() {
-						So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
-						So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, prefix+url)
-					})
+				Convey("Then the request is sent to the babbage handler (the default)", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+					So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 				})
 			})
 		})

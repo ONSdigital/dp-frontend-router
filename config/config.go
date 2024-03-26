@@ -1,7 +1,6 @@
 package config
 
 import (
-	"strings"
 	"time"
 
 	"github.com/kelseyhightower/envconfig"
@@ -43,7 +42,6 @@ type Config struct {
 	RedirectSecret               string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	ReleaseCalendarControllerURL string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	ReleaseCalendarEnabled       bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
-	ReleaseCalendarRoutePrefix   string        `envconfig:"RELEASE_CALENDAR_ROUTE_PREFIX"`
 	UseNewReleaseCalendar        bool          `envconfig:"USE_NEW_RELEASE_CALENDAR"`
 	SearchControllerURL          string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	DataAggregationPagesEnabled  bool          `envconfig:"DATA_AGGREGATION_PAGES_ENABLED"`
@@ -122,16 +120,5 @@ func Get() (*Config, error) {
 		return cfg, err
 	}
 
-	cfg.ReleaseCalendarRoutePrefix = validatePrivatePrefix(cfg.ReleaseCalendarRoutePrefix)
-
 	return cfg, nil
-}
-
-// validatePrivatePrefix ensures that a non-empty private path prefix starts with a '/'
-func validatePrivatePrefix(prefix string) string {
-	if prefix != "" && !strings.HasPrefix(prefix, "/") {
-		return "/" + prefix
-	}
-
-	return prefix
 }

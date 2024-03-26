@@ -28,7 +28,6 @@ func TestSpec(t *testing.T) {
 				So(cfg.SearchRoutesEnabled, ShouldBeTrue)
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.ReleaseCalendarEnabled, ShouldBeFalse)
-				So(cfg.ReleaseCalendarRoutePrefix, ShouldEqual, "")
 				So(cfg.LegacySearchRedirectsEnabled, ShouldBeFalse)
 				So(cfg.APIRouterURL, ShouldEqual, "http://localhost:23200/v1")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
@@ -48,29 +47,6 @@ func TestSpec(t *testing.T) {
 				So(cfg.LegacyCacheProxyEnabled, ShouldBeFalse)
 				So(cfg.LegacyCacheProxyURL, ShouldEqual, "http://localhost:29200")
 			})
-		})
-	})
-}
-
-func TestValidatePrivatePrefix(t *testing.T) {
-	Convey("given an empty private path prefix", t, func() {
-		prefix := ""
-		Convey("validatePrivatePrefix returns the empty private path prefix", func() {
-			So(validatePrivatePrefix(prefix), ShouldEqual, "")
-		})
-	})
-
-	Convey("given a private path prefix is set without an initial '/'", t, func() {
-		prefix := "a-prefix"
-		Convey("validatePrivatePrefix return the given private path prefix with an initial '/'", func() {
-			So(validatePrivatePrefix(prefix), ShouldEqual, "/a-prefix")
-		})
-	})
-
-	Convey("given a private path prefix is set with an initial '/'", t, func() {
-		prefix := "/a-prefix"
-		Convey("validatePrivatePrefix returns the given private path prefix as valid", func() {
-			So(validatePrivatePrefix(prefix), ShouldEqual, "/a-prefix")
 		})
 	})
 }

@@ -5,3 +5,4 @@ build
 .idea
 .go/
 .vscode
+*.sh

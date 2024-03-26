@@ -48,7 +48,6 @@ type Config struct {
 	SearchHandler                http.Handler
 	RelCalHandler                http.Handler
 	RelCalEnabled                bool
-	RelCalRoutePrefix            string
 	UseNewReleaseCalendar        bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
@@ -125,21 +124,21 @@ func New(cfg Config) http.Handler {
 
 	if cfg.RelCalEnabled {
 		if cfg.UseNewReleaseCalendar {
-			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.RelCalHandler))
+			router.Handle("/releasecalendar", relcal.Handler(cfg.RelCalHandler))
 			if cfg.LegacyCacheProxyEnabled {
-				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
+				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
 			} else {
-				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
+				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
 			}
 		} else {
-			router.Handle(cfg.RelCalRoutePrefix+"/releasecalendar", relcal.Handler(cfg.BabbageHandler))
+			router.Handle("/releasecalendar", relcal.Handler(cfg.BabbageHandler))
 			if cfg.LegacyCacheProxyEnabled {
-				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
+				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
 			} else {
-				router.Handle(cfg.RelCalRoutePrefix+"/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
+				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
 			}
 		}
-		router.Handle(cfg.RelCalRoutePrefix+"/calendar/releasecalendar", cfg.RelCalHandler)
+		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
 	}
 
 	var handler http.Handler
