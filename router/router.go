@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/dp-frontend-router/handlers/relcal"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
@@ -48,7 +47,6 @@ type Config struct {
 	SearchHandler                http.Handler
 	RelCalHandler                http.Handler
 	RelCalEnabled                bool
-	UseNewReleaseCalendar        bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
 	ProxyHandler                 http.Handler
@@ -123,22 +121,21 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.RelCalEnabled {
-		if cfg.UseNewReleaseCalendar {
-			router.Handle("/releasecalendar", relcal.Handler(cfg.RelCalHandler))
-			if cfg.LegacyCacheProxyEnabled {
-				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
-			} else {
-				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.RelCalHandler))
-			}
-		} else {
-			router.Handle("/releasecalendar", relcal.Handler(cfg.BabbageHandler))
-			if cfg.LegacyCacheProxyEnabled {
-				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.ProxyHandler))
-			} else {
-				router.Handle("/releases/{uri:.*}", relcal.Handler(cfg.BabbageHandler))
-			}
-		}
 		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
+		router.Handle("/releasecalendar", cfg.RelCalHandler)
+		if cfg.LegacyCacheProxyEnabled {
+			router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
+		} else {
+			router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
+		}
+	} else {
+		router.Handle("/calendar/releasecalendar", cfg.BabbageHandler)
+		router.Handle("/releasecalendar", cfg.BabbageHandler)
+		if cfg.LegacyCacheProxyEnabled {
+			router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
+		} else {
+			router.Handle("/releases/{uri:.*}", cfg.BabbageHandler)
+		}
 	}
 
 	var handler http.Handler
@@ -164,11 +161,7 @@ func New(cfg Config) http.Handler {
 
 	babbageRouter := router.PathPrefix("/").Subrouter()
 	babbageRouter.Use(allRoutesMiddleware)
-	if cfg.LegacyCacheProxyEnabled {
-		babbageRouter.PathPrefix("/").Handler(cfg.ProxyHandler)
-	} else {
-		babbageRouter.PathPrefix("/").Handler(cfg.BabbageHandler)
-	}
+	babbageRouter.PathPrefix("/").Handler(handler)
 
 	return newAlice
 }

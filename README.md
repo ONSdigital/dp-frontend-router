@@ -19,7 +19,7 @@
 | DOWNLOADER_URL                  | <http://localhost:23400>                 | The URL of dp-file-downloader.                                                           |
 | AREA_PROFILE_CONTROLLER_URL     | <http://localhost:26600>                 | The URL of dp-frontend-area-profiles.                                                    |
 | AREA_PROFILE_ROUTES_ENABLED     | false                                    | Area profiles routes enabled                                                             |
-| PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b> | The URL to the sixteens build to use                                                     |
+| PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b>| The URL to the sixteens build to use                                                     |
 | SITE_DOMAIN                     | ons.gov.uk                               | The domain hosting the site                                                              |
 | REDIRECT_SECRET                 | secret                                   | Pre-shared key for signing/encrypting redirect data                                      |
 | ANALYTICS_SQS_URL               |                                          | SQS URL for search analytics; leave blank to disable                                     |
@@ -34,11 +34,10 @@
 | OTEL_EXPORTER_OTLP_ENDPOINT     | localhost:4317                           | Host and port for the OpenTelemetry endpoint                                             |
 | OTEL_SERVICE_NAME               | dp-frontend-router                       | Service name to report to telemetry tools                                                |
 | OTEL_BATCH_TIMEOUT              | 5s                                       | Interval between pushes to OT Collector                                                  |
-| OTEL_ENABLED                    | false                                    | Feature flag to enable OpenTelemetry                                                     
+| OTEL_ENABLED                    | false                                    | Feature flag to enable OpenTelemetry                                                     |
 | LEGACY_CACHE_PROXY_ENABLED      | false                                    | Flag to enable requests to Babbage to go through the dp-legacy-cache-proxy instead.      |
 | LEGACY_CACHE_PROXY_URL          | <http://localhost:29200>                 | The URL of dp-legacy-cache-proxy                                                         |
 | RELEASE_CALENDAR_ENABLED        | false                                    | Feature flag to enable release calendar                                                  |
-| USE_NEW_RELEASE_CALENDAR        | false                                    | Flag to enable use of new release calendar                                               |
 | RELEASE_CALENDAR_CONTROLLER_URL | <http://localhost:27700>                 | The URL of dp-frontend-release-calendar                                                  |
 
 

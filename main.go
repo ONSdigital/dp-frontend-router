@@ -150,7 +150,6 @@ func main() {
 		SearchHandler:                searchHandler,
 		RelCalHandler:                relcalHandler,
 		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
-		UseNewReleaseCalendar:        cfg.UseNewReleaseCalendar,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,

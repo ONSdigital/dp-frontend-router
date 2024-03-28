@@ -564,6 +564,11 @@ func TestRouter(t *testing.T) {
 				Convey("Then no request is sent to the release calendar handler", func() {
 					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 0)
 				})
+
+				Convey("But  the request is sent to the babbage handler (the default)", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+					So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+				})
 			})
 
 			Convey("And the release calendar route is enabled", func() {
@@ -572,9 +577,12 @@ func TestRouter(t *testing.T) {
 				req := httptest.NewRequest("GET", url, http.NoBody)
 				r.ServeHTTP(res, req)
 
-				Convey("Then the request is sent to the babbage handler (the default)", func() {
-					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+				Convey("Then the request is sent to the release calendar handler", func() {
+					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				})
+
+				Convey("And no request is sent to the babbage handler (the default)", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 				})
 			})
 		})
@@ -676,54 +684,50 @@ func TestReleaseCalendarFeatureFlag(t *testing.T) {
 		Convey("And the release calendar route is enabled", func() {
 			config.RelCalEnabled = true
 
-			Convey("And the new release calendar is used", func() {
-				config.UseNewReleaseCalendar = true
+			Convey("And the legacy cache proxy is enabled", func() {
+				config.LegacyCacheProxyEnabled = true
+				req := httptest.NewRequest("GET", url, http.NoBody)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
 
-				Convey("And the legacy cache proxy is enabled", func() {
-					config.LegacyCacheProxyEnabled = true
-					req := httptest.NewRequest("GET", url, http.NoBody)
-					r := router.New(config)
-					r.ServeHTTP(res, req)
-
-					Convey("Then the request is sent to legacy cache proxy", func() {
-						So(len(legacyCacheProxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					})
-				})
-
-				Convey("And the legacy cache proxy is not enabled", func() {
-					config.LegacyCacheProxyEnabled = false
-					req := httptest.NewRequest("GET", url, http.NoBody)
-					r := router.New(config)
-					r.ServeHTTP(res, req)
-
-					Convey("Then the request is sent to release calendar", func() {
-						So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					})
+				Convey("Then the request is sent to legacy cache proxy", func() {
+					So(len(legacyCacheProxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				})
 			})
 
-			Convey("And the new release calendar is not used", func() {
-				config.UseNewReleaseCalendar = false
+			Convey("And the legacy cache proxy is not enabled", func() {
+				config.LegacyCacheProxyEnabled = false
+				req := httptest.NewRequest("GET", url, http.NoBody)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
 
-				Convey("And the legacy cache proxy is enabled", func() {
-					config.LegacyCacheProxyEnabled = true
-					req := httptest.NewRequest("GET", url, http.NoBody)
-					r := router.New(config)
-					r.ServeHTTP(res, req)
-
-					Convey("Then the request is sent to legacy cache proxy", func() {
-						So(len(legacyCacheProxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					})
+				Convey("Then the request is sent to release calendar", func() {
+					So(len(releaseCalendarHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				})
-				Convey("And the legacy cache proxy is not enabled", func() {
-					config.LegacyCacheProxyEnabled = false
-					req := httptest.NewRequest("GET", url, http.NoBody)
-					r := router.New(config)
-					r.ServeHTTP(res, req)
+			})
+		})
 
-					Convey("Then the request is sent to Babbage", func() {
-						So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
-					})
+		Convey("And the release calendar is not used", func() {
+			config.RelCalEnabled = false
+
+			Convey("And the legacy cache proxy is enabled", func() {
+				config.LegacyCacheProxyEnabled = true
+				req := httptest.NewRequest("GET", url, http.NoBody)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
+
+				Convey("Then the request is sent to legacy cache proxy", func() {
+					So(len(legacyCacheProxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				})
+			})
+			Convey("And the legacy cache proxy is not enabled", func() {
+				config.LegacyCacheProxyEnabled = false
+				req := httptest.NewRequest("GET", url, http.NoBody)
+				r := router.New(config)
+				r.ServeHTTP(res, req)
+
+				Convey("Then the request is sent to Babbage", func() {
+					So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				})
 			})
 		})
