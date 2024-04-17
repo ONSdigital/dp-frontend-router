@@ -42,6 +42,7 @@ type Config struct {
 	ZebedeeClient                allRoutes.ZebedeeClient
 	LegacySearchRedirectsEnabled bool
 	DataAggregationPagesEnabled  bool
+	TopicAggregationPagesEnabled bool
 	SearchRoutesEnabled          bool
 	SiteDomain                   string
 	SearchHandler                http.Handler
@@ -116,6 +117,19 @@ func New(cfg Config) http.Handler {
 			router.Handle("/publications", cfg.SearchHandler)
 			router.Handle("/topicspecificmethodology", cfg.SearchHandler)
 			router.Handle("/timeseriestool", cfg.SearchHandler)
+		}
+		if cfg.TopicAggregationPagesEnabled {
+			router.Handle("/{topic}/datalist", cfg.SearchHandler)
+			router.Handle("/{topic}/{subtopic}/datalist", cfg.SearchHandler)
+
+			router.Handle("/{topic}/publications", cfg.SearchHandler)
+			router.Handle("/{topic}/{subtopic}/publications", cfg.SearchHandler)
+
+			router.Handle("/{topic}/staticlist", cfg.SearchHandler)
+			router.Handle("/{topic}/{subtopic}/staticlist", cfg.SearchHandler)
+
+			router.Handle("/{topic}/topicspecificmethodology", cfg.SearchHandler)
+			router.Handle("/{topic}/{subtopic}/topicspecificmethodology", cfg.SearchHandler)
 		}
 		router.Handle("/search", cfg.SearchHandler)
 	}
