@@ -146,6 +146,7 @@ func main() {
 		FilterFlexHandler:            filterFlexHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
 		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
+		TopicAggregationPagesEnabled: cfg.TopicAggregationPagesEnabled,
 		SearchRoutesEnabled:          cfg.SearchRoutesEnabled,
 		SearchHandler:                searchHandler,
 		RelCalHandler:                relcalHandler,
