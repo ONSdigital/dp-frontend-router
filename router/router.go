@@ -143,11 +143,13 @@ func New(cfg Config) http.Handler {
 			router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
 		}
 	} else {
-		router.Handle("/calendar/releasecalendar", cfg.BabbageHandler)
-		router.Handle("/releasecalendar", cfg.BabbageHandler)
 		if cfg.LegacyCacheProxyEnabled {
+			router.Handle("/calendar/releasecalendar", cfg.ProxyHandler)
+			router.Handle("/releasecalendar", cfg.ProxyHandler)
 			router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
 		} else {
+			router.Handle("/calendar/releasecalendar", cfg.BabbageHandler)
+			router.Handle("/releasecalendar", cfg.BabbageHandler)
 			router.Handle("/releases/{uri:.*}", cfg.BabbageHandler)
 		}
 	}
