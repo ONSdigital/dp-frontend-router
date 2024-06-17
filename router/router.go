@@ -118,18 +118,13 @@ func New(cfg Config) http.Handler {
 			router.Handle("/topicspecificmethodology", cfg.SearchHandler)
 			router.Handle("/timeseriestool", cfg.SearchHandler)
 		}
+
 		if cfg.TopicAggregationPagesEnabled {
-			router.Handle("/{topic}/datalist", cfg.SearchHandler)
-			router.Handle("/{topic}/{subtopic}/datalist", cfg.SearchHandler)
-
-			router.Handle("/{topic}/publications", cfg.SearchHandler)
-			router.Handle("/{topic}/{subtopic}/publications", cfg.SearchHandler)
-
-			router.Handle("/{topic}/staticlist", cfg.SearchHandler)
-			router.Handle("/{topic}/{subtopic}/staticlist", cfg.SearchHandler)
-
-			router.Handle("/{topic}/topicspecificmethodology", cfg.SearchHandler)
-			router.Handle("/{topic}/{subtopic}/topicspecificmethodology", cfg.SearchHandler)
+			// handle dynamic topic aggregation pages
+			router.Handle("/{uri:.*}/datalist", cfg.SearchHandler)
+			router.Handle("/{uri:.*}/publications", cfg.SearchHandler)
+			router.Handle("/{uri:.*}/staticlist", cfg.SearchHandler)
+			router.Handle("/{uri:.*}/topicspecificmethodology", cfg.SearchHandler)
 		}
 		router.Handle("/search", cfg.SearchHandler)
 	}

@@ -409,6 +409,40 @@ func TestRouter(t *testing.T) {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
+		Convey("When a 3rd level topic aggregation page request is made, but the topic aggregation pages are not enabled", func() {
+			url := "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datalist"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.SearchRoutesEnabled = true
+			config.TopicAggregationPagesEnabled = false
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then no request is sent to the search handler", func() {
+				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+		Convey("When a 3rd level topic aggregation page request is made, but the topic aggregation pages are enabled", func() {
+			url := "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datalist"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.SearchRoutesEnabled = true
+			config.TopicAggregationPagesEnabled = true
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then the request is sent to the search handler", func() {
+				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(searchHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+			Convey("Then no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+		})
 		Convey("When a dataset finder request is made, but the Dataset Finder is not enabled", func() {
 			url := "/census/find-a-dataset"
 			req := httptest.NewRequest("GET", url, http.NoBody)
