@@ -150,7 +150,6 @@ func main() {
 		SearchRoutesEnabled:          cfg.SearchRoutesEnabled,
 		SearchHandler:                searchHandler,
 		RelCalHandler:                relcalHandler,
-		RelCalEnabled:                cfg.ReleaseCalendarEnabled,
 		SiteDomain:                   cfg.SiteDomain,
 		HomepageHandler:              homepageHandler,
 		BabbageHandler:               babbageHandler,

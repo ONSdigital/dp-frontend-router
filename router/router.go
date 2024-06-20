@@ -47,7 +47,6 @@ type Config struct {
 	SiteDomain                   string
 	SearchHandler                http.Handler
 	RelCalHandler                http.Handler
-	RelCalEnabled                bool
 	HomepageHandler              http.Handler
 	BabbageHandler               http.Handler
 	ProxyHandler                 http.Handler
@@ -129,24 +128,12 @@ func New(cfg Config) http.Handler {
 		router.Handle("/search", cfg.SearchHandler)
 	}
 
-	if cfg.RelCalEnabled {
-		router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
-		router.Handle("/releasecalendar", cfg.RelCalHandler)
-		if cfg.LegacyCacheProxyEnabled {
-			router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
-		} else {
-			router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
-		}
+	router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
+	router.Handle("/releasecalendar", cfg.RelCalHandler)
+	if cfg.LegacyCacheProxyEnabled {
+		router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
 	} else {
-		if cfg.LegacyCacheProxyEnabled {
-			router.Handle("/calendar/releasecalendar", cfg.ProxyHandler)
-			router.Handle("/releasecalendar", cfg.ProxyHandler)
-			router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
-		} else {
-			router.Handle("/calendar/releasecalendar", cfg.BabbageHandler)
-			router.Handle("/releasecalendar", cfg.BabbageHandler)
-			router.Handle("/releases/{uri:.*}", cfg.BabbageHandler)
-		}
+		router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
 	}
 
 	var handler http.Handler

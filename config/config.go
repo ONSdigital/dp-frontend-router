@@ -41,7 +41,6 @@ type Config struct {
 	ProxyTimeout                 time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RedirectSecret               string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	ReleaseCalendarControllerURL string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
-	ReleaseCalendarEnabled       bool          `envconfig:"RELEASE_CALENDAR_ENABLED"`
 	SearchControllerURL          string        `envconfig:"SEARCH_CONTROLLER_URL"`
 	DataAggregationPagesEnabled  bool          `envconfig:"DATA_AGGREGATION_PAGES_ENABLED"`
 	TopicAggregationPagesEnabled bool          `envconfig:"TOPIC_AGGREGATION_PAGES_ENABLED"`
@@ -99,7 +98,6 @@ func Get() (*Config, error) {
 		ProxyTimeout:                 5 * time.Second,
 		RedirectSecret:               "secret",
 		ReleaseCalendarControllerURL: "http://localhost:27700",
-		ReleaseCalendarEnabled:       false,
 		SearchControllerURL:          "http://localhost:25000",
 		SearchRoutesEnabled:          true,
 		TopicAggregationPagesEnabled: false,

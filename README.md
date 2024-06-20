@@ -38,7 +38,6 @@
 | OTEL_ENABLED                    | false                                     | Feature flag to enable OpenTelemetry                                                     |
 | LEGACY_CACHE_PROXY_ENABLED      | false                                     | Flag to enable requests to Babbage to go through the dp-legacy-cache-proxy instead.      |
 | LEGACY_CACHE_PROXY_URL          | <http://localhost:29200>                  | The URL of dp-legacy-cache-proxy                                                         |
-| RELEASE_CALENDAR_ENABLED        | false                                     | Feature flag to enable release calendar                                                  |
 | RELEASE_CALENDAR_CONTROLLER_URL | <http://localhost:27700>                  | The URL of dp-frontend-release-calendar                                                  |
 
 

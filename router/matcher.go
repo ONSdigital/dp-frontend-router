@@ -17,7 +17,6 @@ var knownBabbageEndpoints = []string{
 	"/file",
 	"/resource",
 	"/file",
-	"/calendar",
 	"/chart",
 	"/embed",
 	"/export",
