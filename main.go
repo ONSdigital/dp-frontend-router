@@ -82,7 +82,6 @@ func main() {
 	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
 	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
-	areaProfileControllerURL, _ := parseURL(ctx, cfg.AreaProfilesControllerURL, "AreaProfileControllerURL")
 	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
@@ -125,14 +124,11 @@ func main() {
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	areaProfileHandler := createReverseProxy("areas", areaProfileControllerURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
 		AnalyticsHandler:             analyticsHandler,
-		AreaProfileEnabled:           cfg.AreaProfilesRoutesEnabled,
-		AreaProfileHandler:           areaProfileHandler,
 		DownloadHandler:              downloadHandler,
 		CookieHandler:                cookieHandler,
 		DatasetHandler:               datasetHandler,

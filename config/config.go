@@ -10,8 +10,6 @@ import (
 type Config struct {
 	AWS                          AWS
 	APIRouterURL                 string        `envconfig:"API_ROUTER_URL"`
-	AreaProfilesControllerURL    string        `envconfig:"AREA_PROFILE_CONTROLLER_URL"`
-	AreaProfilesRoutesEnabled    bool          `envconfig:"AREA_PROFILE_ROUTES_ENABLED"`
 	BabbageURL                   string        `envconfig:"BABBAGE_URL"`
 	BindAddr                     string        `envconfig:"BIND_ADDR"`
 	CensusAtlasRoutesEnabled     bool          `envconfig:"CENSUS_ATLAS_ROUTES_ENABLED"`
@@ -67,8 +65,6 @@ func Get() (*Config, error) {
 
 	cfg = &Config{
 		APIRouterURL:                 "http://localhost:23200/v1",
-		AreaProfilesControllerURL:    "http://localhost:26600",
-		AreaProfilesRoutesEnabled:    false,
 		BabbageURL:                   "http://localhost:8080",
 		BindAddr:                     ":20000",
 		CensusAtlasRoutesEnabled:     false,

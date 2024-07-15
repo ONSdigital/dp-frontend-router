@@ -18,8 +18,6 @@
 | SEARCH_ROUTES_ENABLED           | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                  | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
-| AREA_PROFILE_CONTROLLER_URL     | <http://localhost:26600>                  | The URL of dp-frontend-area-profiles.                                                    |
-| AREA_PROFILE_ROUTES_ENABLED     | false                                     | Area profiles routes enabled                                                             |
 | PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b> | The URL to the sixteens build to use                                                     |
 | SITE_DOMAIN                     | ons.gov.uk                                | The domain hosting the site                                                              |
 | REDIRECT_SECRET                 | secret                                    | Pre-shared key for signing/encrypting redirect data                                      |
