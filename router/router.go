@@ -52,6 +52,7 @@ type Config struct {
 	CensusAtlasEnabled           bool
 	DatasetFinderEnabled         bool
 	LegacyCacheProxyEnabled      bool
+	PreviousReleasesRouteEnabled bool
 }
 
 func New(cfg Config) http.Handler {
@@ -132,6 +133,10 @@ func New(cfg Config) http.Handler {
 		router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
 	} else {
 		router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
+	}
+
+	if cfg.PreviousReleasesRouteEnabled {
+		router.Handle("/{uri:.*}/previousreleases", cfg.SearchHandler)
 	}
 
 	var handler http.Handler
