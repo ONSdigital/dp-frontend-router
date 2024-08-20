@@ -156,6 +156,7 @@ func main() {
 		CensusAtlasEnabled:           cfg.CensusAtlasRoutesEnabled,
 		DatasetFinderEnabled:         cfg.DatasetFinderEnabled,
 		LegacyCacheProxyEnabled:      cfg.LegacyCacheProxyEnabled,
+		PreviousReleasesRouteEnabled: cfg.PreviousReleasesRouteEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)
