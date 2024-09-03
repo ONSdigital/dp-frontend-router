@@ -371,7 +371,6 @@ func TestRouter(t *testing.T) {
 			Convey("And the page request has been redirected to the root", func() {
 				So(res.Result().StatusCode, ShouldEqual, 301)
 				So(res.Result().Header.Get("Location"), ShouldEqual, "/alladhocs")
-
 			})
 			Convey("And no request is sent to Babbage", func() {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
