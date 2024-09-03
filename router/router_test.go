@@ -339,6 +339,45 @@ func TestRouter(t *testing.T) {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
+		Convey("When a legacy data aggregation page request is made, but the data aggregation pages are not enabled", func() {
+			url := "/economy/alladhocs"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.SearchRoutesEnabled = true
+			config.DataAggregationPagesEnabled = false
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then no request is sent to the search handler", func() {
+				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+			Convey("Then the request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(babbageHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+		Convey("When a legacy data aggregation page request is made, but the data aggregation pages are enabled", func() {
+			url := "/economy/alladhocs"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.SearchRoutesEnabled = true
+			config.DataAggregationPagesEnabled = true
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then the request is not sent to the search handler", func() {
+				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+			Convey("And the page request has been redirected to the root", func() {
+				So(res.Result().StatusCode, ShouldEqual, 301)
+				So(res.Result().Header.Get("Location"), ShouldEqual, "/alladhocs")
+
+			})
+			Convey("And no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+		})
+
 		Convey("When a topic aggregation page request is made, but the topic aggregation pages are not enabled", func() {
 			url := "/economy/publications"
 			req := httptest.NewRequest("GET", url, http.NoBody)

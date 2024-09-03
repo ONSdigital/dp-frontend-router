@@ -107,6 +107,17 @@ func New(cfg Config) http.Handler {
 	if cfg.SearchRoutesEnabled {
 		// needs both the SearchRoutesEnabled and DataAggregationPagesEnabled since it relies on the SearchHandler
 		if cfg.DataAggregationPagesEnabled {
+			// These pages used to exist as subpages but we're redirecting to root now as they didn't
+			// do anything.
+			legacyAdhocPagesRedirectHandler := redirects.RouteRedirectHandler("/alladhocs")
+			router.Handle("/{uri:.*}/alladhocs", legacyAdhocPagesRedirectHandler)
+
+			legacyMethodologyRedirectHandler := redirects.RouteRedirectHandler("/allmethodologies")
+			router.Handle("/{uri:.*}/allmethodologies", legacyMethodologyRedirectHandler)
+
+			legacyPublishedRequestsRedirectHandler := redirects.RouteRedirectHandler("/publishedrequests")
+			router.Handle("/{uri:.*}/publishedrequests", legacyPublishedRequestsRedirectHandler)
+
 			router.Handle("/alladhocs", cfg.SearchHandler)
 			router.Handle("/datalist", cfg.SearchHandler)
 			router.Handle("/allmethodologies", cfg.SearchHandler)
