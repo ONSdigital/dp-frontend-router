@@ -85,6 +85,45 @@ func TestDynamicRedirect(t *testing.T) {
 	})
 }
 
+func TestRouteRedirect(t *testing.T) {
+	router := mux.NewRouter()
+	middleware := []alice.Constructor{
+		Handler,
+	}
+	testAlice := alice.New(middleware...).Then(router)
+	router.Handle("/{uri:.*}/original", RouteRedirectHandler("/redirected"))
+	router.HandleFunc("/redirected", func(w http.ResponseWriter, req *http.Request) {
+		// empty function in case we want any behaviour here.
+	})
+
+	Convey("Test that a redirect request is redirected to the new url", t, func() {
+		req, _ := http.NewRequest("GET", "/test/original", http.NoBody)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected")
+	})
+
+	Convey("Test that a redirect request with a different path extension is redirected to the new url", t, func() {
+		req, _ := http.NewRequest("GET", "/test2/original", http.NoBody)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected")
+	})
+
+	Convey("Test that a redirect request with parameters is redirected to the new url with the same parameters", t, func() {
+		req, _ := http.NewRequest("GET", "/test/original?q=test&page=2", http.NoBody)
+		w := httptest.NewRecorder()
+		testAlice.ServeHTTP(w, req)
+		So(w.Code, ShouldEqual, 301)
+		So(w.Header(), ShouldContainKey, "Location")
+		So(w.Header()["Location"], ShouldContain, "/redirected?q=test&page=2")
+	})
+}
+
 func TestInit(t *testing.T) {
 	var shouldError bool
 	var returnBytes []byte

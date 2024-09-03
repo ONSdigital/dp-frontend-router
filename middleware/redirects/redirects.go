@@ -97,3 +97,17 @@ func DynamicRedirectHandler(redirectFrom, redirectTo string) http.Handler {
 		http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
 	})
 }
+
+// RouteRedirectHandler will redirect to the new path provided, this can allow for wildcard redirecting. It also preserves query strings.
+func RouteRedirectHandler(redirectTo string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		redirectURL := redirectTo
+
+		if req.URL.RawQuery != "" {
+			redirectURL += "?" + req.URL.RawQuery
+		}
+
+		log.Info(req.Context(), "redirect found", log.Data{"location": redirectURL}, log.HTTP(req, 0, 0, nil, nil))
+		http.Redirect(w, req, redirectURL, http.StatusMovedPermanently)
+	})
+}
