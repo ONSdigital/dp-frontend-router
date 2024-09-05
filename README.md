@@ -16,6 +16,7 @@
 | DATA_AGGREGATION_PAGES_ENABLED  | false                                     | Enables the new data aggregation pages                                                   |
 | TOPIC_AGGREGATION_PAGES_ENABLED | false                                     | enables the topic data aggregation pages                                                 |
 | RELATED_DATA_ROUTE_ENABLED      | false                                     | Flag to enable related data page routing to the dp-frontend-search-controller            |
+| PREVIOUS_RELEASES_ROUTE_ENABLED | false                                     | Flag to enable previous releases page routing to the dp-frontend-search-controller       |
 | SEARCH_ROUTES_ENABLED           | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                  | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
