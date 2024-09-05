@@ -481,6 +481,26 @@ func TestRouter(t *testing.T) {
 				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
 			})
 		})
+		Convey("When a related data request is made, and the RelatedDataRouteEnabled is enabled", func() {
+			url := "/economy/relateddata"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.RelatedDataRouteEnabled = true
+			config.SearchRoutesEnabled = true
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+			Convey("Then the request is sent to the search handler", func() {
+				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(searchHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+			Convey("Then no request is sent to Babbage", func() {
+				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+			})
+		})
 		Convey("When a dataset finder request is made, but the Dataset Finder is not enabled", func() {
 			url := "/census/find-a-dataset"
 			req := httptest.NewRequest("GET", url, http.NoBody)

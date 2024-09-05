@@ -157,6 +157,7 @@ func main() {
 		DatasetFinderEnabled:         cfg.DatasetFinderEnabled,
 		LegacyCacheProxyEnabled:      cfg.LegacyCacheProxyEnabled,
 		PreviousReleasesRouteEnabled: cfg.PreviousReleasesRouteEnabled,
+		RelatedDataRouteEnabled:      cfg.RelatedDataRouteEnabled,
 	}
 
 	httpHandler := router.New(routerConfig)

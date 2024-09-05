@@ -53,6 +53,7 @@ type Config struct {
 	DatasetFinderEnabled         bool
 	LegacyCacheProxyEnabled      bool
 	PreviousReleasesRouteEnabled bool
+	RelatedDataRouteEnabled      bool
 }
 
 func New(cfg Config) http.Handler {
@@ -148,6 +149,10 @@ func New(cfg Config) http.Handler {
 
 	if cfg.PreviousReleasesRouteEnabled {
 		router.Handle("/{uri:.*}/previousreleases", cfg.SearchHandler)
+	}
+
+	if cfg.RelatedDataRouteEnabled {
+		router.Handle("/{uri:.*}/relateddata", cfg.SearchHandler)
 	}
 
 	var handler http.Handler

@@ -14,7 +14,8 @@
 | FEEDBACK_CONTROLLER_URL         | <http://localhost:25200>                  | The URL of dp-frontend-feedback-controller                                               |
 | SEARCH_CONTROLLER_URL           | <http://localhost:25000>                  | The URL of dp-frontend-search-controller                                                 |
 | DATA_AGGREGATION_PAGES_ENABLED  | false                                     | Enables the new data aggregation pages                                                   |
-| TOPIC_AGGREGATION_PAGES_ENABLED | false                                     | enables the topic data aggregation pages                                              |
+| TOPIC_AGGREGATION_PAGES_ENABLED | false                                     | enables the topic data aggregation pages                                                 |
+| RELATED_DATA_ROUTE_ENABLED      | false                                     | Flag to enable related data page routing to the dp-frontend-search-controller            |
 | SEARCH_ROUTES_ENABLED           | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                  | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
@@ -37,7 +38,6 @@
 | LEGACY_CACHE_PROXY_ENABLED      | false                                     | Flag to enable requests to Babbage to go through the dp-legacy-cache-proxy instead.      |
 | LEGACY_CACHE_PROXY_URL          | <http://localhost:29200>                  | The URL of dp-legacy-cache-proxy                                                         |
 | RELEASE_CALENDAR_CONTROLLER_URL | <http://localhost:27700>                  | The URL of dp-frontend-release-calendar                                                  |
-
 
 ### Licence
 

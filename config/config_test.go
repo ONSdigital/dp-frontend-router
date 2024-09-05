@@ -26,6 +26,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.SearchControllerURL, ShouldEqual, "http://localhost:25000")
 				So(cfg.DataAggregationPagesEnabled, ShouldBeFalse)
 				So(cfg.TopicAggregationPagesEnabled, ShouldBeFalse)
+				So(cfg.RelatedDataRouteEnabled, ShouldBeFalse)
 				So(cfg.SearchRoutesEnabled, ShouldBeTrue)
 				So(cfg.ReleaseCalendarControllerURL, ShouldEqual, "http://localhost:27700")
 				So(cfg.LegacySearchRedirectsEnabled, ShouldBeFalse)
