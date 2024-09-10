@@ -153,6 +153,7 @@ func New(cfg Config) http.Handler {
 
 	if cfg.RelatedDataRouteEnabled {
 		router.Handle("/{uri:.*}/relateddata", cfg.SearchHandler)
+		router.Handle("/{uri:.*}/relatedData", cfg.SearchHandler)
 	}
 
 	var handler http.Handler
