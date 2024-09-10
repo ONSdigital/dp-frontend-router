@@ -60,7 +60,7 @@ func isKnownBabbageEndpointMatcher(request *http.Request, _ *mux.RouteMatch) boo
 
 // HasFileExt returns true if the given path has a file extension
 func HasFileExt(path string) bool {
-	return len(filepath.Ext(path)) > 0
+	return filepath.Ext(path) != ""
 }
 
 // hasFileExtMatcher is a mux MatcherFunc implementation, allowing routes to be matched on having a file extension

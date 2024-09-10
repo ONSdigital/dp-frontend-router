@@ -38,7 +38,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 
 			// Obtain access_token from cookie
 			userAccessToken := ""
-			if c, err := req.Cookie(`access_token`); err == nil && len(c.Value) > 0 {
+			if c, err := req.Cookie(`access_token`); err == nil && c.Value != "" {
 				userAccessToken = c.Value
 				log.Info(req.Context(), "Obtained access_token Cookie")
 			}
@@ -73,7 +73,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 
 			pageType := headers.Get(HeaderOnsPageType)
 
-			if len(zebResp.DatasetID) > 0 && zebResp.Type == "api_dataset_landing_page" {
+			if zebResp.DatasetID != "" && zebResp.Type == "api_dataset_landing_page" {
 				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)
 				return
 			}
@@ -91,7 +91,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 
 func constructContentPath(req *http.Request, path string) string {
 	contentPath := "/data"
-	if c, err := req.Cookie(`collection`); err == nil && len(c.Value) > 0 {
+	if c, err := req.Cookie(`collection`); err == nil && c.Value != "" {
 		contentPath += "/" + c.Value + "?uri=" + path
 		log.Info(req.Context(), "generated from 'collection' cookie", log.Data{"contentPath": contentPath})
 	} else {

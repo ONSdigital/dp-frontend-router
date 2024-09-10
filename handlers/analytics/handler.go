@@ -20,7 +20,7 @@ func NewSearchHandler(ctx context.Context, sqSanalyticsURL, redirectSecret strin
 	var b analytics.ServiceBackend
 	var err error
 
-	if len(sqSanalyticsURL) > 0 {
+	if sqSanalyticsURL != "" {
 		b, err = analytics.NewSQSBackend(ctx, sqSanalyticsURL)
 		if err != nil {
 			return nil, err
