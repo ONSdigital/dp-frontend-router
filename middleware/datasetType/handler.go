@@ -41,7 +41,7 @@ func Handler(filterClient FilterClient, datasetClient DatasetClient) func(filter
 			// Obtain access_token from cookie
 			userAccessToken := ""
 			c, err := req.Cookie(`access_token`)
-			if err == nil && len(c.Value) > 0 {
+			if err == nil && c.Value != "" {
 				userAccessToken = c.Value
 				log.Info(req.Context(), "obtained access_token Cookie")
 			}
