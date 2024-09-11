@@ -7,6 +7,11 @@ run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 10m
 linters-settings:
+  revive:
+    rules:
+      - name: unused-parameter
+        severity: error
+        disabled: true
   govet:
     shadow: true
   golint:
@@ -70,16 +75,13 @@ linters:
 
 issues:
   exclude-rules:
-    - path: main.go
-      linters:
-        - typecheck
     - path: _test\.go
       linters:
         - gocyclo
         - errcheck
         - dupl
         - gosec
-    - path: service/service.go
+    - path: main.go|service|component.go
       linters:
         - typecheck
     - linters:

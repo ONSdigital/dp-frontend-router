@@ -20,7 +20,7 @@ build:
 .PHONY: lint
 lint:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.61.0
-	golangci-lint run --verbose ./...
+	golangci-lint run ./...
 
 .PHONY: debug
 debug:
