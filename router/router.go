@@ -56,6 +56,7 @@ type Config struct {
 	RelatedDataRouteEnabled      bool
 }
 
+//nolint:gocyclo // This will be reduced once we complete decomm of legacy search and flags can be removed.
 func New(cfg Config) http.Handler {
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
