@@ -495,11 +495,11 @@ func TestRouter(t *testing.T) {
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then the request is sent to the search handler", func() {
-				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(searchHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(searchHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 			Convey("Then no request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(babbageHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 		Convey("When a related data request is made, the RelatedDataRouteEnabled is enabled and the Legacy Cache Proxy is enabled", func() {
@@ -513,14 +513,14 @@ func TestRouter(t *testing.T) {
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then the request is sent to the legacy cache proxy", func() {
-				So(len(proxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(proxyHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(proxyHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 			Convey("Then no request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(babbageHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 			Convey("Then no request is sent to the Search Handler", func() {
-				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(searchHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 
@@ -536,11 +536,11 @@ func TestRouter(t *testing.T) {
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then the request is sent to the search handler", func() {
-				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(searchHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(searchHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 			Convey("Then no request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(babbageHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 		Convey("When a previous releases request is made, the PreviousReleasesRoute is enabled and the Legacy Cache Proxy is enabled", func() {
@@ -554,14 +554,14 @@ func TestRouter(t *testing.T) {
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 			Convey("Then the request is sent to the legacy cache proxy", func() {
-				So(len(proxyHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(proxyHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
 				So(proxyHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 			Convey("Then no request is sent to Babbage", func() {
-				So(len(babbageHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(babbageHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 			Convey("Then no request is sent to the Search Handler", func() {
-				So(len(searchHandler.ServeHTTPCalls()), ShouldEqual, 0)
+				So(searchHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
 		})
 
