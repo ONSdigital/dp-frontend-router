@@ -56,6 +56,7 @@ type Config struct {
 	RelatedDataRouteEnabled      bool
 }
 
+//nolint:gocyclo // This will be reduced once we complete decomm of legacy search and flags can be removed.
 func New(cfg Config) http.Handler {
 	router := mux.NewRouter()
 	middleware := []alice.Constructor{
@@ -148,12 +149,21 @@ func New(cfg Config) http.Handler {
 	}
 
 	if cfg.PreviousReleasesRouteEnabled {
-		router.Handle("/{uri:.*}/previousreleases", cfg.SearchHandler)
+		if cfg.LegacyCacheProxyEnabled {
+			router.Handle("/{uri:.*}/previousreleases", cfg.ProxyHandler)
+		} else {
+			router.Handle("/{uri:.*}/previousreleases", cfg.SearchHandler)
+		}
 	}
 
 	if cfg.RelatedDataRouteEnabled {
-		router.Handle("/{uri:.*}/relateddata", cfg.SearchHandler)
-		router.Handle("/{uri:.*}/relatedData", cfg.SearchHandler)
+		if cfg.LegacyCacheProxyEnabled {
+			router.Handle("/{uri:.*}/relateddata", cfg.ProxyHandler)
+			router.Handle("/{uri:.*}/relatedData", cfg.ProxyHandler)
+		} else {
+			router.Handle("/{uri:.*}/relateddata", cfg.SearchHandler)
+			router.Handle("/{uri:.*}/relatedData", cfg.SearchHandler)
+		}
 	}
 
 	var handler http.Handler
