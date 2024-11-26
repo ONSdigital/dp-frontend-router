@@ -2,6 +2,10 @@ FROM golang:1.23-bullseye AS base
 
 ENV GOCACHE=/go/.go/cache GOPATH=/go/.go/path TZ=Europe/London
 
+# Prevent git dubious ownership error
+RUN git config --global --add safe.directory /go
+
+# Install github.com/cespare/reflex
 RUN GOBIN=/bin go install github.com/cespare/reflex@v0.3.1
 RUN PATH=$PATH:/bin
 
