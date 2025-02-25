@@ -84,6 +84,7 @@ func main() {
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
 	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
+	performanceTestsURL, _ := parseURL(ctx, cfg.PerformanceTestsURL, "PerformanceTestsURL")
 
 	redirects.Init(assets.Asset)
 
@@ -126,6 +127,7 @@ func main() {
 	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
 	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
+	perfTestsHandler := createReverseProxy("performanceTests", performanceTestsURL)
 
 	routerConfig := router.Config{
 		AnalyticsHandler:             analyticsHandler,
@@ -158,6 +160,7 @@ func main() {
 		LegacyCacheProxyEnabled:      cfg.LegacyCacheProxyEnabled,
 		PreviousReleasesRouteEnabled: cfg.PreviousReleasesRouteEnabled,
 		RelatedDataRouteEnabled:      cfg.RelatedDataRouteEnabled,
+		PerformanceTestHandler:       perfTestsHandler,
 	}
 
 	httpHandler := router.New(routerConfig)

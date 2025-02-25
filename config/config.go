@@ -36,6 +36,7 @@ type Config struct {
 	OTBatchTimeout               time.Duration `envconfig:"OTEL_BATCH_TIMEOUT"`
 	OtelEnabled                  bool          `envconfig:"OTEL_ENABLED"`
 	PatternLibraryAssetsPath     string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
+	PerformanceTestsURL          string        `envconfig:"PERFORMANCE_TESTS_URL"`
 	PreviousReleasesRouteEnabled bool          `envconfig:"PREVIOUS_RELEASES_ROUTE_ENABLED"`
 	ProxyTimeout                 time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RedirectSecret               string        `envconfig:"REDIRECT_SECRET" json:"-"`
@@ -93,6 +94,7 @@ func Get() (*Config, error) {
 		OTBatchTimeout:               5 * time.Second,
 		OtelEnabled:                  false,
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
+		PerformanceTestsURL:          "http://localhost:30001",
 		PreviousReleasesRouteEnabled: false,
 		ProxyTimeout:                 5 * time.Second,
 		RedirectSecret:               "secret",
