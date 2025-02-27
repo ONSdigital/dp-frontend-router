@@ -3,6 +3,7 @@ package router
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -84,141 +85,52 @@ func New(cfg Config) http.Handler {
 	router.Handle("/means", cfg.PerformanceTestHandler)
 	router.Handle("/heinz", cfg.PerformanceTestHandler)
 
+	for i := 0; i < 1000; i++ {
+		router.Handle("/beans"+strconv.Itoa(i), cfg.PerformanceTestHandler)
+	}
+
 	router.Handle("/{uri:.*}/beans", cfg.PerformanceTestHandler)
 	router.Handle("/{uri:.*}/means", cfg.PerformanceTestHandler)
 	router.Handle("/{uri:.*}/heinz", cfg.PerformanceTestHandler)
 
+	for i := 0; i < 1000; i++ {
+		router.Handle("/{uri:.*}/beans"+strconv.Itoa(i), cfg.PerformanceTestHandler)
+	}
+
 	router.Handle("/beans/{uri:.*}", cfg.PerformanceTestHandler)
 	router.Handle("/means/{uri:.*}", cfg.PerformanceTestHandler)
 	router.Handle("/heinz/{uri:.*}", cfg.PerformanceTestHandler)
+
+	for i := 0; i < 1000; i++ {
+		router.Handle("/beans"+strconv.Itoa(i)+"/{uri:.*}", cfg.PerformanceTestHandler)
+	}
 
 	perfTestsRedirectHandler := redirects.RouteRedirectHandler("/beans")
 	router.Handle("/cola", perfTestsRedirectHandler)
 	router.Handle("/capri-sun", perfTestsRedirectHandler)
 	router.Handle("/choc pudding", perfTestsRedirectHandler)
 
+	for i := 0; i < 1000; i++ {
+		router.Handle("/cola"+strconv.Itoa(i), perfTestsRedirectHandler)
+	}
+
 	perfTestsRedirectSuffixHandler := redirects.RouteRedirectHandler("/means")
 	router.Handle("/{uri:.*}/cola", perfTestsRedirectSuffixHandler)
 	router.Handle("/{uri:.*}/capri-sun", perfTestsRedirectSuffixHandler)
 	router.Handle("/{uri:.*}/choc pudding", perfTestsRedirectSuffixHandler)
+
+	for i := 0; i < 1000; i++ {
+		router.Handle("/{uri:.*}/cola"+strconv.Itoa(i), perfTestsRedirectHandler)
+	}
 
 	perfTestsRedirectPrefixHandler := redirects.RouteRedirectHandler("/heinz")
 	router.Handle("/cola/{uri:.*}", perfTestsRedirectPrefixHandler)
 	router.Handle("/capri-sun/{uri:.*}", perfTestsRedirectPrefixHandler)
 	router.Handle("/choc pudding/{uri:.*}", perfTestsRedirectPrefixHandler)
 
-	//router.Handle("/", cfg.HomepageHandler)
-	//
-	//if cfg.CensusAtlasEnabled {
-	//	router.Handle("/census/maps{uri:.*}", cfg.CensusAtlasHandler)
-	//}
-	//
-	//router.Handle("/census", cfg.HomepageHandler)
-	//
-	//if cfg.DatasetFinderEnabled {
-	//	router.Handle("/census/find-a-dataset", cfg.SearchHandler)
-	//}
-	//
-	//router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
-	//router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
-	//router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
-	//router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
-	//router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
-	//router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
-	//router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
-	//
-	//if cfg.LegacySearchRedirectsEnabled {
-	//	searchDataHandler := redirects.DynamicRedirectHandler("/searchdata", "/search")
-	//	searchPublicationHandler := redirects.DynamicRedirectHandler("/searchpublication", "/search")
-	//
-	//	router.Handle("/searchdata", searchDataHandler)
-	//	router.Handle("/searchpublication", searchPublicationHandler)
-	//}
-	//
-	//if cfg.SearchRoutesEnabled {
-	//	// needs both the SearchRoutesEnabled and DataAggregationPagesEnabled since it relies on the SearchHandler
-	//	if cfg.DataAggregationPagesEnabled {
-	//		// These pages used to exist as subpages but we're redirecting to root now as they didn't
-	//		// do anything.
-	//		legacyAdhocPagesRedirectHandler := redirects.RouteRedirectHandler("/alladhocs")
-	//		router.Handle("/{uri:.*}/alladhocs", legacyAdhocPagesRedirectHandler)
-	//
-	//		legacyMethodologyRedirectHandler := redirects.RouteRedirectHandler("/allmethodologies")
-	//		router.Handle("/{uri:.*}/allmethodologies", legacyMethodologyRedirectHandler)
-	//
-	//		legacyPublishedRequestsRedirectHandler := redirects.RouteRedirectHandler("/publishedrequests")
-	//		router.Handle("/{uri:.*}/publishedrequests", legacyPublishedRequestsRedirectHandler)
-	//
-	//		router.Handle("/alladhocs", cfg.SearchHandler)
-	//		router.Handle("/datalist", cfg.SearchHandler)
-	//		router.Handle("/allmethodologies", cfg.SearchHandler)
-	//		router.Handle("/publishedrequests", cfg.SearchHandler)
-	//		router.Handle("/staticlist", cfg.SearchHandler)
-	//		router.Handle("/publications", cfg.SearchHandler)
-	//		router.Handle("/topicspecificmethodology", cfg.SearchHandler)
-	//		router.Handle("/timeseriestool", cfg.SearchHandler)
-	//	}
-	//
-	//	if cfg.TopicAggregationPagesEnabled {
-	//		// handle dynamic topic aggregation pages
-	//		router.Handle("/{uri:.*}/datalist", cfg.SearchHandler)
-	//		router.Handle("/{uri:.*}/publications", cfg.SearchHandler)
-	//		router.Handle("/{uri:.*}/staticlist", cfg.SearchHandler)
-	//		router.Handle("/{uri:.*}/topicspecificmethodology", cfg.SearchHandler)
-	//	}
-	//	router.Handle("/search", cfg.SearchHandler)
-	//}
-	//
-	//router.Handle("/calendar/releasecalendar", cfg.RelCalHandler)
-	//router.Handle("/releasecalendar", cfg.RelCalHandler)
-	//if cfg.LegacyCacheProxyEnabled {
-	//	router.Handle("/releases/{uri:.*}", cfg.ProxyHandler)
-	//} else {
-	//	router.Handle("/releases/{uri:.*}", cfg.RelCalHandler)
-	//}
-	//
-	//if cfg.PreviousReleasesRouteEnabled {
-	//	if cfg.LegacyCacheProxyEnabled {
-	//		router.Handle("/{uri:.*}/previousreleases", cfg.ProxyHandler)
-	//	} else {
-	//		router.Handle("/{uri:.*}/previousreleases", cfg.SearchHandler)
-	//	}
-	//}
-	//
-	//if cfg.RelatedDataRouteEnabled {
-	//	if cfg.LegacyCacheProxyEnabled {
-	//		router.Handle("/{uri:.*}/relateddata", cfg.ProxyHandler)
-	//		router.Handle("/{uri:.*}/relatedData", cfg.ProxyHandler)
-	//	} else {
-	//		router.Handle("/{uri:.*}/relateddata", cfg.SearchHandler)
-	//		router.Handle("/{uri:.*}/relatedData", cfg.SearchHandler)
-	//	}
-	//}
-	//
-	//var handler http.Handler
-	//if cfg.LegacyCacheProxyEnabled {
-	//	handler = cfg.ProxyHandler
-	//} else {
-	//	handler = cfg.BabbageHandler
-	//}
-	//
-	//// if the request is for a file go directly to babbage instead of using the allRoutesMiddleware
-	//router.MatcherFunc(hasFileExtMatcher).Handler(handler)
-	//// If it is a known babbage endpoint go directly to babbage instead of using the allRoutesMiddleware
-	//router.MatcherFunc(isKnownBabbageEndpointMatcher).Handler(handler)
-	//
-	//// all other requests go through the allRoutesMiddleware to check the page type first
-	//handlers := map[string]http.Handler{
-	//	"dataset_landing_page": cfg.DatasetHandler,
-	//}
-	//if cfg.NewDatasetRoutingEnabled {
-	//	handlers["dataset"] = cfg.PrefixDatasetHandler
-	//}
-	//allRoutesMiddleware := allRoutes.Handler(handlers, cfg.ZebedeeClient, cfg.ContentTypeByteLimit)
-	//
-	//babbageRouter := router.PathPrefix("/").Subrouter()
-	//babbageRouter.Use(allRoutesMiddleware)
-	//babbageRouter.PathPrefix("/").Handler(handler)
+	for i := 0; i < 1000; i++ {
+		router.Handle("/cola"+strconv.Itoa(i)+"/{uri:.*}", perfTestsRedirectHandler)
+	}
 
 	return newAlice
 }
