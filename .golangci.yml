@@ -95,4 +95,9 @@ issues:
       linters:
         - revive
       source: "github.com/smartystreets/goconvey/convey"
+    # Allow log.Fatal in main.go (log.go library continues after calling this, unlike std library log.Fatal)
+    - path: main.go
+      linters:
+        - gocritic
+      source: "log.Fatal"
   new: false
