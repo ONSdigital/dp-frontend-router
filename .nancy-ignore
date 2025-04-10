@@ -1,2 +1,0 @@
-CVE-2024-8421 # vulnerability is present in latest golang.org/x/net version
-CVE-2025-22872 # github.com/golang/net - Improper Validation of Syntactic Correctness of Input
