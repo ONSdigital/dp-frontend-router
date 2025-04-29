@@ -3,12 +3,12 @@ module github.com/ONSdigital/dp-frontend-router
 go 1.24
 
 require (
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.264.0
-	github.com/ONSdigital/dp-healthcheck v1.6.3
-	github.com/ONSdigital/dp-net/v2 v2.22.0
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.266.0
+	github.com/ONSdigital/dp-healthcheck v1.6.4
+	github.com/ONSdigital/dp-net/v3 v3.3.0
 	github.com/ONSdigital/dp-otel-go v0.0.8
-	github.com/ONSdigital/log.go/v2 v2.4.4
-	github.com/aws/aws-sdk-go-v2/config v1.29.11
+	github.com/ONSdigital/log.go/v2 v2.4.5
+	github.com/aws/aws-sdk-go-v2/config v1.29.13
 	github.com/aws/aws-sdk-go-v2/service/sqs v1.38.2
 	github.com/form3tech-oss/jwt-go v3.2.5+incompatible
 	github.com/golang/glog v1.2.4
@@ -24,18 +24,17 @@ require (
 )
 
 require (
-	github.com/ONSdigital/dp-net/v3 v3.0.0 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.36.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.64 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.66 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.30 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.34 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.12.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.12.15 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.25.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.29.2 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.33.17 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.25.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.30.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.33.18 // indirect
 	github.com/aws/smithy-go v1.22.3 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/fatih/color v1.18.0 // indirect
