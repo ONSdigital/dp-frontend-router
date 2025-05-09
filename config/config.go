@@ -38,7 +38,6 @@ type Config struct {
 	PatternLibraryAssetsPath     string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	PreviousReleasesRouteEnabled bool          `envconfig:"PREVIOUS_RELEASES_ROUTE_ENABLED"`
 	ProxyTimeout                 time.Duration `envconfig:"PROXY_TIMEOUT"`
-	RedirectSecret               string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	RelatedDataRouteEnabled      bool          `envconfig:"RELATED_DATA_ROUTE_ENABLED"`
 	ReleaseCalendarControllerURL string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	SearchControllerURL          string        `envconfig:"SEARCH_CONTROLLER_URL"`
@@ -46,7 +45,6 @@ type Config struct {
 	TopicAggregationPagesEnabled bool          `envconfig:"TOPIC_AGGREGATION_PAGES_ENABLED"`
 	SearchRoutesEnabled          bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	SiteDomain                   string        `envconfig:"SITE_DOMAIN"`
-	SQSAnalyticsURL              string        `envconfig:"SQS_ANALYTICS_URL"`
 	ZebedeeRequestMaximumRetries int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	ZebedeeRequestMaximumTimeout time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
 }
@@ -95,7 +93,6 @@ func Get() (*Config, error) {
 		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		PreviousReleasesRouteEnabled: false,
 		ProxyTimeout:                 5 * time.Second,
-		RedirectSecret:               "secret",
 		RelatedDataRouteEnabled:      false,
 		ReleaseCalendarControllerURL: "http://localhost:27700",
 		SearchControllerURL:          "http://localhost:25000",
@@ -103,7 +100,6 @@ func Get() (*Config, error) {
 		TopicAggregationPagesEnabled: false,
 		DataAggregationPagesEnabled:  false,
 		SiteDomain:                   "ons.gov.uk",
-		SQSAnalyticsURL:              "",
 		ZebedeeRequestMaximumRetries: 0,
 		ZebedeeRequestMaximumTimeout: 5 * time.Second,
 	}

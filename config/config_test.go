@@ -35,8 +35,6 @@ func TestSpec(t *testing.T) {
 				So(cfg.FilterFlexDatasetServiceURL, ShouldEqual, "http://localhost:20100")
 				So(cfg.PatternLibraryAssetsPath, ShouldEqual, "https://cdn.ons.gov.uk/sixteens/f816ac8")
 				So(cfg.SiteDomain, ShouldEqual, "ons.gov.uk")
-				So(cfg.RedirectSecret, ShouldEqual, "secret")
-				So(cfg.SQSAnalyticsURL, ShouldEqual, "")
 				So(cfg.ContentTypeByteLimit, ShouldEqual, 5000000)
 				So(cfg.HealthcheckInterval, ShouldEqual, 30*time.Second)
 				So(cfg.HealthcheckCriticalTimeout, ShouldEqual, 90*time.Second)

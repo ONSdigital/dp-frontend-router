@@ -25,7 +25,6 @@ type Handler http.Handler
 
 type Config struct {
 	HealthCheckHandler           func(w http.ResponseWriter, req *http.Request)
-	AnalyticsHandler             http.Handler
 	DownloadHandler              http.Handler
 	DatasetHandler               http.Handler
 	DatasetClient                datasetType.DatasetClient
@@ -90,7 +89,6 @@ func New(cfg Config) http.Handler {
 		router.Handle("/census/find-a-dataset", cfg.SearchHandler)
 	}
 
-	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)

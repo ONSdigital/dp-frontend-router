@@ -70,7 +70,6 @@ func TestSecurityHandler(t *testing.T) {
 func TestRouter(t *testing.T) {
 	Convey("Given a configured router", t, func() {
 		healthCheckHandler := NewHandlerMock()
-		analyticsHandler := NewHandlerMock()
 		searchHandler := NewHandlerMock()
 		downloadHandler := NewHandlerMock()
 		cookieHandler := NewHandlerMock()
@@ -104,7 +103,6 @@ func TestRouter(t *testing.T) {
 		}
 
 		config := router.Config{
-			AnalyticsHandler:     analyticsHandler,
 			SearchHandler:        searchHandler,
 			DownloadHandler:      downloadHandler,
 			HealthCheckHandler:   healthCheckHandler.ServeHTTPFunc,
@@ -140,23 +138,6 @@ func TestRouter(t *testing.T) {
 			searchURL                = "/search"
 		)
 
-		Convey("When a analytics request is made", func() {
-			url := "/redir/123"
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
-
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-
-			Convey("Then the request is sent to the search handler", func() {
-				So(len(analyticsHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(analyticsHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-		})
 		Convey("When a download request is made", func() {
 			url := "/download/123"
 			req := httptest.NewRequest("GET", url, http.NoBody)
