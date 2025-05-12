@@ -8,7 +8,6 @@ import (
 
 // Config represents service configuration for dp-frontend-router
 type Config struct {
-	AWS                          AWS
 	APIRouterURL                 string        `envconfig:"API_ROUTER_URL"`
 	BabbageURL                   string        `envconfig:"BABBAGE_URL"`
 	BindAddr                     string        `envconfig:"BIND_ADDR"`
@@ -47,12 +46,6 @@ type Config struct {
 	SiteDomain                   string        `envconfig:"SITE_DOMAIN"`
 	ZebedeeRequestMaximumRetries int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	ZebedeeRequestMaximumTimeout time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
-}
-
-type AWS struct {
-	AccessKeyID     string `envconfig:"AWS_ACCESS_KEY_ID"      json:"-"`
-	Region          string `envconfig:"AWS_REGION"`
-	SecretAccessKey string `envconfig:"AWS_SECRET_ACCESS_KEY"  json:"-"`
 }
 
 var cfg *Config
@@ -102,12 +95,6 @@ func Get() (*Config, error) {
 		SiteDomain:                   "ons.gov.uk",
 		ZebedeeRequestMaximumRetries: 0,
 		ZebedeeRequestMaximumTimeout: 5 * time.Second,
-	}
-
-	cfg.AWS = AWS{
-		AccessKeyID:     "",
-		Region:          "eu-west-2",
-		SecretAccessKey: "",
 	}
 
 	if err := envconfig.Process("", cfg); err != nil {
