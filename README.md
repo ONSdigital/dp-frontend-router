@@ -20,7 +20,6 @@
 | SEARCH_ROUTES_ENABLED           | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                  | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
-| PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b> | The URL to the sixteens build to use                                                     |
 | SITE_DOMAIN                     | ons.gov.uk                                | The domain hosting the site                                                              |
 | CONTENT_TYPE_BYTE_LIMIT         | 5000000 (5MB)                             | Response size at which we stop checking content-type to avoid oom errors                 |
 | HEALTHCHECK_INTERVAL            | 30s                                       | The period of time between health checks                                                 |

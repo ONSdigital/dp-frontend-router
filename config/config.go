@@ -34,7 +34,6 @@ type Config struct {
 	OTServiceName                string        `envconfig:"OTEL_SERVICE_NAME"`
 	OTBatchTimeout               time.Duration `envconfig:"OTEL_BATCH_TIMEOUT"`
 	OtelEnabled                  bool          `envconfig:"OTEL_ENABLED"`
-	PatternLibraryAssetsPath     string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	PreviousReleasesRouteEnabled bool          `envconfig:"PREVIOUS_RELEASES_ROUTE_ENABLED"`
 	ProxyTimeout                 time.Duration `envconfig:"PROXY_TIMEOUT"`
 	RelatedDataRouteEnabled      bool          `envconfig:"RELATED_DATA_ROUTE_ENABLED"`
@@ -83,7 +82,6 @@ func Get() (*Config, error) {
 		OTServiceName:                "dp-frontend-router",
 		OTBatchTimeout:               5 * time.Second,
 		OtelEnabled:                  false,
-		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		PreviousReleasesRouteEnabled: false,
 		ProxyTimeout:                 5 * time.Second,
 		RelatedDataRouteEnabled:      false,

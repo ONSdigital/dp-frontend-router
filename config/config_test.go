@@ -33,7 +33,6 @@ func TestSpec(t *testing.T) {
 				So(cfg.APIRouterURL, ShouldEqual, "http://localhost:23200/v1")
 				So(cfg.DownloaderURL, ShouldEqual, "http://localhost:23400")
 				So(cfg.FilterFlexDatasetServiceURL, ShouldEqual, "http://localhost:20100")
-				So(cfg.PatternLibraryAssetsPath, ShouldEqual, "https://cdn.ons.gov.uk/sixteens/f816ac8")
 				So(cfg.SiteDomain, ShouldEqual, "ons.gov.uk")
 				So(cfg.ContentTypeByteLimit, ShouldEqual, 5000000)
 				So(cfg.HealthcheckInterval, ShouldEqual, 30*time.Second)
