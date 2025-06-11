@@ -198,15 +198,6 @@ func TestRouter(t *testing.T) {
 			r := router.New(config)
 			r.ServeHTTP(res, req)
 
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(zebedeeClient.GetWithHeadersCalls(), ShouldHaveLength, 0)
-			})
-
-			Convey("Then the request is sent to the filter handler", func() {
-				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
-				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-
 			Convey("Then no requests are sent to the filter/flex handler", func() {
 				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
 			})
@@ -227,15 +218,6 @@ func TestRouter(t *testing.T) {
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-
-			Convey("Then the request is sent to the filter/flex handler", func() {
-				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
-				So(filterFlexHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
 
 			Convey("Then no requests are sent to the filter handler", func() {
 				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
