@@ -2,7 +2,6 @@ package router
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -94,12 +93,7 @@ func New(cfg Config) http.Handler {
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
-	// router.Handle("/filters/{uri:.*}", cfg.DatasetHandler)
-	router.HandleFunc("/filters/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
-		fmt.Println("HHHHHHHHHHHHHHH router")
-		target := appConfig.DatasetControllerURL + req.URL.Path
-		http.Redirect(w, req, target, http.StatusTemporaryRedirect)
-	})
+	router.Handle("/filters/{uri:.*}", cfg.DatasetHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
 	if cfg.LegacySearchRedirectsEnabled {
