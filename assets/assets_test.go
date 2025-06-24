@@ -9,8 +9,6 @@ import (
 
 func TestAsset(t *testing.T) {
 	Convey("Given an asset exists", t, func() {
-		assetPath := "redirects/redirects.csv"
-
 		// get the file details (largely, size)
 		fileInfo, err := os.Stat(assetPath)
 		So(err, ShouldBeNil)

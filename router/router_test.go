@@ -70,7 +70,6 @@ func TestSecurityHandler(t *testing.T) {
 func TestRouter(t *testing.T) {
 	Convey("Given a configured router", t, func() {
 		healthCheckHandler := NewHandlerMock()
-		analyticsHandler := NewHandlerMock()
 		searchHandler := NewHandlerMock()
 		downloadHandler := NewHandlerMock()
 		cookieHandler := NewHandlerMock()
@@ -104,7 +103,6 @@ func TestRouter(t *testing.T) {
 		}
 
 		config := router.Config{
-			AnalyticsHandler:     analyticsHandler,
 			SearchHandler:        searchHandler,
 			DownloadHandler:      downloadHandler,
 			HealthCheckHandler:   healthCheckHandler.ServeHTTPFunc,
@@ -124,23 +122,22 @@ func TestRouter(t *testing.T) {
 			ProxyHandler:         proxyHandler,
 		}
 
-		Convey("When a analytics request is made", func() {
-			url := "/redir/123"
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
+		// Common URLs
+		const (
+			alladhocsURL             = "/alladhocs"
+			cpiURL                   = "/inflationandpriceindices/datasets/consumerpriceinflation/current"
+			datalistURL              = "/datalist"
+			economyURL               = "/economy"
+			environmentalaccountsURL = "/environmentalaccounts"
+			findADatasetURL          = "/census/find-a-dataset"
+			filterURL                = "/filters/123"
+			previousreleasesURL      = "/previousreleases"
+			publicsectorfinanceURL   = "/governmentpublicsectorandtaxes/publicsectorfinance"
+			publicationsURL          = "/publications"
+			relateddataURL           = "/relateddata"
+			searchURL                = "/search"
+		)
 
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-
-			Convey("Then the request is sent to the search handler", func() {
-				So(len(analyticsHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(analyticsHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-		})
 		Convey("When a download request is made", func() {
 			url := "/download/123"
 			req := httptest.NewRequest("GET", url, http.NoBody)
@@ -191,7 +188,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a filter request is made for an invalid flexible dataset", func() {
-			url := "/filters/123"
+			url := filterURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -203,7 +200,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a filter request is made for a valid flexible dataset", func() {
-			url := "/filters/123"
+			url := filterURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -255,7 +252,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a search request is made, but the search handler is not enabled", func() {
-			url := "/search"
+			url := searchURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -271,7 +268,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a search request is made, and the search handler is enabled", func() {
-			url := "/search"
+			url := searchURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -290,7 +287,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a data aggregation page request is made, but the data aggregation pages are not enabled", func() {
-			url := "/alladhocs"
+			url := alladhocsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -307,7 +304,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a data aggregation page request is made, but the data aggregation pages are enabled", func() {
-			url := "/alladhocs"
+			url := alladhocsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -324,7 +321,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a legacy data aggregation page request is made, but the data aggregation pages are not enabled", func() {
-			url := "/economy/alladhocs"
+			url := economyURL + alladhocsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -341,7 +338,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a legacy data aggregation page request is made, but the data aggregation pages are enabled", func() {
-			url := "/economy/alladhocs"
+			url := economyURL + alladhocsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -362,7 +359,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a topic aggregation page request is made, but the topic aggregation pages are not enabled", func() {
-			url := "/economy/publications"
+			url := economyURL + publicationsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -380,7 +377,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a topic aggregation page request is made, but the topic aggregation pages are enabled", func() {
-			url := "/economy/publications"
+			url := economyURL + publicationsURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -398,7 +395,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a subtopic aggregation page request is made, but the subtopic aggregation pages are not enabled", func() {
-			url := "/economy/environmentalaccounts/datalist"
+			url := economyURL + environmentalaccountsURL + datalistURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -415,7 +412,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a subtopic aggregation page request is made, but the subtopic aggregation pages are enabled", func() {
-			url := "/economy/environmentalaccounts/datalist"
+			url := economyURL + environmentalaccountsURL + datalistURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -432,7 +429,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a 3rd level topic aggregation page request is made, but the topic aggregation pages are not enabled", func() {
-			url := "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datalist"
+			url := economyURL + publicsectorfinanceURL + datalistURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -449,7 +446,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a 3rd level topic aggregation page request is made, but the topic aggregation pages are enabled", func() {
-			url := "/economy/governmentpublicsectorandtaxes/publicsectorfinance/datalist"
+			url := economyURL + publicsectorfinanceURL + datalistURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -466,7 +463,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a related data request is made, the RelatedDataRouteEnabled is enabled and the Legacy Cache Proxy is disabled", func() {
-			url := "/economy/relateddata"
+			url := economyURL + relateddataURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -485,7 +482,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a related data request is made, the RelatedDataRouteEnabled is enabled and the Legacy Cache Proxy is enabled", func() {
-			url := "/economy/relateddata"
+			url := economyURL + relateddataURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -507,7 +504,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a previous releases request is made, the PreviousReleasesRoute is enabled and the Legacy Cache Proxy is disabled", func() {
-			url := "/economy/previousreleases"
+			url := economyURL + previousreleasesURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -526,7 +523,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a previous releases request is made, the PreviousReleasesRoute is enabled and the Legacy Cache Proxy is enabled", func() {
-			url := "/economy/previousreleases"
+			url := economyURL + previousreleasesURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -548,7 +545,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a dataset finder request is made, but the Dataset Finder is not enabled", func() {
-			url := "/census/find-a-dataset"
+			url := findADatasetURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -564,7 +561,7 @@ func TestRouter(t *testing.T) {
 			})
 		})
 		Convey("When a dataset finder request is made, and the Dataset Finder is enabled", func() {
-			url := "/census/find-a-dataset"
+			url := findADatasetURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -599,7 +596,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy page request is made", func() {
-			url := "/economy"
+			url := economyURL
 			expectedZebedeeURL := "/data?uri=" + url
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
@@ -790,7 +787,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy dataset request is made, but the dataset handler is not enabled", func() {
-			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
+			url := economyURL + cpiURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
@@ -813,7 +810,7 @@ func TestRouter(t *testing.T) {
 		})
 
 		Convey("When a legacy dataset request is made, and the dataset handler is enabled", func() {
-			url := "/economy/inflationandpriceindices/datasets/consumerpriceinflation/current"
+			url := economyURL + cpiURL
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 

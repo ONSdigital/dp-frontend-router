@@ -17,11 +17,10 @@ import (
 	"github.com/ONSdigital/dp-api-clients-go/v2/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
-	"github.com/ONSdigital/dp-frontend-router/handlers/analytics"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
-	dphttp "github.com/ONSdigital/dp-net/v2/http"
+	dphttp "github.com/ONSdigital/dp-net/v3/http"
 	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -108,11 +107,6 @@ func main() {
 		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 	}
 
-	analyticsHandler, err := analytics.NewSearchHandler(ctx, cfg.SQSAnalyticsURL, cfg.RedirectSecret)
-	if err != nil {
-		log.Fatal(ctx, "error creating search analytics handler", err)
-	}
-
 	downloadHandler := createReverseProxy("download", downloaderURL)
 	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
@@ -128,7 +122,6 @@ func main() {
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
-		AnalyticsHandler:             analyticsHandler,
 		DownloadHandler:              downloadHandler,
 		CookieHandler:                cookieHandler,
 		DatasetHandler:               datasetHandler,

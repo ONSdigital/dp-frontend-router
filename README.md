@@ -20,10 +20,7 @@
 | SEARCH_ROUTES_ENABLED           | false                                     | Search routes feature toggle                                                             |
 | API_ROUTER_URL                  | <http://localhost:23200/v1>               | The API router URL                                                                       |
 | DOWNLOADER_URL                  | <http://localhost:23400>                  | The URL of dp-file-downloader.                                                           |
-| PATTERN_LIBRARY_ASSETS_PATH     | <https://cdn.ons.gov.uk/sixteens/e42235b> | The URL to the sixteens build to use                                                     |
 | SITE_DOMAIN                     | ons.gov.uk                                | The domain hosting the site                                                              |
-| REDIRECT_SECRET                 | secret                                    | Pre-shared key for signing/encrypting redirect data                                      |
-| ANALYTICS_SQS_URL               |                                           | SQS URL for search analytics; leave blank to disable                                     |
 | CONTENT_TYPE_BYTE_LIMIT         | 5000000 (5MB)                             | Response size at which we stop checking content-type to avoid oom errors                 |
 | HEALTHCHECK_INTERVAL            | 30s                                       | The period of time between health checks                                                 |
 | HEALTHCHECK_CRITICAL_TIMEOUT    | 90s                                       | The period of time after which failing checks will result in critical global check       |
@@ -42,6 +39,6 @@
 
 ### Licence
 
-Copyright © 2023, Office for National Statistics (<https://www.ons.gov.uk>)
+Copyright © 2025, Office for National Statistics (<https://www.ons.gov.uk>)
 
 Released under MIT license, see [LICENSE](LICENSE.md) for details

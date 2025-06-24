@@ -8,7 +8,6 @@ import (
 
 // Config represents service configuration for dp-frontend-router
 type Config struct {
-	AWS                          AWS
 	APIRouterURL                 string        `envconfig:"API_ROUTER_URL"`
 	BabbageURL                   string        `envconfig:"BABBAGE_URL"`
 	BindAddr                     string        `envconfig:"BIND_ADDR"`
@@ -35,10 +34,8 @@ type Config struct {
 	OTServiceName                string        `envconfig:"OTEL_SERVICE_NAME"`
 	OTBatchTimeout               time.Duration `envconfig:"OTEL_BATCH_TIMEOUT"`
 	OtelEnabled                  bool          `envconfig:"OTEL_ENABLED"`
-	PatternLibraryAssetsPath     string        `envconfig:"PATTERN_LIBRARY_ASSETS_PATH"`
 	PreviousReleasesRouteEnabled bool          `envconfig:"PREVIOUS_RELEASES_ROUTE_ENABLED"`
 	ProxyTimeout                 time.Duration `envconfig:"PROXY_TIMEOUT"`
-	RedirectSecret               string        `envconfig:"REDIRECT_SECRET" json:"-"`
 	RelatedDataRouteEnabled      bool          `envconfig:"RELATED_DATA_ROUTE_ENABLED"`
 	ReleaseCalendarControllerURL string        `envconfig:"RELEASE_CALENDAR_CONTROLLER_URL"`
 	SearchControllerURL          string        `envconfig:"SEARCH_CONTROLLER_URL"`
@@ -46,15 +43,8 @@ type Config struct {
 	TopicAggregationPagesEnabled bool          `envconfig:"TOPIC_AGGREGATION_PAGES_ENABLED"`
 	SearchRoutesEnabled          bool          `envconfig:"SEARCH_ROUTES_ENABLED"`
 	SiteDomain                   string        `envconfig:"SITE_DOMAIN"`
-	SQSAnalyticsURL              string        `envconfig:"SQS_ANALYTICS_URL"`
 	ZebedeeRequestMaximumRetries int           `envconfig:"ZEBEDEE_REQUEST_MAXIMUM_RETRIES"`
 	ZebedeeRequestMaximumTimeout time.Duration `envconfig:"ZEBEDEE_REQUEST_TIMEOUT_SECONDS"`
-}
-
-type AWS struct {
-	AccessKeyID     string `envconfig:"AWS_ACCESS_KEY_ID"      json:"-"`
-	Region          string `envconfig:"AWS_REGION"`
-	SecretAccessKey string `envconfig:"AWS_SECRET_ACCESS_KEY"  json:"-"`
 }
 
 var cfg *Config
@@ -92,10 +82,8 @@ func Get() (*Config, error) {
 		OTServiceName:                "dp-frontend-router",
 		OTBatchTimeout:               5 * time.Second,
 		OtelEnabled:                  false,
-		PatternLibraryAssetsPath:     "https://cdn.ons.gov.uk/sixteens/f816ac8",
 		PreviousReleasesRouteEnabled: false,
 		ProxyTimeout:                 5 * time.Second,
-		RedirectSecret:               "secret",
 		RelatedDataRouteEnabled:      false,
 		ReleaseCalendarControllerURL: "http://localhost:27700",
 		SearchControllerURL:          "http://localhost:25000",
@@ -103,15 +91,8 @@ func Get() (*Config, error) {
 		TopicAggregationPagesEnabled: false,
 		DataAggregationPagesEnabled:  false,
 		SiteDomain:                   "ons.gov.uk",
-		SQSAnalyticsURL:              "",
 		ZebedeeRequestMaximumRetries: 0,
 		ZebedeeRequestMaximumTimeout: 5 * time.Second,
-	}
-
-	cfg.AWS = AWS{
-		AccessKeyID:     "",
-		Region:          "eu-west-2",
-		SecretAccessKey: "",
 	}
 
 	if err := envconfig.Process("", cfg); err != nil {

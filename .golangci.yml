@@ -1,30 +1,27 @@
 # This file was inspired by the golangci-lint one:
 # https://github.com/golangci/golangci-lint/blob/master/.golangci.yml
 run:
-  # default concurrency is the available CPU number
+  # number of operating system threads that can execute golangci-lint simultaneously
   concurrency: 4
 
   # timeout for analysis, e.g. 30s, 5m, default is 1m
-  timeout: 10m
+  timeout: 5m
 linters-settings:
-  revive:
-    rules:
-      - name: unused-parameter
-        severity: error
-        disabled: true
   govet:
     shadow: true
   golint:
     min-confidence: 0
   gocyclo:
-    min-complexity: 15
+    min-complexity: 20
+  gocognit:
+    min-complexity: 40
   maligned:
     suggest-new: true
   dupl:
     threshold: 100
   goconst:
-    min-len: 3
-    min-occurrences: 4
+    min-len: 2
+    min-occurrences: 2
   misspell:
     locale: UK
   lll:
@@ -44,6 +41,17 @@ linters-settings:
       - ifElseChain
       - octalLiteral
       - hugeParam
+  revive:
+    rules:
+      # disabled as parameter names are useful for context even when unused, especially in interface implementations
+      - name: unused-parameter
+        severity: warning
+        disabled: true
+    include:
+      - "**/*_test.go" # Specify test files to include
+  funlen:
+  # lines: 100
+  # statements: 100
 
 linters:
   # please, do not use `enable-all`: it's deprecated and will be removed soon.
@@ -81,28 +89,15 @@ issues:
         - errcheck
         - dupl
         - gosec
-    - path: main.go|service|component.go
-      linters:
-        - typecheck
-    - linters:
-      - govet
-      text: 'declaration of "(err|ctx)" shadows declaration at'
-    # Allow log.Fatal in main.go (log.go library continues after calling this, unlike std library log.Fatal)
-    - path: main.go
-      linters:
-        - gocritic
-      source: "log.Fatal"
     # Allow dot import in test files for goconvey
     - path: _test.go
       text: "dot-imports"
       linters:
         - revive
       source: "github.com/smartystreets/goconvey/convey"
+    # Allow log.Fatal in main.go (log.go library continues after calling this, unlike std library log.Fatal)
+    - path: main.go
+      linters:
+        - gocritic
+      source: "log.Fatal"
   new: false
-
-# golangci.com configuration
-# https://github.com/golangci/golangci/wiki/Configuration
-service:
-  golangci-lint-version: 1.61.x # use the fixed version to not introduce new linters unexpectedly
-  prepare:
-    - echo "here I can run custom commands, but no preparation needed for this repo"

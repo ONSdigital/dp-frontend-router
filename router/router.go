@@ -10,7 +10,7 @@ import (
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
-	dprequest "github.com/ONSdigital/dp-net/v2/request"
+	dprequest "github.com/ONSdigital/dp-net/v3/request"
 	"github.com/ONSdigital/log.go/v2/log"
 	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
@@ -26,7 +26,6 @@ type Handler http.Handler
 
 type Config struct {
 	HealthCheckHandler           func(w http.ResponseWriter, req *http.Request)
-	AnalyticsHandler             http.Handler
 	DownloadHandler              http.Handler
 	DatasetHandler               http.Handler
 	DatasetClient                datasetType.DatasetClient
@@ -91,7 +90,6 @@ func New(cfg Config) http.Handler {
 		router.Handle("/census/find-a-dataset", cfg.SearchHandler)
 	}
 
-	router.Handle("/redir/{data:.*}", cfg.AnalyticsHandler)
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
