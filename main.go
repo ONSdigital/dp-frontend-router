@@ -81,7 +81,6 @@ func main() {
 	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
 	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
-	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	redirects.Init(assets.Asset)
@@ -111,14 +110,13 @@ func main() {
 	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
 	prefixDatasetHandler := createReverseProxy("datasets", prefixDatasetControllerURL)
-	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
+	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
 	searchHandler := createReverseProxy("search", searchControllerURL)
 	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
@@ -129,10 +127,9 @@ func main() {
 		PrefixDatasetHandler:         prefixDatasetHandler,
 		DatasetClient:                datasetClient,
 		HealthCheckHandler:           hc.Handler,
-		FilterHandler:                filterHandler,
 		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
-		FilterFlexHandler:            filterFlexHandler,
+		FilterHandler:                filterHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
 		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
 		TopicAggregationPagesEnabled: cfg.TopicAggregationPagesEnabled,

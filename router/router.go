@@ -31,9 +31,8 @@ type Config struct {
 	NewDatasetRoutingEnabled     bool
 	PrefixDatasetHandler         http.Handler
 	CookieHandler                http.Handler
-	FilterHandler                http.Handler
-	FilterFlexHandler            http.Handler
 	FilterClient                 datasetType.FilterClient
+	FilterHandler                http.Handler
 	FeedbackHandler              http.Handler
 	ContentTypeByteLimit         int
 	ZebedeeClient                allRoutes.ZebedeeClient
@@ -92,8 +91,7 @@ func New(cfg Config) http.Handler {
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
-	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
-	router.Handle("/filters/{uri:.*}", cfg.DatasetHandler)
+	router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
 	if cfg.LegacySearchRedirectsEnabled {
