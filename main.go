@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"time"
 
@@ -17,6 +16,7 @@ import (
 	"github.com/ONSdigital/dp-api-clients-go/v2/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
+	"github.com/ONSdigital/dp-frontend-router/helpers"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-healthcheck/healthcheck"
@@ -24,8 +24,6 @@ import (
 	dpotelgo "github.com/ONSdigital/dp-otel-go"
 	"github.com/ONSdigital/log.go/v2/log"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/propagation"
 )
 
 var (
@@ -69,18 +67,18 @@ func main() {
 		}()
 	}
 
-	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
-	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
+	cookiesControllerURL, _ := helpers.ParseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
+	datasetControllerURL, _ := helpers.ParseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
 	prefixedDatasetURL := cfg.DatasetControllerURL + "/dataset"
-	prefixDatasetControllerURL, _ := parseURL(ctx, prefixedDatasetURL, "DatasetControllerURL")
-	filterDatasetControllerURL, _ := parseURL(ctx, cfg.FilterDatasetControllerURL, "FilterDatasetControllerURL")
-	homepageControllerURL, _ := parseURL(ctx, cfg.HomepageControllerURL, "HomepageControllerURL")
-	searchControllerURL, _ := parseURL(ctx, cfg.SearchControllerURL, "SearchControllerURL")
-	relcalControllerURL, _ := parseURL(ctx, cfg.ReleaseCalendarControllerURL, "ReleaseCalendarControllerURL")
-	legacyCacheProxyURL, _ := parseURL(ctx, cfg.LegacyCacheProxyURL, "LegacyCacheProxyURL")
-	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
-	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
-	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
+	prefixDatasetControllerURL, _ := helpers.ParseURL(ctx, prefixedDatasetURL, "DatasetControllerURL")
+	filterDatasetControllerURL, _ := helpers.ParseURL(ctx, cfg.FilterDatasetControllerURL, "FilterDatasetControllerURL")
+	homepageControllerURL, _ := helpers.ParseURL(ctx, cfg.HomepageControllerURL, "HomepageControllerURL")
+	searchControllerURL, _ := helpers.ParseURL(ctx, cfg.SearchControllerURL, "SearchControllerURL")
+	relcalControllerURL, _ := helpers.ParseURL(ctx, cfg.ReleaseCalendarControllerURL, "ReleaseCalendarControllerURL")
+	legacyCacheProxyURL, _ := helpers.ParseURL(ctx, cfg.LegacyCacheProxyURL, "LegacyCacheProxyURL")
+	babbageURL, _ := helpers.ParseURL(ctx, cfg.BabbageURL, "BabbageURL")
+	downloaderURL, _ := helpers.ParseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
+	feedbackControllerURL, _ := helpers.ParseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	redirects.Init(assets.Asset)
@@ -106,18 +104,18 @@ func main() {
 		log.Fatal(ctx, "Failed to add api router checker to healthcheck", err)
 	}
 
-	downloadHandler := createReverseProxy("download", downloaderURL)
-	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
-	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
-	prefixDatasetHandler := createReverseProxy("datasets", prefixDatasetControllerURL)
-	feedbackHandler := createReverseProxy("feedback", feedbackControllerURL)
-	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
-	searchHandler := createReverseProxy("search", searchControllerURL)
-	relcalHandler := createReverseProxy("relcal", relcalControllerURL)
-	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
-	babbageHandler := createReverseProxy("babbage", babbageURL)
-	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
+	downloadHandler := helpers.CreateReverseProxy("download", downloaderURL)
+	cookieHandler := helpers.CreateReverseProxy("cookies", cookiesControllerURL)
+	datasetHandler := helpers.CreateReverseProxy("datasets", datasetControllerURL)
+	prefixDatasetHandler := helpers.CreateReverseProxy("datasets", prefixDatasetControllerURL)
+	feedbackHandler := helpers.CreateReverseProxy("feedback", feedbackControllerURL)
+	filterHandler := helpers.CreateReverseProxy("filters", filterDatasetControllerURL)
+	searchHandler := helpers.CreateReverseProxy("search", searchControllerURL)
+	relcalHandler := helpers.CreateReverseProxy("relcal", relcalControllerURL)
+	homepageHandler := helpers.CreateReverseProxy("homepage", homepageControllerURL)
+	babbageHandler := helpers.CreateReverseProxy("babbage", babbageURL)
+	proxyHandler := helpers.CreateReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
+	censusAtlasHandler := helpers.CreateReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
 		DownloadHandler:              downloadHandler,
@@ -190,40 +188,6 @@ func main() {
 			log.Fatal(ctx, "error shutting down opentelemettry", err)
 		}
 	}
-}
-
-func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
-	parsedURL, err := url.Parse(cfgValue)
-	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": configName, "value": cfgValue})
-		return nil, err
-	}
-	return parsedURL, nil
-}
-
-func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
-	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
-	director := proxy.Director
-	proxy.Transport = &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).DialContext,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       180 * time.Second,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-	}
-	proxy.Director = func(req *http.Request) {
-		log.Info(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
-			"destination": proxyURL,
-			"proxy_name":  proxyName,
-		})
-		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
-		director(req)
-	}
-	return proxy
 }
 
 func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL {
