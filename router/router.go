@@ -178,7 +178,13 @@ func New(cfg Config) http.Handler {
 
 	// all other requests go through the allRoutesMiddleware to check the page type first
 	handlers := map[string]http.Handler{
-		"dataset_landing_page": cfg.DatasetHandler,
+		"dataset_landing_page": func() http.Handler {
+			if cfg.LegacyCacheProxyEnabled {
+				return cfg.ProxyHandler
+			} else {
+				return cfg.DatasetHandler
+			}
+		}(),
 	}
 	if cfg.NewDatasetRoutingEnabled {
 		handlers["dataset"] = cfg.PrefixDatasetHandler

@@ -40,20 +40,20 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			userAccessToken := ""
 			if c, err := req.Cookie(`access_token`); err == nil && c.Value != "" {
 				userAccessToken = c.Value
-				log.Info(req.Context(), "Obtained access_token Cookie")
+				log.Info(req.Context(), "obtained access_token Cookie")
 			}
 
 			// Do the GET call using Zebedee Client and providing any access_token from cookie
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
 				// intentionally log as info with the error in log.data to prevent the full stack trace being logged as zebedee 404's are common
-				log.Info(req.Context(), "Zebedee GET failed", log.Data{"error": err.Error(), "path": path})
+				log.Info(req.Context(), "zebedee GET failed", log.Data{"error": err.Error(), "path": path})
 				h.ServeHTTP(w, req)
 				return
 			}
 
 			if len(b) > contentTypeByteLimit {
-				log.Warn(req.Context(), "Response exceeds acceptable byte limit for assessing content-type. Falling through to default handling")
+				log.Warn(req.Context(), "response exceeds acceptable byte limit for assessing content-type. Falling through to default handling")
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -74,12 +74,13 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			pageType := headers.Get(HeaderOnsPageType)
 
 			if zebResp.DatasetID != "" && zebResp.Type == "api_dataset_landing_page" {
-				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), 302)
+				http.Redirect(w, req, fmt.Sprintf("/datasets/%s", zebResp.DatasetID), http.StatusFound)
 				return
 			}
 
 			if routesH, ok := routesHandler[pageType]; ok {
-				log.Info(req.Context(), "Using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
+				log.Info(req.Context(), "using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
+				req.Header.Add(HeaderOnsPageType, pageType)
 				routesH.ServeHTTP(w, req)
 				return
 			}
