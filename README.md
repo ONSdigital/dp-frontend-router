@@ -1,5 +1,17 @@
 # dp-frontend-router
 
+## Tools
+
+To run some of our tests you will need additional tooling:
+
+### Audit
+
+We use `dis-vulncheck` to do auditing, which you will [need to install](https://github.com/ONSdigital/dis-vulncheck).
+
+### Linting
+
+We use v2 of golangci-lint, which you will [need to install](https://golangci-lint.run/docs/welcome/install).
+
 ## Configuration
 
 | Environment variable            | Default                                   | Description                                                                              |
