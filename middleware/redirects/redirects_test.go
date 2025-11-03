@@ -21,7 +21,7 @@ func TestRedirect(t *testing.T) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	var handled bool
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
 		handled = true
 	})
 
@@ -54,7 +54,7 @@ func TestDynamicRedirect(t *testing.T) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.Handle("/original{uri:.*}", DynamicRedirectHandler("/original", "/redirected"))
-	router.HandleFunc("/redirected{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {
+	router.HandleFunc("/redirected{uri:.*}", func(w http.ResponseWriter, req *http.Request) {
 	})
 
 	Convey("Test that a redirect request is redirected to the new url", t, func() {
@@ -92,7 +92,7 @@ func TestRouteRedirect(t *testing.T) {
 	}
 	testAlice := alice.New(middleware...).Then(router)
 	router.Handle("/{uri:.*}/original", RouteRedirectHandler("/redirected"))
-	router.HandleFunc("/redirected", func(_ http.ResponseWriter, _ *http.Request) {
+	router.HandleFunc("/redirected", func(w http.ResponseWriter, req *http.Request) {
 		// empty function in case we want any behaviour here.
 	})
 
@@ -128,7 +128,7 @@ func TestInit(t *testing.T) {
 	var shouldError bool
 	var returnBytes []byte
 	var called bool
-	var asset = func(_ string) ([]byte, error) {
+	var asset = func(name string) ([]byte, error) {
 		called = true
 		if shouldError {
 			return nil, errors.New("error")
@@ -193,7 +193,7 @@ func BenchmarkWithoutRedirectMiddleware(b *testing.B) {
 		// securityHandler,
 	}
 	testAlice := alice.New(middleware...).Then(router)
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {})
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
@@ -210,7 +210,7 @@ func BenchmarkWithoutRedirects(b *testing.B) {
 		Handler,
 	}
 	testAlice := alice.New(middleware...).Then(router)
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {})
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
@@ -233,7 +233,7 @@ func BenchmarkWith100Redirects(b *testing.B) {
 		Handler,
 	}
 	testAlice := alice.New(middleware...).Then(router)
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {})
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
@@ -256,7 +256,7 @@ func BenchmarkWith10000Redirects(b *testing.B) {
 		Handler,
 	}
 	testAlice := alice.New(middleware...).Then(router)
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {})
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {
@@ -279,7 +279,7 @@ func BenchmarkWith1000000Redirects(b *testing.B) {
 		Handler,
 	}
 	testAlice := alice.New(middleware...).Then(router)
-	router.HandleFunc("/{uri:.*}", func(_ http.ResponseWriter, _ *http.Request) {})
+	router.HandleFunc("/{uri:.*}", func(w http.ResponseWriter, req *http.Request) {})
 	req, _ := http.NewRequest("GET", "/", http.NoBody)
 
 	for n := 0; n < b.N; n++ {

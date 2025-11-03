@@ -78,7 +78,6 @@ func main() {
 	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
 	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
-	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	redirects.Init(assets.Asset)
@@ -111,7 +110,6 @@ func main() {
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
@@ -123,7 +121,6 @@ func main() {
 		HealthCheckHandler:           hc.Handler,
 		FilterHandler:                filterHandler,
 		FeedbackHandler:              feedbackHandler,
-		FilterFlexHandler:            filterFlexHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
 		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
 		TopicAggregationPagesEnabled: cfg.TopicAggregationPagesEnabled,

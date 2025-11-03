@@ -72,7 +72,6 @@ func TestRouter(t *testing.T) {
 		cookieHandler := NewHandlerMock()
 		datasetHandler := NewHandlerMock()
 		filterHandler := NewHandlerMock()
-		filterFlexHandler := NewHandlerMock()
 		feedbackHandler := NewHandlerMock()
 		babbageHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
@@ -95,7 +94,6 @@ func TestRouter(t *testing.T) {
 			DatasetHandler:       datasetHandler,
 			PrefixDatasetHandler: prefixDatasetHandler,
 			FilterHandler:        filterHandler,
-			FilterFlexHandler:    filterFlexHandler,
 			FeedbackHandler:      feedbackHandler,
 			ZebedeeClient:        zebedeeClient,
 			BabbageHandler:       babbageHandler,
@@ -168,6 +166,22 @@ func TestRouter(t *testing.T) {
 			Convey("Then the request is sent to the dataset handler", func() {
 				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
 				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
+		Convey("When a filter request is made", func() {
+			url := "/filters/321"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+			Convey("Then the request is sent to the filter handler", func() {
+				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
 
