@@ -7,11 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
-	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes/allroutestest"
-	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType/mocks"
 	"github.com/ONSdigital/dp-frontend-router/router"
 	"github.com/ONSdigital/dp-frontend-router/router/routertest"
 	. "github.com/smartystreets/goconvey/convey"
@@ -19,7 +16,7 @@ import (
 
 func NewHandlerMock() *routertest.HandlerMock {
 	return &routertest.HandlerMock{
-		ServeHTTPFunc: func(in1 http.ResponseWriter, in2 *http.Request) {},
+		ServeHTTPFunc: func(_ http.ResponseWriter, _ *http.Request) {},
 	}
 }
 
@@ -75,7 +72,6 @@ func TestRouter(t *testing.T) {
 		cookieHandler := NewHandlerMock()
 		datasetHandler := NewHandlerMock()
 		filterHandler := NewHandlerMock()
-		filterFlexHandler := NewHandlerMock()
 		feedbackHandler := NewHandlerMock()
 		babbageHandler := NewHandlerMock()
 		homepageHandler := NewHandlerMock()
@@ -85,20 +81,8 @@ func TestRouter(t *testing.T) {
 		proxyHandler := NewHandlerMock()
 
 		zebedeeClient := &allroutestest.ZebedeeClientMock{
-			GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
+			GetWithHeadersFunc: func(_ context.Context, _ string, _ string) ([]byte, http.Header, error) {
 				return make([]byte, 0), http.Header{}, nil
-			},
-		}
-
-		filterClient := &mocks.FilterClientMock{
-			GetJobStateFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, downloadServiceToken, collectionID, filterID string) (filter.Model, string, error) {
-				return filter.Model{}, "", nil
-			},
-		}
-
-		datasetClient := &mocks.DatasetClientMock{
-			GetFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, collectionID, datasetID string) (dataset.DatasetDetails, error) {
-				return dataset.DatasetDetails{}, nil
 			},
 		}
 
@@ -109,10 +93,7 @@ func TestRouter(t *testing.T) {
 			CookieHandler:        cookieHandler,
 			DatasetHandler:       datasetHandler,
 			PrefixDatasetHandler: prefixDatasetHandler,
-			DatasetClient:        datasetClient,
 			FilterHandler:        filterHandler,
-			FilterClient:         filterClient,
-			FilterFlexHandler:    filterFlexHandler,
 			FeedbackHandler:      feedbackHandler,
 			ZebedeeClient:        zebedeeClient,
 			BabbageHandler:       babbageHandler,
@@ -187,57 +168,23 @@ func TestRouter(t *testing.T) {
 				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-		Convey("When a filter request is made for an invalid flexible dataset", func() {
-			url := filterURL
+
+		Convey("When a filter request is made", func() {
+			url := "/filters/321"
 			req := httptest.NewRequest("GET", url, http.NoBody)
 			res := httptest.NewRecorder()
 
 			r := router.New(config)
 			r.ServeHTTP(res, req)
-
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(zebedeeClient.GetWithHeadersCalls(), ShouldHaveLength, 0)
-			})
-
-			Convey("Then the request is sent to the filter handler", func() {
-				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
-				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-
-			Convey("Then no requests are sent to the filter/flex handler", func() {
-				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
-			})
-		})
-		Convey("When a filter request is made for a valid flexible dataset", func() {
-			url := filterURL
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
-
-			flexDataset := &mocks.DatasetClientMock{
-				GetFunc: func(ctx context.Context, userAuthToken, serviceAuthToken, collectionID, datasetID string) (dataset.DatasetDetails, error) {
-					return dataset.DatasetDetails{
-						Type: "cantabular_flexible_table",
-					}, nil
-				},
-			}
-			config.DatasetClient = flexDataset
-
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-
 			Convey("Then no requests are sent to Zebedee", func() {
 				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
 			})
-
-			Convey("Then the request is sent to the filter/flex handler", func() {
-				So(filterFlexHandler.ServeHTTPCalls(), ShouldHaveLength, 1)
-				So(filterFlexHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-
-			Convey("Then no requests are sent to the filter handler", func() {
-				So(filterHandler.ServeHTTPCalls(), ShouldHaveLength, 0)
+			Convey("Then the request is sent to the filter handler", func() {
+				So(len(filterHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(filterHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
+
 		Convey("When a filter-output request is made", func() {
 			url := "/filter-outputs/321"
 			req := httptest.NewRequest("GET", url, http.NoBody)
@@ -837,7 +784,7 @@ func TestRouter(t *testing.T) {
 			// mock allRouteHandler's zebedee response to return dataset page type
 			zebedeeResponseBody := json.RawMessage(`{"type":"dataset","apiDatasetId":""}`)
 			zebedeeClient = &allroutestest.ZebedeeClientMock{
-				GetWithHeadersFunc: func(ctx context.Context, userAccessToken string, path string) ([]byte, http.Header, error) {
+				GetWithHeadersFunc: func(_ context.Context, _ string, _ string) ([]byte, http.Header, error) {
 					h := http.Header{}
 					h.Add(allRoutes.HeaderOnsPageType, "dataset")
 					return zebedeeResponseBody, h, nil

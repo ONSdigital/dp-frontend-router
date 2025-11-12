@@ -11,9 +11,6 @@ import (
 
 	"golang.org/x/net/netutil"
 
-	"github.com/ONSdigital/dp-api-clients-go/v2/dataset"
-	"github.com/ONSdigital/dp-api-clients-go/v2/filter"
-	"github.com/ONSdigital/dp-api-clients-go/v2/health"
 	"github.com/ONSdigital/dp-api-clients-go/v2/zebedee"
 	"github.com/ONSdigital/dp-frontend-router/assets"
 	"github.com/ONSdigital/dp-frontend-router/config"
@@ -81,7 +78,6 @@ func main() {
 	babbageURL, _ := parseURL(ctx, cfg.BabbageURL, "BabbageURL")
 	downloaderURL, _ := parseURL(ctx, cfg.DownloaderURL, "DownloaderURL")
 	feedbackControllerURL, _ := parseURL(ctx, cfg.FeedbackControllerURL, "FeedbackControllerURL")
-	filterFlexDatasetServiceURL, _ := parseURL(ctx, cfg.FilterFlexDatasetServiceURL, "FilterFlexDatasetServiceURL")
 	censusAtlasURL := urlFromConfig(ctx, "CensusAtlas", cfg.CensusAtlasURL)
 
 	redirects.Init(assets.Asset)
@@ -92,10 +88,6 @@ func main() {
 	hcClienter.SetTimeout(cfg.ZebedeeRequestMaximumTimeout)
 
 	zebedeeClient := zebedee.NewClientWithClienter(cfg.APIRouterURL, hcClienter)
-
-	hcClient := health.NewClient("api-router", cfg.APIRouterURL)
-	filterClient := filter.NewWithHealthClient(hcClient)
-	datasetClient := dataset.NewWithHealthClient(hcClient)
 
 	// Healthcheck API
 	versionInfo, err := healthcheck.NewVersionInfo(BuildTime, GitCommit, Version)
@@ -118,7 +110,6 @@ func main() {
 	homepageHandler := createReverseProxy("homepage", homepageControllerURL)
 	babbageHandler := createReverseProxy("babbage", babbageURL)
 	proxyHandler := createReverseProxy("legacyCacheProxy", legacyCacheProxyURL)
-	filterFlexHandler := createReverseProxy("flex", filterFlexDatasetServiceURL)
 	censusAtlasHandler := createReverseProxy("censusAtlas", censusAtlasURL)
 
 	routerConfig := router.Config{
@@ -127,12 +118,9 @@ func main() {
 		DatasetHandler:               datasetHandler,
 		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,
 		PrefixDatasetHandler:         prefixDatasetHandler,
-		DatasetClient:                datasetClient,
 		HealthCheckHandler:           hc.Handler,
 		FilterHandler:                filterHandler,
-		FilterClient:                 filterClient,
 		FeedbackHandler:              feedbackHandler,
-		FilterFlexHandler:            filterFlexHandler,
 		LegacySearchRedirectsEnabled: cfg.LegacySearchRedirectsEnabled,
 		DataAggregationPagesEnabled:  cfg.DataAggregationPagesEnabled,
 		TopicAggregationPagesEnabled: cfg.TopicAggregationPagesEnabled,

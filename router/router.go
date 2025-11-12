@@ -7,7 +7,6 @@ import (
 
 	"github.com/ONSdigital/dp-frontend-router/config"
 	"github.com/ONSdigital/dp-frontend-router/middleware/allRoutes"
-	"github.com/ONSdigital/dp-frontend-router/middleware/datasetType"
 	"github.com/ONSdigital/dp-frontend-router/middleware/redirects"
 	dprequest "github.com/ONSdigital/dp-net/v3/request"
 	"github.com/ONSdigital/log.go/v2/log"
@@ -27,13 +26,11 @@ type Config struct {
 	HealthCheckHandler           func(w http.ResponseWriter, req *http.Request)
 	DownloadHandler              http.Handler
 	DatasetHandler               http.Handler
-	DatasetClient                datasetType.DatasetClient
 	NewDatasetRoutingEnabled     bool
 	PrefixDatasetHandler         http.Handler
 	CookieHandler                http.Handler
 	FilterHandler                http.Handler
 	FilterFlexHandler            http.Handler
-	FilterClient                 datasetType.FilterClient
 	FeedbackHandler              http.Handler
 	ContentTypeByteLimit         int
 	ZebedeeClient                allRoutes.ZebedeeClient
@@ -92,7 +89,7 @@ func New(cfg Config) http.Handler {
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
-	router.Handle("/filters/{uri:.*}", datasetType.Handler(cfg.FilterClient, cfg.DatasetClient)(cfg.FilterHandler, cfg.FilterFlexHandler))
+	router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
 
@@ -181,9 +178,8 @@ func New(cfg Config) http.Handler {
 		"dataset_landing_page": func() http.Handler {
 			if cfg.LegacyCacheProxyEnabled {
 				return cfg.ProxyHandler
-			} else {
-				return cfg.DatasetHandler
 			}
+			return cfg.DatasetHandler
 		}(),
 	}
 	if cfg.NewDatasetRoutingEnabled {
