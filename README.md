@@ -22,6 +22,7 @@ We use v2 of golangci-lint, which you will [need to install](https://golangci-li
 | COOKIES_CONTROLLER_URL          | <http://localhost:24100>                  | The URL of dp-frontend-cookie-controller                                                 |
 | HOMEPAGE_CONTROLLER_URL         | <http://localhost:24400>                  | The URL of dp-frontend-dataset-controller                                                |
 | DATASET_CONTROLLER_URL          | <http://localhost:20200>                  | The URL of dp-frontend-dataset-controller                                                |
+| ENABLE_STATIC_DATASET_ROUTING   | false                                     | Flag to enable static dataset page routing to dp-frontend-dataset-controller             |
 | FILTER_DATASET_CONTROLLER_URL   | <http://localhost:20001>                  | The URL of dp-frontend-filter-dataset-controller                                         |
 | FEEDBACK_CONTROLLER_URL         | <http://localhost:25200>                  | The URL of dp-frontend-feedback-controller                                               |
 | SEARCH_CONTROLLER_URL           | <http://localhost:25000>                  | The URL of dp-frontend-search-controller                                                 |

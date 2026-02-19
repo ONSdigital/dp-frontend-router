@@ -16,6 +16,7 @@ type Config struct {
 	ContentTypeByteLimit         int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
 	CookiesControllerURL         string        `envconfig:"COOKIES_CONTROLLER_URL"`
 	DatasetControllerURL         string        `envconfig:"DATASET_CONTROLLER_URL"`
+	EnableStaticDatasetRouting   bool          `envconfig:"ENABLE_STATIC_DATASET_ROUTING"`
 	DatasetFinderEnabled         bool          `envconfig:"DATASET_FINDER_ENABLED"`
 	DownloaderURL                string        `envconfig:"DOWNLOADER_URL"`
 	FeedbackControllerURL        string        `envconfig:"FEEDBACK_CONTROLLER_URL"`
@@ -63,6 +64,7 @@ func Get() (*Config, error) {
 		ContentTypeByteLimit:         5000000,
 		CookiesControllerURL:         "http://localhost:24100",
 		DatasetControllerURL:         "http://localhost:20200",
+		EnableStaticDatasetRouting:   false,
 		DatasetFinderEnabled:         false,
 		DownloaderURL:                "http://localhost:23400",
 		FeedbackControllerURL:        "http://localhost:25200",

@@ -19,6 +19,7 @@ func TestSpec(t *testing.T) {
 				So(cfg.BabbageURL, ShouldEqual, "http://localhost:8080")
 				So(cfg.CookiesControllerURL, ShouldEqual, "http://localhost:24100")
 				So(cfg.DatasetControllerURL, ShouldEqual, "http://localhost:20200")
+				So(cfg.EnableStaticDatasetRouting, ShouldBeFalse)
 				So(cfg.FilterDatasetControllerURL, ShouldEqual, "http://localhost:20001")
 				So(cfg.FeedbackControllerURL, ShouldEqual, "http://localhost:25200")
 				So(cfg.FeedbackEnabled, ShouldBeFalse)
