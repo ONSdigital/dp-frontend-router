@@ -26,6 +26,7 @@ type Config struct {
 	HealthCheckHandler           func(w http.ResponseWriter, req *http.Request)
 	DownloadHandler              http.Handler
 	DatasetHandler               http.Handler
+	EnableStaticDatasetRouting   bool
 	NewDatasetRoutingEnabled     bool
 	PrefixDatasetHandler         http.Handler
 	CookieHandler                http.Handler
@@ -86,9 +87,13 @@ func New(cfg Config) http.Handler {
 		router.Handle("/census/find-a-dataset", cfg.SearchHandler)
 	}
 
+	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
+	if cfg.EnableStaticDatasetRouting {
+		router.Handle("/{topic}/datasets/{uri:.*}", cfg.DatasetHandler)
+	}
+
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
 	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
-	router.Handle("/datasets/{uri:.*}", cfg.DatasetHandler)
 	router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)

@@ -116,6 +116,7 @@ func main() {
 		DownloadHandler:              downloadHandler,
 		CookieHandler:                cookieHandler,
 		DatasetHandler:               datasetHandler,
+		EnableStaticDatasetRouting:   cfg.EnableStaticDatasetRouting,
 		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,
 		PrefixDatasetHandler:         prefixDatasetHandler,
 		HealthCheckHandler:           hc.Handler,

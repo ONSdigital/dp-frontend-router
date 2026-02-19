@@ -169,6 +169,25 @@ func TestRouter(t *testing.T) {
 			})
 		})
 
+		Convey("When a static dataset request is made and EnableStaticDatasetRouting is true", func() {
+			url := "/economy/datasets/cpih"
+			req := httptest.NewRequest("GET", url, http.NoBody)
+			res := httptest.NewRecorder()
+
+			config.EnableStaticDatasetRouting = true
+			r := router.New(config)
+			r.ServeHTTP(res, req)
+
+			Convey("Then no requests are sent to Zebedee", func() {
+				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
+			})
+
+			Convey("And the request is sent to the dataset handler", func() {
+				So(len(datasetHandler.ServeHTTPCalls()), ShouldEqual, 1)
+				So(datasetHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
+			})
+		})
+
 		Convey("When a filter request is made", func() {
 			url := "/filters/321"
 			req := httptest.NewRequest("GET", url, http.NoBody)
