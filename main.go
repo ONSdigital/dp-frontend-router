@@ -194,28 +194,30 @@ func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error
 }
 
 func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
-	proxy := httputil.NewSingleHostReverseProxy(proxyURL)
-	director := proxy.Director
-	proxy.Transport = &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			Timeout:   5 * time.Second,
-			KeepAlive: 30 * time.Second,
-		}).DialContext,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       180 * time.Second,
-		TLSHandshakeTimeout:   5 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
+	return &httputil.ReverseProxy{
+		Transport: &http.Transport{
+			Proxy: http.ProxyFromEnvironment,
+			DialContext: (&net.Dialer{
+				Timeout:   5 * time.Second,
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			MaxIdleConns:          100,
+			IdleConnTimeout:       180 * time.Second,
+			TLSHandshakeTimeout:   5 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+		},
+
+		Rewrite: func(req *httputil.ProxyRequest) {
+			log.Info(req.In.Context(), "proxying request", log.HTTP(req.In, 0, 0, nil, nil), log.Data{
+				"destination": proxyURL,
+				"proxy_name":  proxyName,
+			})
+			otel.GetTextMapPropagator().Inject(req.In.Context(), propagation.HeaderCarrier(req.In.Header))
+			req.SetURL(proxyURL)
+			req.Out.Host = req.In.Host
+			req.SetXForwarded()
+		},
 	}
-	proxy.Director = func(req *http.Request) {
-		log.Info(req.Context(), "proxying request", log.HTTP(req, 0, 0, nil, nil), log.Data{
-			"destination": proxyURL,
-			"proxy_name":  proxyName,
-		})
-		otel.GetTextMapPropagator().Inject(req.Context(), propagation.HeaderCarrier(req.Header))
-		director(req)
-	}
-	return proxy
 }
 
 func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL {
