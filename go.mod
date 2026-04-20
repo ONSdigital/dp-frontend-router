@@ -3,7 +3,7 @@ module github.com/ONSdigital/dp-frontend-router
 go 1.26
 
 require (
-	github.com/ONSdigital/dp-api-clients-go/v2 v2.277.0
+	github.com/ONSdigital/dp-api-clients-go/v2 v2.273.0
 	github.com/ONSdigital/dp-healthcheck v1.6.4
 	github.com/ONSdigital/dp-net/v3 v3.10.0
 	github.com/ONSdigital/dp-otel-go v0.0.8
