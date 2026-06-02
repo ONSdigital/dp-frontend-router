@@ -14,6 +14,8 @@ import (
 // HeaderOnsPageType is the header name that defines the handler that will be used by the Middleware
 const HeaderOnsPageType = "ONS-Page-Type" // NOTE: when using the http method Add and Get, this returns the canonical format: "Ons-Page-Type"
 
+const logKeyPath = "path"
+
 //go:generate moq -out allroutestest/zebedeeclient.go -pkg allroutestest . ZebedeeClient
 type ZebedeeClient interface {
 	GetWithHeaders(ctx context.Context, userAccessToken, path string) ([]byte, http.Header, error)
@@ -47,7 +49,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			b, headers, err := zebedeeClient.GetWithHeaders(req.Context(), userAccessToken, contentPath)
 			if err != nil {
 				// intentionally log as info with the error in log.data to prevent the full stack trace being logged as zebedee 404's are common
-				log.Info(req.Context(), "zebedee GET failed", log.Data{"error": err.Error(), "path": path})
+				log.Info(req.Context(), "zebedee GET failed", log.Data{"error": err.Error(), logKeyPath: path})
 				h.ServeHTTP(w, req)
 				return
 			}
@@ -79,7 +81,7 @@ func Handler(routesHandler map[string]http.Handler, zebedeeClient ZebedeeClient,
 			}
 
 			if routesH, ok := routesHandler[pageType]; ok {
-				log.Info(req.Context(), "using handler for page type", log.Data{"pageType": pageType, "path": contentPath})
+				log.Info(req.Context(), "using handler for page type", log.Data{"pageType": pageType, logKeyPath: contentPath})
 				req.Header.Add(HeaderOnsPageType, pageType)
 				routesH.ServeHTTP(w, req)
 				return

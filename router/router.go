@@ -202,7 +202,7 @@ func New(cfg Config) http.Handler {
 // SecurityHandler is the custom handler for for setting frame options
 func SecurityHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.URL.Path != "/embed" &&
+		if req.URL.Path != EndpointEmbed &&
 			!strings.HasPrefix(req.URL.Path, "/visualisations/") &&
 			!strings.HasPrefix(req.URL.Path, "/census/maps/") {
 			w.Header().Set(HTTPHeaderKeyXFrameOptions, "SAMEORIGIN")

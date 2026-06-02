@@ -8,6 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+const EndpointEmbed = "/embed"
+
 var knownBabbageEndpoints = []string{
 	"/chartconfig",
 	"/chartimage",
@@ -16,9 +18,8 @@ var knownBabbageEndpoints = []string{
 	"/search",
 	"/file",
 	"/resource",
-	"/file",
 	"/chart",
-	"/embed",
+	EndpointEmbed,
 	"/export",
 	"/hash",
 }

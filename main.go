@@ -34,6 +34,12 @@ var (
 	Version string
 )
 
+const (
+	logKeyConfig     = "config"
+	logKeyConfigName = "config_name"
+	logKeyValue      = "value"
+)
+
 func main() {
 	log.Namespace = "dp-frontend-router"
 
@@ -44,7 +50,7 @@ func main() {
 		log.Fatal(ctx, "unable to retrieve service configuration", err)
 	}
 
-	log.Info(ctx, "got service configuration", log.Data{"config": cfg})
+	log.Info(ctx, "got service configuration", log.Data{logKeyConfig: cfg})
 
 	var otelShutdown func(context.Context) error
 	if cfg.OtelEnabled {
@@ -148,7 +154,7 @@ func main() {
 		httpHandler = otelhttp.NewHandler(httpHandler, "/")
 	}
 
-	log.Info(ctx, "Starting server", log.Data{"config": cfg})
+	log.Info(ctx, "Starting server", log.Data{logKeyConfig: cfg})
 
 	s := &http.Server{
 		Handler:      httpHandler,
@@ -187,7 +193,7 @@ func main() {
 func parseURL(ctx context.Context, cfgValue, configName string) (*url.URL, error) {
 	parsedURL, err := url.Parse(cfgValue)
 	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": configName, "value": cfgValue})
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{logKeyConfigName: configName, logKeyValue: cfgValue})
 		return nil, err
 	}
 	return parsedURL, nil
@@ -223,7 +229,7 @@ func createReverseProxy(proxyName string, proxyURL *url.URL) http.Handler {
 func urlFromConfig(ctx context.Context, serviceName, serviceURL string) *url.URL {
 	configuredServiceURL, err := url.Parse(serviceURL)
 	if err != nil {
-		log.Fatal(ctx, "configuration value is invalid", err, log.Data{"config_name": serviceName, "value": serviceURL})
+		log.Fatal(ctx, "configuration value is invalid", err, log.Data{logKeyConfigName: serviceName, logKeyValue: serviceURL})
 	}
 	return configuredServiceURL
 }
