@@ -72,7 +72,6 @@ func main() {
 		}()
 	}
 
-	cookiesControllerURL, _ := parseURL(ctx, cfg.CookiesControllerURL, "CookiesControllerURL")
 	datasetControllerURL, _ := parseURL(ctx, cfg.DatasetControllerURL, "DatasetControllerURL")
 	prefixedDatasetURL := cfg.DatasetControllerURL + "/dataset"
 	prefixDatasetControllerURL, _ := parseURL(ctx, prefixedDatasetURL, "DatasetControllerURL")
@@ -106,7 +105,6 @@ func main() {
 	}
 
 	downloadHandler := createReverseProxy("download", downloaderURL)
-	cookieHandler := createReverseProxy("cookies", cookiesControllerURL)
 	datasetHandler := createReverseProxy("datasets", datasetControllerURL)
 	prefixDatasetHandler := createReverseProxy("datasets", prefixDatasetControllerURL)
 	filterHandler := createReverseProxy("filters", filterDatasetControllerURL)
@@ -120,7 +118,6 @@ func main() {
 
 	routerConfig := router.Config{
 		DownloadHandler:              downloadHandler,
-		CookieHandler:                cookieHandler,
 		DatasetHandler:               datasetHandler,
 		EnableStaticDatasetRouting:   cfg.EnableStaticDatasetRouting,
 		NewDatasetRoutingEnabled:     cfg.NewDatasetRoutingEnabled,

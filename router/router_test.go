@@ -69,7 +69,6 @@ func TestRouter(t *testing.T) {
 		healthCheckHandler := NewHandlerMock()
 		searchHandler := NewHandlerMock()
 		downloadHandler := NewHandlerMock()
-		cookieHandler := NewHandlerMock()
 		datasetHandler := NewHandlerMock()
 		filterHandler := NewHandlerMock()
 		feedbackHandler := NewHandlerMock()
@@ -90,7 +89,6 @@ func TestRouter(t *testing.T) {
 			SearchHandler:        searchHandler,
 			DownloadHandler:      downloadHandler,
 			HealthCheckHandler:   healthCheckHandler.ServeHTTPFunc,
-			CookieHandler:        cookieHandler,
 			DatasetHandler:       datasetHandler,
 			PrefixDatasetHandler: prefixDatasetHandler,
 			FilterHandler:        filterHandler,
@@ -136,21 +134,7 @@ func TestRouter(t *testing.T) {
 				So(downloadHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
 			})
 		})
-		Convey("When a cookie request is made", func() {
-			url := "/cookies/123/345"
-			req := httptest.NewRequest("GET", url, http.NoBody)
-			res := httptest.NewRecorder()
 
-			r := router.New(config)
-			r.ServeHTTP(res, req)
-			Convey("Then no requests are sent to Zebedee", func() {
-				So(len(zebedeeClient.GetWithHeadersCalls()), ShouldEqual, 0)
-			})
-			Convey("Then the request is sent to the cookie handler", func() {
-				So(len(cookieHandler.ServeHTTPCalls()), ShouldEqual, 1)
-				So(cookieHandler.ServeHTTPCalls()[0].In2.URL.Path, ShouldResemble, url)
-			})
-		})
 		Convey("When a dataset request is made", func() {
 			url := "/datasets/cpih"
 			req := httptest.NewRequest("GET", url, http.NoBody)

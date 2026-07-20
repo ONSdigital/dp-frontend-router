@@ -1,6 +1,6 @@
 module github.com/ONSdigital/dp-frontend-router
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/ONSdigital/dp-api-clients-go/v2 v2.273.0

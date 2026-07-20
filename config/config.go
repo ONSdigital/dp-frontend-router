@@ -14,7 +14,6 @@ type Config struct {
 	CensusAtlasRoutesEnabled     bool          `envconfig:"CENSUS_ATLAS_ROUTES_ENABLED"`
 	CensusAtlasURL               string        `envconfig:"CENSUS_ATLAS_URL"`
 	ContentTypeByteLimit         int           `envconfig:"CONTENT_TYPE_BYTE_LIMIT"`
-	CookiesControllerURL         string        `envconfig:"COOKIES_CONTROLLER_URL"`
 	DatasetControllerURL         string        `envconfig:"DATASET_CONTROLLER_URL"`
 	EnableStaticDatasetRouting   bool          `envconfig:"ENABLE_STATIC_DATASET_ROUTING"`
 	DatasetFinderEnabled         bool          `envconfig:"DATASET_FINDER_ENABLED"`
@@ -62,7 +61,6 @@ func Get() (*Config, error) {
 		CensusAtlasRoutesEnabled:     false,
 		CensusAtlasURL:               "http://localhost:28100",
 		ContentTypeByteLimit:         5000000,
-		CookiesControllerURL:         "http://localhost:24100",
 		DatasetControllerURL:         "http://localhost:20200",
 		EnableStaticDatasetRouting:   false,
 		DatasetFinderEnabled:         false,

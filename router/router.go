@@ -29,7 +29,6 @@ type Config struct {
 	EnableStaticDatasetRouting   bool
 	NewDatasetRoutingEnabled     bool
 	PrefixDatasetHandler         http.Handler
-	CookieHandler                http.Handler
 	FilterHandler                http.Handler
 	FilterFlexHandler            http.Handler
 	FeedbackHandler              http.Handler
@@ -93,7 +92,6 @@ func New(cfg Config) http.Handler {
 	}
 
 	router.Handle("/download/{uri:.*}", cfg.DownloadHandler)
-	router.Handle("/cookies{uri:.*}", cfg.CookieHandler)
 	router.Handle("/filters/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/filter-outputs/{uri:.*}", cfg.FilterHandler)
 	router.Handle("/feedback{uri:.*}", cfg.FeedbackHandler)
